@@ -44,6 +44,7 @@ consumer.
 | [11-migration.md](11-migration.md) | Phases across repositories, what each delivers, what stays optional in guestweave |
 | [12-open-questions.md](12-open-questions.md) | Unresolved questions, who resolves them and what they block |
 | [13-deployment-profiles.md](13-deployment-profiles.md) | github, private and hybrid profiles; the `weave-zot` reference registry; cosign key signing; the `weaveoci` and `weave-zot` container images |
+| [14-guestweave-adoption.md](14-guestweave-adoption.md) | Phases 4 and 5: guestweave standalone or with weaveplatform-oci, the image-source seam, cache and prune, push per guest OS, Windows VHD conversion, the hostweave contract |
 | [glossary.md](glossary.md) | Terms used across the set |
 | [decisions/](decisions/README.md) | Decision records 0001–0013 |
 
