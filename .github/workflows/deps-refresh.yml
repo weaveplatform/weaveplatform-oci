@@ -6,7 +6,8 @@ name: deps | Refresh
 #   - the go directive, to the latest stable Go release;
 #   - every module and every go.mod tool (govulncheck, go-test-coverage),
 #     with go get -u;
-#   - the golangci-lint version in .github/golangci-lint-version.
+#   - the golangci-lint version in .github/golangci-lint-version;
+#   - modules pinned to a branch or query in .github/deps-refresh.pins.
 #
 # The result goes up as one PR from the org App, so the quality gate runs on
 # it like any other change, and auto-merge.yml merges it when the gate
@@ -74,6 +75,15 @@ jobs:
           latest=$(go env GOVERSION | sed -E 's/^go([0-9]+\.[0-9]+).*/\1/')
           go mod edit -go="$latest"
           go get -u ./... tool
+          # Some modules' newest version is not "latest": gVisor, for one,
+          # publishes its Go module on the go branch, and its default branch
+          # does not build as a module. Each line of the optional pins file is
+          # a module@query applied after the general update.
+          if [ -f .github/deps-refresh.pins ]; then
+            grep -v -e '^#' -e '^[[:space:]]*$' .github/deps-refresh.pins | while read -r pin; do
+              go get "$pin"
+            done
+          fi
           go mod tidy
           gh api repos/golangci/golangci-lint/releases/latest -q .tag_name > .github/golangci-lint-version
           git status --short
