@@ -6,8 +6,6 @@ export GOWORK := off
 
 GO ?= go
 GOLANGCI_LINT ?= golangci-lint
-GO_TEST_COVERAGE := github.com/vladopajic/go-test-coverage/v2@v2.19.0
-GOVULNCHECK := golang.org/x/vuln/cmd/govulncheck@latest
 MODULE := github.com/weaveplatform/weaveplatform-oci
 COVER_DIR := cover
 BIN_DIR := bin
@@ -54,11 +52,11 @@ cover:
 	$(GO) tool covdata merge -i=$$dirs -o=$(COVER_DIR)/.merged && \
 	$(GO) tool covdata textfmt -i=$(COVER_DIR)/.merged -o=$(COVER_DIR)/coverage.out && \
 	$(GO) tool covdata percent -i=$(COVER_DIR)/.merged
-	$(GO) run $(GO_TEST_COVERAGE) --config=.testcoverage.yml
+	$(GO) tool go-test-coverage --config=.testcoverage.yml
 
 ## vuln: govulncheck
 vuln:
-	$(GO) run $(GOVULNCHECK) ./...
+	$(GO) tool govulncheck ./...
 
 ## build: cross-compile weaveoci for every release platform into bin/ (CGO disabled)
 build:
