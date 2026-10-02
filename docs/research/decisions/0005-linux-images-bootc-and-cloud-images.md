@@ -106,7 +106,7 @@ Alternatives considered:
   created with `-F raw`, seed attached, `HOSTWEAVE_QEMU_IMAGES` no longer read.
 - Checksum verification test per distribution against recorded fixtures.
 - **Implemented 2026-10-02 (cloud-image path, Ubuntu 24.04):**
-  `images/linux/ubuntu-24.04/` pins Canonical's signing key by fingerprint;
+  `images/linux/ubuntu-24.04-base/` pins Canonical's signing key by fingerprint;
   `weaveoci source fetch` verifies `SHA256SUMS.gpg` and the image hash;
   `scripts/linux/build-cloud-image.sh` converts to raw and runs `weaveoci bundle init`;
   `scripts/linux/boot-test.sh` boots the raw base through a qcow2 overlay with OVMF and

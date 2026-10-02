@@ -1,6 +1,6 @@
-name: images | ubuntu-24.04
+name: images | ubuntu-24.04-base
 
-# The ubuntu-24.04 image (images/linux/ubuntu-24.04). Pull requests that
+# The ubuntu-24.04-base image (images/linux/ubuntu-24.04-base). Pull requests that
 # touch the definition, the scripts or the build workflow build it, check
 # conformance and boot it, without pushing. Publishing is a deliberate act
 # while the platform is being built out: run this workflow by hand with
@@ -8,12 +8,12 @@ name: images | ubuntu-24.04
 on:
   pull_request:
     paths:
-      - 'images/linux/ubuntu-24.04/**'
+      - 'images/linux/ubuntu-24.04-base/**'
       - 'scripts/linux/**'
       - 'pkg/source/**'
       - 'internal/cli/build.go'
       - '.github/workflows/build-linux.yml'
-      - '.github/workflows/image-ubuntu-24.04.yml'
+      - '.github/workflows/image-ubuntu-24.04-base.yml'
   workflow_dispatch:
     inputs:
       publish:
@@ -33,7 +33,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: image-ubuntu-24.04-${{ github.ref }}
+  group: image-ubuntu-24.04-base-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
       artifact-metadata: write
     secrets: inherit
     with:
-      image: linux/ubuntu-24.04
+      image: linux/ubuntu-24.04-base
       publish: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
       serial: ${{ inputs.serial || '' }}
       revision: ${{ inputs.revision || '1' }}

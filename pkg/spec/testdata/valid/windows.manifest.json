@@ -1719,6 +1719,7 @@
     "run.weaveplatform.guest.disk.totalSize": "68824334336",
     "run.weaveplatform.guest.os": "windows",
     "run.weaveplatform.guest.osBuild": "26200.6584",
-    "run.weaveplatform.guest.osVersion": "10.0.26200.6584"
+    "run.weaveplatform.guest.osVersion": "10.0.26200.6584",
+    "run.weaveplatform.guest.variant": "base"
   }
 }

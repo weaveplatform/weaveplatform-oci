@@ -33,6 +33,7 @@ decisions borrow from or deliberately avoid.
 | 0011 | [Deployment profiles and the reference private registry](0011-deployment-profiles-and-reference-registry.md) |
 | 0012 | [Container images published by weaveplatform-oci](0012-container-images.md) |
 | 0013 | [Quality gates: coverage and acceptance per phase](0013-quality-gates.md) |
+| 0014 | [Image tiers: base images and derived images](0014-image-tiers.md) |
 
 Fixed decisions taken by the project owner on 2026-10-02, which these records elaborate
 and do not reopen:

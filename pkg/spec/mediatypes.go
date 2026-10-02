@@ -41,6 +41,7 @@ const (
 	AnnotationDistro        = AnnotationPrefix + "distro"
 	AnnotationDiskTotalSize = AnnotationPrefix + "disk.totalSize"
 	AnnotationHypervisors   = AnnotationPrefix + "hypervisors"
+	AnnotationVariant       = AnnotationPrefix + "variant"
 )
 
 // Standard OCI annotation keys used by the contract.
@@ -53,6 +54,15 @@ const (
 	AnnotationDescription = "org.opencontainers.image.description"
 	AnnotationVendor      = "org.opencontainers.image.vendor"
 	AnnotationLicenses    = "org.opencontainers.image.licenses"
+	AnnotationBaseName    = "org.opencontainers.image.base.name"
+	AnnotationBaseDigest  = "org.opencontainers.image.base.digest"
+)
+
+// Image tiers (guest.variant, contract §4.4). Any other value names a further
+// layer, such as xcode-26 or runner.
+const (
+	TierBase  = "base"
+	TierAgent = "agent"
 )
 
 // Fixed sizes and limits.

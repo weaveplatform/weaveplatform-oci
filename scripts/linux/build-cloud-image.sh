@@ -24,7 +24,7 @@ weaveoci=${WEAVEOCI:-weaveoci}
 def="$image_dir/image.env"
 
 val() { sed -n "s/^$1=//p" "$def" | tail -n1; }
-for k in REPOSITORY DISTRO OS_VERSION BASE_URL MEDIUM CHECKSUMS SIGNATURE KEYRING FINGERPRINTS ARCHES CPU_MIN CPU MEMORY_MIN MEMORY CREDENTIAL_HINT; do
+for k in REPOSITORY VARIANT DISTRO OS_VERSION BASE_URL MEDIUM CHECKSUMS SIGNATURE KEYRING FINGERPRINTS ARCHES CPU_MIN CPU MEMORY_MIN MEMORY CREDENTIAL_HINT; do
   [ -n "$(val "$k")" ] || { echo "$def: $k is missing" >&2; exit 2; }
 done
 
@@ -61,6 +61,7 @@ for arch in ${ARCHES:-$(val ARCHES)}; do
   rm -f "$work/$arch.img"
   "$weaveoci" bundle init "$out/$arch" --disk "$work/$arch.raw" --source "$work/$arch.source.json" \
     --os linux --arch "$arch" --os-version "$(val OS_VERSION)" --os-build "$serial" --distro "$(val DISTRO)" \
+    --variant "$(val VARIANT)" \
     --firmware uefi --cpu-min "$(val CPU_MIN)" --cpu "$(val CPU)" \
     --memory-min "$(val MEMORY_MIN)" --memory "$(val MEMORY)" --credential-hint "$(val CREDENTIAL_HINT)" \
     --template "$image_dir" --template-ref "$repo_slug@$sha" \
