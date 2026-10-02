@@ -2,17 +2,17 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"strings"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
 	"oras.land/oras-go/v2/content"
 
 	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/fetch"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
-	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 type unpackResult struct {
@@ -92,38 +92,9 @@ func selectManifest(
 	root ocispec.Descriptor,
 	platform string,
 ) (ocispec.Descriptor, error) {
-	if root.MediaType != spec.MediaTypeIndex {
-		return root, nil
+	d, err := fetch.SelectPlatform(cmd.Context(), f, root, platform)
+	if errors.Is(err, fetch.ErrPlatform) {
+		return d, fmt.Errorf("%w: %w (use --platform os/arch)", errUsage, err)
 	}
-	raw, err := content.FetchAll(cmd.Context(), f, root)
-	if err != nil {
-		return ocispec.Descriptor{}, fmt.Errorf("fetch index: %w", err)
-	}
-	var idx ocispec.Index
-	if err := json.Unmarshal(raw, &idx); err != nil {
-		return ocispec.Descriptor{}, fmt.Errorf("decode index: %w", err)
-	}
-	if platform == "" {
-		if len(idx.Manifests) != 1 {
-			return ocispec.Descriptor{}, fmt.Errorf(
-				"%w: index has %d platforms; choose one with --platform",
-				errUsage,
-				len(idx.Manifests),
-			)
-		}
-		return idx.Manifests[0], nil
-	}
-	osName, arch, ok := strings.Cut(platform, "/")
-	if !ok || osName == "" || arch == "" {
-		return ocispec.Descriptor{}, fmt.Errorf(
-			"%w: --platform must be os/arch, got %q",
-			errUsage,
-			platform,
-		)
-	}
-	d, err := spec.SelectChild(idx, ocispec.Platform{OS: osName, Architecture: arch})
-	if err != nil {
-		return ocispec.Descriptor{}, err //nolint:wrapcheck // spec error names the platform
-	}
-	return d, nil
+	return d, err //nolint:wrapcheck // fetch names the index problem
 }
