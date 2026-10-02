@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -28,7 +29,11 @@ func TestGCOrderingAndEarlyStop(t *testing.T) {
 	refA, _ := f.publish(t, "a", "1", 1)
 	refB, _ := f.publish(t, "b", "1", 2)
 	clock := time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)
-	s, _ := cache.Open(ctx, t.TempDir(), cache.Options{Now: func() time.Time { clock = clock.Add(time.Minute); return clock }})
+	s, _ := cache.Open(
+		ctx,
+		t.TempDir(),
+		cache.Options{Now: func() time.Time { clock = clock.Add(time.Minute); return clock }},
+	)
 	if u, err := s.Usage(); err != nil || u != 0 {
 		t.Fatalf("fresh usage %d %v", u, err)
 	}
@@ -56,7 +61,16 @@ func TestEvictUntrackedAndUntaggableRoots(t *testing.T) {
 	old := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 	// a root the layout does not know, with no refs: evicted quietly
 	dir := t.TempDir()
-	writeState(t, dir, map[string]any{digest.FromString("ghost").String(): map[string]any{"refs": []string{}, "lastAccess": old}})
+	writeState(
+		t,
+		dir,
+		map[string]any{
+			digest.FromString("ghost").String(): map[string]any{
+				"refs":       []string{},
+				"lastAccess": old,
+			},
+		},
+	)
 	s, err := cache.Open(ctx, dir, cache.Options{})
 	if err != nil {
 		t.Fatal(err)
@@ -73,7 +87,16 @@ func TestEvictUntrackedAndUntaggableRoots(t *testing.T) {
 	}
 	// a root whose ref does not exist in the layout: untag fails
 	dir = t.TempDir()
-	writeState(t, dir, map[string]any{digest.FromString("ghost").String(): map[string]any{"refs": []string{"nope:1"}, "lastAccess": old}})
+	writeState(
+		t,
+		dir,
+		map[string]any{
+			digest.FromString("ghost").String(): map[string]any{
+				"refs":       []string{"nope:1"},
+				"lastAccess": old,
+			},
+		},
+	)
 	s, _ = cache.Open(ctx, dir, cache.Options{Quota: 1})
 	_ = os.MkdirAll(filepath.Join(dir, "layout", "blobs", "sha256"), 0o750)
 	_ = os.WriteFile(filepath.Join(dir, "layout", "blobs", "sha256", "junk"), []byte("x"), 0o600)
@@ -101,8 +124,8 @@ func TestStateSaveFailures(t *testing.T) {
 }
 
 func TestUnreadableBlobsAndGuardErrors(t *testing.T) {
-	if os.Geteuid() == 0 {
-		t.Skip("permissions do not apply to root")
+	if os.Geteuid() == 0 || runtime.GOOS == "windows" {
+		t.Skip("POSIX permission bits do not restrict root or Windows")
 	}
 	ctx := context.Background()
 	f := newFixture(t)

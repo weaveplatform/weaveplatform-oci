@@ -204,7 +204,8 @@ func TestSplitAnnotatesAndDetectsZero(t *testing.T) {
 			t.Fatalf("chunk %d uncompressed digest", i)
 		}
 		a := c.Descriptor.Annotations
-		if a[spec.AnnotationChunkIndex] != strconv.Itoa(i) || a[spec.AnnotationDiskName] != "disk0" ||
+		if a[spec.AnnotationChunkIndex] != strconv.Itoa(i) ||
+			a[spec.AnnotationDiskName] != "disk0" ||
 			a[spec.AnnotationTitle] != fmt.Sprintf("disk0.chunk.%06d", i) ||
 			c.Descriptor.MediaType != spec.MediaTypeDiskChunk {
 			t.Fatalf("chunk %d annotations %v", i, a)

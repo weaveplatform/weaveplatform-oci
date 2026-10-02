@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
@@ -24,7 +25,7 @@ import (
 type selective struct {
 	*memory.Store
 	pushFail, fetchFail string
-	alreadyExists      bool
+	alreadyExists       bool
 }
 
 func (s selective) Push(ctx context.Context, d ocispec.Descriptor, r io.Reader) error {
@@ -49,11 +50,21 @@ func TestStoreFailuresByMediaType(t *testing.T) {
 	ctx := context.Background()
 	b := bundle(t, testbundle.Options{OS: spec.OSDarwin, Arch: spec.ArchARM64})
 	for _, mt := range []string{spec.MediaTypeConfig, spec.MediaTypeAuxStorage, spec.MediaTypeManifest} {
-		if _, err := pack.Manifest(ctx, b, selective{Store: memory.New(), pushFail: mt}, chunk.Options{}); err == nil {
+		if _, err := pack.Manifest(
+			ctx,
+			b,
+			selective{Store: memory.New(), pushFail: mt},
+			chunk.Options{},
+		); err == nil {
 			t.Fatalf("push failure of %s swallowed", mt)
 		}
 	}
-	if _, err := pack.Manifest(ctx, b, selective{Store: memory.New(), fetchFail: spec.MediaTypeManifest}, chunk.Options{}); err == nil {
+	if _, err := pack.Manifest(
+		ctx,
+		b,
+		selective{Store: memory.New(), fetchFail: spec.MediaTypeManifest},
+		chunk.Options{},
+	); err == nil {
 		t.Fatal("manifest read-back failure swallowed")
 	}
 	// a store that answers "already exists" for chunks is fine
@@ -62,17 +73,27 @@ func TestStoreFailuresByMediaType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := pack.Index(ctx, selective{Store: s.Store, pushFail: spec.MediaTypeIndex}, []ocispec.Descriptor{m}, nil); err == nil {
+	if _, err := pack.Index(
+		ctx,
+		selective{Store: s.Store, pushFail: spec.MediaTypeIndex},
+		[]ocispec.Descriptor{m},
+		nil,
+	); err == nil {
 		t.Fatal("index push failure swallowed")
 	}
-	if _, err := pack.Index(ctx, selective{Store: s.Store, fetchFail: spec.MediaTypeConfig}, []ocispec.Descriptor{m}, nil); err == nil {
+	if _, err := pack.Index(
+		ctx,
+		selective{Store: s.Store, fetchFail: spec.MediaTypeConfig},
+		[]ocispec.Descriptor{m},
+		nil,
+	); err == nil {
 		t.Fatal("config fetch failure swallowed")
 	}
 }
 
 func TestUnreadableBundleFiles(t *testing.T) {
-	if os.Geteuid() == 0 {
-		t.Skip("permissions do not apply to root")
+	if os.Geteuid() == 0 || runtime.GOOS == "windows" {
+		t.Skip("POSIX permission bits do not restrict root or Windows")
 	}
 	ctx := context.Background()
 	for _, name := range []string{"disk0.img", "nvram.bin"} {

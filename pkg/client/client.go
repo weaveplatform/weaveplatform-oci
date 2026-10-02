@@ -70,7 +70,13 @@ type Client struct {
 
 // New returns a client for p.
 func New(p profile.Profile, o Options) *Client {
-	c := &Client{prof: p, creds: o.Credentials, base: o.Transport, conc: o.Concurrency, ua: o.UserAgent}
+	c := &Client{
+		prof:  p,
+		creds: o.Credentials,
+		base:  o.Transport,
+		conc:  o.Concurrency,
+		ua:    o.UserAgent,
+	}
 	if c.creds == nil {
 		c.creds = DefaultCredentials()
 	}
@@ -149,7 +155,12 @@ func (c *Client) Parse(ref string) (Reference, error) {
 	path := ref
 	if host, rest, ok := strings.Cut(ref, "/"); ok && c.knownHost(host) {
 		if host != reg.Host {
-			return Reference{}, fmt.Errorf("%w: %s names a mirror; use the canonical host %s", ErrReference, ref, reg.Host)
+			return Reference{}, fmt.Errorf(
+				"%w: %s names a mirror; use the canonical host %s",
+				ErrReference,
+				ref,
+				reg.Host,
+			)
 		}
 		path = rest
 	} else if reg.Namespace != "" {
@@ -207,7 +218,9 @@ func (c *Client) Repository(reg profile.Registry, repo string) (*remote.Reposito
 	if reg.InsecureSkipTLSVerify {
 		if t, ok := base.(*http.Transport); ok {
 			t = t.Clone()
-			t.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // explicitly configured per mirror
+			t.TLSClientConfig = &tls.Config{
+				InsecureSkipVerify: true,
+			} //nolint:gosec // explicitly configured per mirror
 			base = t
 		}
 	}
@@ -250,7 +263,12 @@ func (c *Client) Resolve(ctx context.Context, ref Reference) (ocispec.Descriptor
 			break
 		}
 	}
-	return ocispec.Descriptor{}, Source{}, fmt.Errorf("%w: resolve %s: %w", ErrUnavailable, ref, errors.Join(errs...))
+	return ocispec.Descriptor{}, Source{}, fmt.Errorf(
+		"%w: resolve %s: %w",
+		ErrUnavailable,
+		ref,
+		errors.Join(errs...),
+	)
 }
 
 // PullOptions tune Pull.
@@ -266,7 +284,12 @@ type PullOptions struct {
 // state blobs) into dst. Blobs already in dst are not fetched again, so an
 // interrupted pull resumes at blob granularity. Mirrors are tried first;
 // content is verified against its digest whichever source served it.
-func (c *Client) Pull(ctx context.Context, ref Reference, dst oras.Target, o PullOptions) (ocispec.Descriptor, Source, error) {
+func (c *Client) Pull(
+	ctx context.Context,
+	ref Reference,
+	dst oras.Target,
+	o PullOptions,
+) (ocispec.Descriptor, Source, error) {
 	tag := o.Tag
 	if tag == "" {
 		tag = ref.Ref()
@@ -295,13 +318,22 @@ func (c *Client) Pull(ctx context.Context, ref Reference, dst oras.Target, o Pul
 			break
 		}
 	}
-	return ocispec.Descriptor{}, Source{}, fmt.Errorf("%w: pull %s: %w", ErrUnavailable, ref, errors.Join(errs...))
+	return ocispec.Descriptor{}, Source{}, fmt.Errorf(
+		"%w: pull %s: %w",
+		ErrUnavailable,
+		ref,
+		errors.Join(errs...),
+	)
 }
 
 // Size returns the bytes a pull of ref would download into dst: the sum of
 // every blob and manifest in the graph that dst does not already hold. It
 // reads only manifests and indexes, never chunks.
-func (c *Client) Size(ctx context.Context, ref Reference, dst content.ReadOnlyStorage) (int64, error) {
+func (c *Client) Size(
+	ctx context.Context,
+	ref Reference,
+	dst content.ReadOnlyStorage,
+) (int64, error) {
 	root, src, err := c.Resolve(ctx, ref)
 	if err != nil {
 		return 0, err
@@ -344,7 +376,13 @@ type PushOptions struct {
 // registry. oras copies successors before predecessors, so every chunk and
 // state blob is present before the manifest that references it (zot does not
 // check this for custom config media types).
-func (c *Client) Push(ctx context.Context, src oras.ReadOnlyTarget, srcRef string, ref Reference, o PushOptions) (ocispec.Descriptor, error) {
+func (c *Client) Push(
+	ctx context.Context,
+	src oras.ReadOnlyTarget,
+	srcRef string,
+	ref Reference,
+	o PushOptions,
+) (ocispec.Descriptor, error) {
 	if ref.Tag == "" {
 		return ocispec.Descriptor{}, fmt.Errorf("%w: push needs a tag: %s", ErrReference, ref)
 	}
@@ -371,7 +409,12 @@ func (c *Client) Push(ctx context.Context, src oras.ReadOnlyTarget, srcRef strin
 }
 
 // Tag points an additional tag at desc on the canonical registry.
-func (c *Client) Tag(ctx context.Context, ref Reference, desc ocispec.Descriptor, tag string) error {
+func (c *Client) Tag(
+	ctx context.Context,
+	ref Reference,
+	desc ocispec.Descriptor,
+	tag string,
+) error {
 	repo, err := c.Repository(ref.Registry, ref.Repository)
 	if err != nil {
 		return err
@@ -406,7 +449,12 @@ func (c *Client) Tags(ctx context.Context, ref Reference) ([]string, error) {
 // Referrers lists referrers of subject with the given artifactType (empty
 // for all), through the referrers API or the sha256-<hex> fallback tag, on
 // the first source that answers.
-func (c *Client) Referrers(ctx context.Context, ref Reference, subject ocispec.Descriptor, artifactType string) ([]ocispec.Descriptor, error) {
+func (c *Client) Referrers(
+	ctx context.Context,
+	ref Reference,
+	subject ocispec.Descriptor,
+	artifactType string,
+) ([]ocispec.Descriptor, error) {
 	var errs []error
 	for _, reg := range c.sources() {
 		repo, err := c.Repository(reg, ref.Repository)
@@ -423,12 +471,21 @@ func (c *Client) Referrers(ctx context.Context, ref Reference, subject ocispec.D
 		}
 		errs = append(errs, fmt.Errorf("%s: %w", reg.Host, err))
 	}
-	return nil, fmt.Errorf("%w: referrers of %s: %w", ErrUnavailable, subject.Digest, errors.Join(errs...))
+	return nil, fmt.Errorf(
+		"%w: referrers of %s: %w",
+		ErrUnavailable,
+		subject.Digest,
+		errors.Join(errs...),
+	)
 }
 
 // FetchAll reads a small blob or manifest (configs, bundles, indexes) from
 // the first source that has it, verified against its descriptor.
-func (c *Client) FetchAll(ctx context.Context, ref Reference, d ocispec.Descriptor) ([]byte, error) {
+func (c *Client) FetchAll(
+	ctx context.Context,
+	ref Reference,
+	d ocispec.Descriptor,
+) ([]byte, error) {
 	var errs []error
 	for _, reg := range c.sources() {
 		repo, err := c.Repository(reg, ref.Repository)
@@ -454,7 +511,11 @@ type RepoSource struct {
 func (c *Client) Bind(ref Reference) RepoSource { return RepoSource{c: c, ref: ref} }
 
 // Referrers lists referrers of subject (API or fallback tag).
-func (s RepoSource) Referrers(ctx context.Context, subject ocispec.Descriptor, artifactType string) ([]ocispec.Descriptor, error) {
+func (s RepoSource) Referrers(
+	ctx context.Context,
+	subject ocispec.Descriptor,
+	artifactType string,
+) ([]ocispec.Descriptor, error) {
 	return s.c.Referrers(ctx, s.ref, subject, artifactType)
 }
 

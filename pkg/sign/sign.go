@@ -41,20 +41,18 @@ import (
 
 // Wire constants shared with cosign v3.
 const (
-	BundleMediaType      = "application/vnd.dev.sigstore.bundle.v0.3+json"
-	PredicateType        = "https://sigstore.dev/cosign/sign/v1"
-	InTotoPayloadType    = "application/vnd.in-toto+json"
-	AnnotationContent    = "dev.sigstore.bundle.content"
-	AnnotationPredicate  = "dev.sigstore.bundle.predicateType"
-	EnvPassword          = "COSIGN_PASSWORD"
-	privateKeyPEMType    = "ENCRYPTED SIGSTORE PRIVATE KEY"
-	envKeyPrefix         = "env://"
+	BundleMediaType     = "application/vnd.dev.sigstore.bundle.v0.3+json"
+	PredicateType       = "https://sigstore.dev/cosign/sign/v1"
+	InTotoPayloadType   = "application/vnd.in-toto+json"
+	AnnotationContent   = "dev.sigstore.bundle.content"
+	AnnotationPredicate = "dev.sigstore.bundle.predicateType"
+	EnvPassword         = "COSIGN_PASSWORD"
+	privateKeyPEMType   = "ENCRYPTED SIGSTORE PRIVATE KEY"
+	envKeyPrefix        = "env://"
 )
 
-var (
-	// ErrKey reports an unusable signing key.
-	ErrKey = errors.New("unusable signing key")
-)
+// ErrKey reports an unusable signing key.
+var ErrKey = errors.New("unusable signing key")
 
 // Signer signs subjects and pushes the signature referrer.
 type Signer struct {
@@ -104,8 +102,10 @@ func (s *Signer) Bundle(_ context.Context, subject digest.Digest) ([]byte, error
 		return nil, fmt.Errorf("statement: %w", err)
 	}
 	stmt := &intotov1.Statement{
-		Type:          intotov1.StatementTypeUri,
-		Subject:       []*intotov1.ResourceDescriptor{{Digest: map[string]string{"sha256": subject.Encoded()}, Annotations: ann}},
+		Type: intotov1.StatementTypeUri,
+		Subject: []*intotov1.ResourceDescriptor{
+			{Digest: map[string]string{"sha256": subject.Encoded()}, Annotations: ann},
+		},
 		PredicateType: PredicateType,
 		Predicate:     &structpb.Struct{},
 	}
@@ -120,10 +120,14 @@ func (s *Signer) Bundle(_ context.Context, subject digest.Digest) ([]byte, error
 	pb := &protobundle.Bundle{
 		MediaType: BundleMediaType,
 		VerificationMaterial: &protobundle.VerificationMaterial{
-			Content: &protobundle.VerificationMaterial_PublicKey{PublicKey: &protocommon.PublicKeyIdentifier{Hint: string(s.hint)}},
+			Content: &protobundle.VerificationMaterial_PublicKey{
+				PublicKey: &protocommon.PublicKeyIdentifier{Hint: string(s.hint)},
+			},
 		},
 		Content: &protobundle.Bundle_DsseEnvelope{DsseEnvelope: &protodsse.Envelope{
-			Payload: payload, PayloadType: InTotoPayloadType, Signatures: []*protodsse.Signature{{Sig: sig}},
+			Payload:     payload,
+			PayloadType: InTotoPayloadType,
+			Signatures:  []*protodsse.Signature{{Sig: sig}},
 		}},
 	}
 	out, err := protojson.Marshal(pb)
@@ -136,7 +140,11 @@ func (s *Signer) Bundle(_ context.Context, subject digest.Digest) ([]byte, error
 // Sign signs subject and pushes the referrer to dst (a registry repository or
 // any oras target). Registries without the referrers API receive the
 // sha256-<hex> fallback tag through oras. It returns the referrer descriptor.
-func (s *Signer) Sign(ctx context.Context, dst oras.Target, subject ocispec.Descriptor) (ocispec.Descriptor, error) {
+func (s *Signer) Sign(
+	ctx context.Context,
+	dst oras.Target,
+	subject ocispec.Descriptor,
+) (ocispec.Descriptor, error) {
 	b, err := s.Bundle(ctx, subject.Digest)
 	if err != nil {
 		return ocispec.Descriptor{}, err
@@ -145,16 +153,26 @@ func (s *Signer) Sign(ctx context.Context, dst oras.Target, subject ocispec.Desc
 	if err := pushIfMissing(ctx, dst, layer, b); err != nil {
 		return ocispec.Descriptor{}, err
 	}
-	subj := ocispec.Descriptor{MediaType: subject.MediaType, Digest: subject.Digest, Size: subject.Size}
-	d, err := oras.PackManifest(ctx, dst, oras.PackManifestVersion1_1, BundleMediaType, oras.PackManifestOptions{
-		Subject: &subj,
-		Layers:  []ocispec.Descriptor{layer},
-		ManifestAnnotations: map[string]string{
-			ocispec.AnnotationCreated: s.now().UTC().Format(time.RFC3339),
-			AnnotationContent:         "dsse-envelope",
-			AnnotationPredicate:       PredicateType,
+	subj := ocispec.Descriptor{
+		MediaType: subject.MediaType,
+		Digest:    subject.Digest,
+		Size:      subject.Size,
+	}
+	d, err := oras.PackManifest(
+		ctx,
+		dst,
+		oras.PackManifestVersion1_1,
+		BundleMediaType,
+		oras.PackManifestOptions{
+			Subject: &subj,
+			Layers:  []ocispec.Descriptor{layer},
+			ManifestAnnotations: map[string]string{
+				ocispec.AnnotationCreated: s.now().UTC().Format(time.RFC3339),
+				AnnotationContent:         "dsse-envelope",
+				AnnotationPredicate:       PredicateType,
+			},
 		},
-	})
+	)
 	if err != nil {
 		return ocispec.Descriptor{}, fmt.Errorf("push signature for %s: %w", subject.Digest, err)
 	}
@@ -177,7 +195,9 @@ func pushIfMissing(ctx context.Context, dst oras.Target, d ocispec.Descriptor, b
 
 // PAE is the DSSE pre-authentication encoding that is actually signed.
 func PAE(payloadType string, payload []byte) []byte {
-	return []byte(fmt.Sprintf("DSSEv1 %d %s %d %s", len(payloadType), payloadType, len(payload), payload))
+	return []byte(
+		fmt.Sprintf("DSSEv1 %d %s %d %s", len(payloadType), payloadType, len(payload), payload),
+	)
 }
 
 // signPAE signs sha256(PAE) with ECDSA, as cosign and sigstore-go do.

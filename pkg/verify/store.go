@@ -15,7 +15,11 @@ type StoreSource struct {
 }
 
 // Referrers returns predecessors whose manifest has the given artifactType.
-func (s StoreSource) Referrers(ctx context.Context, subject ocispec.Descriptor, artifactType string) ([]ocispec.Descriptor, error) {
+func (s StoreSource) Referrers(
+	ctx context.Context,
+	subject ocispec.Descriptor,
+	artifactType string,
+) ([]ocispec.Descriptor, error) {
 	preds, err := s.Store.Predecessors(ctx, subject)
 	if err != nil {
 		return nil, fmt.Errorf("predecessors of %s: %w", subject.Digest, err)

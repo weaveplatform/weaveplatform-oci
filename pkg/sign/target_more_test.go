@@ -41,9 +41,17 @@ func TestSignManifestPushFailureAndExistingBundle(t *testing.T) {
 	ctx := context.Background()
 	k, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	s, _ := sign.New(k)
-	subj := ocispec.Descriptor{MediaType: ocispec.MediaTypeImageIndex, Digest: digest.FromString("s"), Size: 1}
+	subj := ocispec.Descriptor{
+		MediaType: ocispec.MediaTypeImageIndex,
+		Digest:    digest.FromString("s"),
+		Size:      1,
+	}
 	for _, claim := range []bool{false, true} {
-		if _, err := s.Sign(ctx, manifestRefusing{Store: memory.New(), claimExists: claim}, subj); err == nil {
+		if _, err := s.Sign(
+			ctx,
+			manifestRefusing{Store: memory.New(), claimExists: claim},
+			subj,
+		); err == nil {
 			t.Fatalf("claimExists=%v: manifest refusal swallowed", claim)
 		}
 	}

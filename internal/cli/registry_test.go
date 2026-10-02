@@ -90,7 +90,16 @@ func TestProfileCommands(t *testing.T) {
 	if out := mustRun(t, "profile", "show"); !strings.Contains(out, "kind: private") {
 		t.Fatal(out)
 	}
-	if out := mustRun(t, "profile", "show", "--profile", "open"); !strings.Contains(out, "kind: github") {
+	if out := mustRun(
+		t,
+		"profile",
+		"show",
+		"--profile",
+		"open",
+	); !strings.Contains(
+		out,
+		"kind: github",
+	) {
 		t.Fatal(out)
 	}
 	if out := mustRun(t, "profile", "validate"); !strings.Contains(out, "2 profile(s) valid") {
@@ -124,7 +133,18 @@ func TestKeygenSignPushPullVerifyPublish(t *testing.T) {
 	amd := writeBundle(t, testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchAMD64, Seed: 2})
 
 	// publish in the private profile (signs with the profile key)
-	out := mustRun(t, "publish", arm, amd, "--repository", "ubuntu", "--tag", "1-r1", "--promotion-out", e.p("entry.json"))
+	out := mustRun(
+		t,
+		"publish",
+		arm,
+		amd,
+		"--repository",
+		"ubuntu",
+		"--tag",
+		"1-r1",
+		"--promotion-out",
+		e.p("entry.json"),
+	)
 	if !strings.Contains(out, "signature sha256:") || !strings.Contains(out, "linux/amd64") {
 		t.Fatal(out)
 	}
@@ -133,14 +153,47 @@ func TestKeygenSignPushPullVerifyPublish(t *testing.T) {
 	}
 	expect(t, cli.ExitFailure, "publish", arm, "--repository", "ubuntu", "--tag", "1-r1")
 	expect(t, cli.ExitUsage, "publish", arm, "--repository", "ubuntu")
-	expect(t, cli.ExitFailure, "publish", arm, "--repository", "ubuntu", "--tag", "2-r1", "--key", e.p("missing.key"))
-	expect(t, cli.ExitFailure, "publish", arm, "--repository", "ubuntu", "--tag", "3-r1", "--promotion-out", filepath.Join(file, "x"))
+	expect(
+		t,
+		cli.ExitFailure,
+		"publish",
+		arm,
+		"--repository",
+		"ubuntu",
+		"--tag",
+		"2-r1",
+		"--key",
+		e.p("missing.key"),
+	)
+	expect(
+		t,
+		cli.ExitFailure,
+		"publish",
+		arm,
+		"--repository",
+		"ubuntu",
+		"--tag",
+		"3-r1",
+		"--promotion-out",
+		filepath.Join(file, "x"),
+	)
 	// a profile that does not sign
 	out = mustRun(t, "publish", arm, "--repository", "plain", "--tag", "1-r1", "--profile", "open")
 	if strings.Contains(out, "signature") {
 		t.Fatal(out)
 	}
-	expect(t, cli.ExitFailure, "publish", arm, "--repository", "x", "--tag", "1", "--profiles", e.p("missing.yaml"))
+	expect(
+		t,
+		cli.ExitFailure,
+		"publish",
+		arm,
+		"--repository",
+		"x",
+		"--tag",
+		"1",
+		"--profiles",
+		e.p("missing.yaml"),
+	)
 
 	// pull: signature verified, unpack one platform, resume
 	out = mustRun(t, "pull", "ubuntu:1-r1", "--to", e.p("out"), "--platform", "linux/amd64")
@@ -149,14 +202,39 @@ func TestKeygenSignPushPullVerifyPublish(t *testing.T) {
 	}
 	mustRun(t, "pull", "ubuntu:1-r1", "--to", e.p("out"), "--platform", "linux/amd64", "--resume")
 	expect(t, cli.ExitUsage, "pull", "ubuntu:1-r1", "--to", e.p("out2"))
-	expect(t, cli.ExitFailure, "pull", "ubuntu:1-r1", "--to", e.p("out3"), "--platform", "windows/amd64")
-	expect(t, cli.ExitFailure, "pull", "plain:1-r1")                        // unsigned under signature mode
-	mustRun(t, "pull", "plain:1-r1", "--verify", "none")                       // explicitly off
-	expect(t, cli.ExitFailure, "pull", "plain:1-r1", "--verify", "trust-me")   // bad mode
-	expect(t, cli.ExitFailure, "pull", "missing:1")                           // unknown ref
-	expect(t, cli.ExitUsage, "pull", "UPPER:1")                               // bad ref
-	expect(t, cli.ExitFailure, "pull", "ubuntu:1-r1", "--profile", "nope")    // bad profile
-	expect(t, cli.ExitFailure, "pull", "ubuntu:1-r1", "--to", file, "--platform", "linux/amd64", "--verify", "none")
+	expect(
+		t,
+		cli.ExitFailure,
+		"pull",
+		"ubuntu:1-r1",
+		"--to",
+		e.p("out3"),
+		"--platform",
+		"windows/amd64",
+	)
+	expect(
+		t,
+		cli.ExitFailure,
+		"pull",
+		"plain:1-r1",
+	) // unsigned under signature mode
+	mustRun(t, "pull", "plain:1-r1", "--verify", "none")                     // explicitly off
+	expect(t, cli.ExitFailure, "pull", "plain:1-r1", "--verify", "trust-me") // bad mode
+	expect(t, cli.ExitFailure, "pull", "missing:1")                          // unknown ref
+	expect(t, cli.ExitUsage, "pull", "UPPER:1")                              // bad ref
+	expect(t, cli.ExitFailure, "pull", "ubuntu:1-r1", "--profile", "nope")   // bad profile
+	expect(
+		t,
+		cli.ExitFailure,
+		"pull",
+		"ubuntu:1-r1",
+		"--to",
+		file,
+		"--platform",
+		"linux/amd64",
+		"--verify",
+		"none",
+	)
 	t.Setenv("WEAVEOCI_CACHE", filepath.Join(file, "cache"))
 	expect(t, cli.ExitFailure, "pull", "ubuntu:1-r1")
 	t.Setenv("WEAVEOCI_CACHE", e.p("cache"))

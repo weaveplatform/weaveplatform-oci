@@ -40,7 +40,9 @@ func keyFile(t *testing.T, pw string) (string, []byte) {
 
 func subjectIn(t *testing.T, s *memory.Store) ocispec.Descriptor {
 	t.Helper()
-	b := []byte(`{"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[]}`)
+	b := []byte(
+		`{"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[]}`,
+	)
 	d := content.NewDescriptorFromBytes(ocispec.MediaTypeImageIndex, b)
 	if err := s.Push(context.Background(), d, strings.NewReader(string(b))); err != nil {
 		t.Fatal(err)
@@ -73,7 +75,9 @@ func TestSignProducesCosignShape(t *testing.T) {
 	var m ocispec.Manifest
 	_ = json.Unmarshal(raw, &m)
 	if m.ArtifactType != sign.BundleMediaType || m.Config.MediaType != ocispec.MediaTypeEmptyJSON ||
-		len(m.Layers) != 1 || m.Layers[0].MediaType != sign.BundleMediaType || m.Subject == nil || m.Subject.Digest != subj.Digest ||
+		len(
+			m.Layers,
+		) != 1 || m.Layers[0].MediaType != sign.BundleMediaType || m.Subject == nil || m.Subject.Digest != subj.Digest ||
 		m.Annotations[sign.AnnotationContent] != "dsse-envelope" || m.Annotations[sign.AnnotationPredicate] != sign.PredicateType {
 		t.Fatalf("referrer manifest %s", raw)
 	}
@@ -191,10 +195,24 @@ func TestSignErrors(t *testing.T) {
 	}
 	store := memory.New()
 	subj := subjectIn(t, store)
-	if _, err := s.Sign(ctx, failingTarget{Store: store, existsErr: errBoom}, subj); !errors.Is(err, errBoom) {
+	if _, err := s.Sign(
+		ctx,
+		failingTarget{Store: store, existsErr: errBoom},
+		subj,
+	); !errors.Is(
+		err,
+		errBoom,
+	) {
 		t.Fatal(err)
 	}
-	if _, err := s.Sign(ctx, failingTarget{Store: memory.New(), pushErr: errBoom}, subj); !errors.Is(err, errBoom) {
+	if _, err := s.Sign(
+		ctx,
+		failingTarget{Store: memory.New(), pushErr: errBoom},
+		subj,
+	); !errors.Is(
+		err,
+		errBoom,
+	) {
 		t.Fatal(err)
 	}
 	// the bundle blob exists but the manifest push fails
@@ -202,10 +220,25 @@ func TestSignErrors(t *testing.T) {
 	if _, err := s.Sign(ctx, fresh, subj); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Sign(ctx, failingTarget{Store: fresh, pushErr: errBoom}, ocispec.Descriptor{MediaType: ocispec.MediaTypeImageIndex, Digest: digest.FromString("other"), Size: 5}); err == nil {
+	if _, err := s.Sign(
+		ctx,
+		failingTarget{Store: fresh, pushErr: errBoom},
+		ocispec.Descriptor{
+			MediaType: ocispec.MediaTypeImageIndex,
+			Digest:    digest.FromString("other"),
+			Size:      5,
+		},
+	); err == nil {
 		t.Fatal("manifest push failure swallowed")
 	}
-	if _, err := s.Sign(ctx, store, ocispec.Descriptor{Digest: "sha512:x"}); !errors.Is(err, sign.ErrKey) {
+	if _, err := s.Sign(
+		ctx,
+		store,
+		ocispec.Descriptor{Digest: "sha512:x"},
+	); !errors.Is(
+		err,
+		sign.ErrKey,
+	) {
 		t.Fatal(err)
 	}
 }

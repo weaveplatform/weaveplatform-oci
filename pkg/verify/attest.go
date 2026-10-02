@@ -48,12 +48,18 @@ func (id *Identity) Verify(bundleJSON []byte, subject digest.Digest) (*Signature
 	return id.verifyEntity(&b, subject)
 }
 
-func (id *Identity) verifyEntity(e sgverify.SignedEntity, subject digest.Digest) (*SignatureResult, error) {
+func (id *Identity) verifyEntity(
+	e sgverify.SignedEntity,
+	subject digest.Digest,
+) (*SignatureResult, error) {
 	if id.Trusted == nil {
 		// sigstore-go accepts nil trusted material and then panics in Verify
 		return nil, fmt.Errorf("%w: attestation verification needs a trusted root", ErrConfig)
 	}
-	opts := []sgverify.VerifierOption{sgverify.WithTransparencyLog(1), sgverify.WithObserverTimestamps(1)}
+	opts := []sgverify.VerifierOption{
+		sgverify.WithTransparencyLog(1),
+		sgverify.WithObserverTimestamps(1),
+	}
 	if id.RequireSCT {
 		opts = append(opts, sgverify.WithSignedCertificateTimestamps(1))
 	}
@@ -69,7 +75,13 @@ func (id *Identity) verifyEntity(e sgverify.SignedEntity, subject digest.Digest)
 	if err != nil || subject.Algorithm() != digest.SHA256 {
 		return nil, fmt.Errorf("%w: subject %q is not a sha256 digest", ErrConfig, subject)
 	}
-	res, err := v.Verify(e, sgverify.NewPolicy(sgverify.WithArtifactDigest("sha256", raw), sgverify.WithCertificateIdentity(ci)))
+	res, err := v.Verify(
+		e,
+		sgverify.NewPolicy(
+			sgverify.WithArtifactDigest("sha256", raw),
+			sgverify.WithCertificateIdentity(ci),
+		),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrUnverified, err)
 	}

@@ -46,8 +46,13 @@ func (w *world) register(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		dir, err := os.MkdirTemp("", "weaveoci-scenario-")
 		w.root, w.reg, w.copyErr = dir, nil, nil
-		w.env = map[string]string{"WEAVEOCI_CACHE": filepath.Join(dir, "cache"), "DOCKER_CONFIG": filepath.Join(dir, "docker")}
-		w.vars = map[string]string{"run": strings.ToLower(filepath.Base(dir)[len("weaveoci-scenario-"):])}
+		w.env = map[string]string{
+			"WEAVEOCI_CACHE": filepath.Join(dir, "cache"),
+			"DOCKER_CONFIG":  filepath.Join(dir, "docker"),
+		}
+		w.vars = map[string]string{
+			"run": strings.ToLower(filepath.Base(dir)[len("weaveoci-scenario-"):]),
+		}
 		return ctx, err
 	})
 	sc.After(func(ctx context.Context, _ *godog.Scenario, err error) (context.Context, error) {
@@ -168,12 +173,27 @@ func (w *world) cosignVerifies(ref, key string) error {
 		home, _ := os.UserHomeDir()
 		bin = filepath.Join(home, "go", "bin", "cosign")
 		if _, err := os.Stat(bin); err != nil {
-			return errors.New("cosign v3 is required for the interop check (go install github.com/sigstore/cosign/v3/cmd/cosign@v3.1.3)")
+			return errors.New(
+				"cosign v3 is required for the interop check (go install github.com/sigstore/cosign/v3/cmd/cosign@v3.1.3)",
+			)
 		}
 	}
-	args := []string{"verify", "--key", w.expand(key), "--insecure-ignore-tlog", "--allow-http-registry", "--allow-insecure-registry"}
+	args := []string{
+		"verify",
+		"--key",
+		w.expand(key),
+		"--insecure-ignore-tlog",
+		"--allow-http-registry",
+		"--allow-insecure-registry",
+	}
 	if w.reg.kind == "weave-zot" {
-		args = append(args, "--registry-username", "publisher", "--registry-password", publisherPassword)
+		args = append(
+			args,
+			"--registry-username",
+			"publisher",
+			"--registry-password",
+			publisherPassword,
+		)
 	}
 	cmd := exec.Command(bin, append(args, w.expand(ref))...) //nolint:gosec // test tool
 	cmd.Env = w.environ()

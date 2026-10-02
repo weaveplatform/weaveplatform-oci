@@ -33,12 +33,23 @@ func TestChannelEvidenceOnPullAndVerify(t *testing.T) {
 	mustRun(t, "channel", "endorse", e.p("root.key"), e.p("ch/signing.pub"))
 	mustRun(t, "channel", "new", "org", e.p("ch/stable.json"))
 	b := writeBundle(t, testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchARM64})
-	mustRun(t, "publish", b, "--repository", "ubuntu", "--tag", "1-r1", "--promotion-out", e.p("entry.json"))
+	mustRun(
+		t,
+		"publish",
+		b,
+		"--repository",
+		"ubuntu",
+		"--tag",
+		"1-r1",
+		"--promotion-out",
+		e.p("entry.json"),
+	)
 	mustRun(t, "channel", "promote", e.p("ch/stable.json"), e.p("entry.json"))
 	mustRun(t, "channel", "sign", e.p("ch/signing.key"), e.p("ch/stable.json"))
 	for _, args := range [][]string{{"pull", "ubuntu:1-r1"}, {"verify", "ubuntu:1-r1"}} {
 		out := mustRun(t, args...)
-		if !strings.Contains(out, "channel: org (anchor org-root, sequence 1)") || !strings.Contains(out, "signature: cosign-key") {
+		if !strings.Contains(out, "channel: org (anchor org-root, sequence 1)") ||
+			!strings.Contains(out, "signature: cosign-key") {
 			t.Fatalf("%v: %s", args, out)
 		}
 	}

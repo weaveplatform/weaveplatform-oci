@@ -66,14 +66,24 @@ type Result struct {
 // Run publishes r.
 func Run(ctx context.Context, r Request) (Result, error) {
 	if r.Client == nil || len(r.Bundles) == 0 || r.Repository == "" || r.Tag == "" {
-		return Result{}, fmt.Errorf("%w: client, bundles, repository and tag are required", ErrRequest)
+		return Result{}, fmt.Errorf(
+			"%w: client, bundles, repository and tag are required",
+			ErrRequest,
+		)
 	}
 	if ChannelTags[r.Tag] {
-		return Result{}, fmt.Errorf("%w: %q is a channel tag, moved only by promotion", ErrRequest, r.Tag)
+		return Result{}, fmt.Errorf(
+			"%w: %q is a channel tag, moved only by promotion",
+			ErrRequest,
+			r.Tag,
+		)
 	}
 	prov := r.Client.Profile().Signing.Provider
 	if prov == profile.SigningCosignKey && r.Signer == nil {
-		return Result{}, fmt.Errorf("%w: the profile signs with cosign-key but no key was given", ErrRequest)
+		return Result{}, fmt.Errorf(
+			"%w: the profile signs with cosign-key but no key was given",
+			ErrRequest,
+		)
 	}
 	now := time.Now
 	if r.Now != nil {
@@ -102,7 +112,13 @@ func Run(ctx context.Context, r Request) (Result, error) {
 	if err := store.Tag(ctx, res.Index, local); err != nil {
 		return res, fmt.Errorf("publish: %w", err)
 	}
-	if rep, err := conformance.Check(ctx, store, res.Index, conformance.Options{}); err != nil || !rep.OK() {
+	if rep, err := conformance.Check(
+		ctx,
+		store,
+		res.Index,
+		conformance.Options{},
+	); err != nil ||
+		!rep.OK() {
 		return res, fmt.Errorf("%w: conformance: %v %v", ErrSelfCheck, err, rep.Problems())
 	}
 	if _, err := r.Client.Push(ctx, store, local, ref, client.PushOptions{}); err != nil {
@@ -126,7 +142,12 @@ func Run(ctx context.Context, r Request) (Result, error) {
 	return res, nil
 }
 
-func packAll(ctx context.Context, store content.Storage, dirs []string, o chunk.Options) (ocispec.Descriptor, []spec.Description, error) {
+func packAll(
+	ctx context.Context,
+	store content.Storage,
+	dirs []string,
+	o chunk.Options,
+) (ocispec.Descriptor, []spec.Description, error) {
 	kids := make([]ocispec.Descriptor, 0, len(dirs))
 	descs := make([]spec.Description, 0, len(dirs))
 	for _, dir := range dirs {
@@ -166,7 +187,12 @@ func selfCheck(ctx context.Context, r Request, ref client.Reference, res Result)
 	}
 	byDigest := ref
 	byDigest.Digest = res.Index.Digest
-	root, _, err := r.Client.Pull(ctx, byDigest, fresh, client.PullOptions{Tag: "check", Referrers: true})
+	root, _, err := r.Client.Pull(
+		ctx,
+		byDigest,
+		fresh,
+		client.PullOptions{Tag: "check", Referrers: true},
+	)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrSelfCheck, err)
 	}
@@ -192,14 +218,24 @@ func selfCheck(ctx context.Context, r Request, ref client.Reference, res Result)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrSelfCheck, err)
 	}
-	pol := verify.Policy{Mode: profile.VerifySignature, Provider: profile.SigningCosignKey, Keys: ks}
+	pol := verify.Policy{
+		Mode:     profile.VerifySignature,
+		Provider: profile.SigningCosignKey,
+		Keys:     ks,
+	}
 	if _, err := verify.Verify(ctx, pol, r.Client.Bind(ref), res.Index); err != nil {
 		return fmt.Errorf("%w: %w", ErrSelfCheck, err)
 	}
 	return nil
 }
 
-func promotion(ref client.Reference, res Result, s *sign.Signer, prov profile.SigningProvider, now time.Time) channel.Image {
+func promotion(
+	ref client.Reference,
+	res Result,
+	s *sign.Signer,
+	prov profile.SigningProvider,
+	now time.Time,
+) channel.Image {
 	img := channel.Image{
 		Repository: ref.Repository,
 		Tag:        ref.Tag,
@@ -208,7 +244,10 @@ func promotion(ref client.Reference, res Result, s *sign.Signer, prov profile.Si
 	}
 	for _, d := range res.Children {
 		img.Platforms = append(img.Platforms, channel.Platform{
-			OS: d.Platform.OS, Arch: d.Platform.Architecture, OSVersion: d.Platform.OSVersion, Digest: d.Digest.String(),
+			OS:        d.Platform.OS,
+			Arch:      d.Platform.Architecture,
+			OSVersion: d.Platform.OSVersion,
+			Digest:    d.Digest.String(),
 		})
 	}
 	switch prov {

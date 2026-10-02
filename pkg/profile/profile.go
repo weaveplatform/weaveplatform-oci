@@ -214,7 +214,10 @@ func (f File) Validate() error {
 		}
 	}
 	if f.Default != "" && !seen[f.Default] {
-		errs = append(errs, fmt.Errorf("%w: default profile %q is not defined", ErrInvalid, f.Default))
+		errs = append(
+			errs,
+			fmt.Errorf("%w: default profile %q is not defined", ErrInvalid, f.Default),
+		)
 	}
 	return errors.Join(errs...)
 }
@@ -242,7 +245,10 @@ var hostPattern = regexp.MustCompile(`^[A-Za-z0-9.-]+(:[0-9]+)?$`)
 func (p Profile) Validate() error {
 	var errs []error
 	bad := func(format string, args ...any) {
-		errs = append(errs, fmt.Errorf("%w: profile %q: %s", ErrInvalid, p.Name, fmt.Sprintf(format, args...)))
+		errs = append(
+			errs,
+			fmt.Errorf("%w: profile %q: %s", ErrInvalid, p.Name, fmt.Sprintf(format, args...)),
+		)
 	}
 	if p.Name == "" {
 		bad("name is required")
@@ -310,9 +316,12 @@ func (p Profile) validateVerify(bad func(string, ...any)) {
 				bad("verifying cosign-key signatures needs verify.publicKeys")
 			}
 		case SigningGitHubAttestation:
-			if p.Verify.Identity == nil || p.Verify.Identity.Issuer == "" || p.Verify.Identity.SubjectRegexp == "" {
+			if p.Verify.Identity == nil || p.Verify.Identity.Issuer == "" ||
+				p.Verify.Identity.SubjectRegexp == "" {
 				bad("verifying attestations needs verify.identity issuer and subjectRegexp")
-			} else if _, err := regexp.Compile(p.Verify.Identity.SubjectRegexp); err != nil {
+			} else if _, err := regexp.Compile(
+				p.Verify.Identity.SubjectRegexp,
+			); err != nil {
 				bad("verify.identity.subjectRegexp: %v", err)
 			}
 		default:

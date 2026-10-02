@@ -35,7 +35,13 @@ import (
 var errBoom = errors.New("boom")
 
 // craftBundle builds a key-signed DSSE bundle over an arbitrary statement.
-func craftBundle(t *testing.T, k *ecdsa.PrivateKey, hint string, stmt []byte, withMaterial bool) []byte {
+func craftBundle(
+	t *testing.T,
+	k *ecdsa.PrivateKey,
+	hint string,
+	stmt []byte,
+	withMaterial bool,
+) []byte {
 	t.Helper()
 	d := sha256.Sum256(sign.PAE(sign.InTotoPayloadType, stmt))
 	sig, err := k.Sign(rand.Reader, d[:], crypto.SHA256)
@@ -45,12 +51,16 @@ func craftBundle(t *testing.T, k *ecdsa.PrivateKey, hint string, stmt []byte, wi
 	b := &protobundle.Bundle{
 		MediaType: sign.BundleMediaType,
 		Content: &protobundle.Bundle_DsseEnvelope{DsseEnvelope: &protodsse.Envelope{
-			Payload: stmt, PayloadType: sign.InTotoPayloadType, Signatures: []*protodsse.Signature{{Sig: sig}},
+			Payload:     stmt,
+			PayloadType: sign.InTotoPayloadType,
+			Signatures:  []*protodsse.Signature{{Sig: sig}},
 		}},
 	}
 	if withMaterial {
 		b.VerificationMaterial = &protobundle.VerificationMaterial{
-			Content: &protobundle.VerificationMaterial_PublicKey{PublicKey: &protocommon.PublicKeyIdentifier{Hint: hint}},
+			Content: &protobundle.VerificationMaterial_PublicKey{
+				PublicKey: &protocommon.PublicKeyIdentifier{Hint: hint},
+			},
 		}
 	}
 	out, err := protojson.Marshal(b)
@@ -74,7 +84,13 @@ func TestKeySetEdgeCases(t *testing.T) {
 		t.Fatalf("foreign predicate accepted: %v", err)
 	}
 	// no verification material at all
-	if _, err := ks.Verify(craftBundle(t, k, s.KeyID(), statement(d, sign.PredicateType), false), d); !errors.Is(err, verify.ErrUnverified) {
+	if _, err := ks.Verify(
+		craftBundle(t, k, s.KeyID(), statement(d, sign.PredicateType), false),
+		d,
+	); !errors.Is(
+		err,
+		verify.ErrUnverified,
+	) {
 		t.Fatal(err)
 	}
 	// a keyless (certificate) bundle has no key hint
@@ -106,7 +122,12 @@ func TestAttestationBundleBytesAndTrustedRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	b, _ := data.Bundle(t, "dsse.sigstore.json").MarshalJSON()
-	id := &verify.Identity{Trusted: loaded, Issuer: "https://accounts.google.com", SubjectRegexp: ".*", RequireSCT: true}
+	id := &verify.Identity{
+		Trusted:       loaded,
+		Issuer:        "https://accounts.google.com",
+		SubjectRegexp: ".*",
+		RequireSCT:    true,
+	}
 	if _, err := id.Verify(b, digest.FromString("x")); err == nil {
 		t.Fatal("unrelated subject verified")
 	}
@@ -120,7 +141,11 @@ type fakeSource struct {
 	fetchErr map[digest.Digest]error
 }
 
-func (f fakeSource) Referrers(context.Context, ocispec.Descriptor, string) ([]ocispec.Descriptor, error) {
+func (f fakeSource) Referrers(
+	context.Context,
+	ocispec.Descriptor,
+	string,
+) ([]ocispec.Descriptor, error) {
 	return f.refs, f.refsErr
 }
 
@@ -135,16 +160,29 @@ func TestSignatureDiscoveryFailures(t *testing.T) {
 	ctx := context.Background()
 	k, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	ks, _ := verify.NewKeySet(k.Public())
-	subj := ocispec.Descriptor{MediaType: ocispec.MediaTypeImageIndex, Digest: digest.FromString("s"), Size: 1}
+	subj := ocispec.Descriptor{
+		MediaType: ocispec.MediaTypeImageIndex,
+		Digest:    digest.FromString("s"),
+		Size:      1,
+	}
 	layer := content.NewDescriptorFromBytes(sign.BundleMediaType, []byte("{}"))
 	good, _ := json.Marshal(ocispec.Manifest{Layers: []ocispec.Descriptor{layer}})
 	twoLayers, _ := json.Marshal(ocispec.Manifest{Layers: []ocispec.Descriptor{layer, layer}})
 	gd, td, nd := digest.FromBytes(good), digest.FromBytes(twoLayers), digest.FromString("notjson")
 	src := fakeSource{
 		refs: []ocispec.Descriptor{{Digest: nd}, {Digest: td}, {Digest: gd}},
-		blobs: map[digest.Digest][]byte{nd: []byte("not json"), td: twoLayers, gd: good, layer.Digest: []byte("{}")},
+		blobs: map[digest.Digest][]byte{
+			nd:           []byte("not json"),
+			td:           twoLayers,
+			gd:           good,
+			layer.Digest: []byte("{}"),
+		},
 	}
-	base := verify.Policy{Mode: profile.VerifySignature, Provider: profile.SigningCosignKey, Keys: ks}
+	base := verify.Policy{
+		Mode:     profile.VerifySignature,
+		Provider: profile.SigningCosignKey,
+		Keys:     ks,
+	}
 	if _, err := verify.Signature(ctx, base, src, subj); !errors.Is(err, verify.ErrUnverified) {
 		t.Fatalf("garbage bundle verified: %v", err)
 	}
@@ -158,13 +196,25 @@ func TestSignatureDiscoveryFailures(t *testing.T) {
 	if _, err := verify.Signature(ctx, base, failBlob, subj); !errors.Is(err, errBoom) {
 		t.Fatal(err)
 	}
-	if _, err := verify.Signature(ctx, base, fakeSource{refsErr: errBoom}, subj); !errors.Is(err, errBoom) {
+	if _, err := verify.Signature(
+		ctx,
+		base,
+		fakeSource{refsErr: errBoom},
+		subj,
+	); !errors.Is(
+		err,
+		errBoom,
+	) {
 		t.Fatal(err)
 	}
 	// attestation provider with an identity: bundle fails, error is ErrUnverified
 	vs := base
 	vs.Provider = profile.SigningGitHubAttestation
-	vs.Identity = &verify.Identity{Trusted: data.TrustedRoot(t, "public-good.json"), Issuer: "i", SubjectRegexp: ".*"}
+	vs.Identity = &verify.Identity{
+		Trusted:       data.TrustedRoot(t, "public-good.json"),
+		Issuer:        "i",
+		SubjectRegexp: ".*",
+	}
 	if _, err := verify.Signature(ctx, vs, src, subj); !errors.Is(err, verify.ErrUnverified) {
 		t.Fatal(err)
 	}
@@ -176,7 +226,10 @@ type failingGraph struct {
 	predErr, fetchErr error
 }
 
-func (f failingGraph) Predecessors(ctx context.Context, d ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+func (f failingGraph) Predecessors(
+	ctx context.Context,
+	d ocispec.Descriptor,
+) ([]ocispec.Descriptor, error) {
 	if f.predErr != nil {
 		return nil, f.predErr
 	}
@@ -199,23 +252,52 @@ func TestStoreSourceFailuresAndFiltering(t *testing.T) {
 		t.Fatal(err)
 	}
 	// a non-referrer predecessor: an index listing the subject
-	parent, _ := json.Marshal(ocispec.Index{Versioned: subjVersioned(), MediaType: ocispec.MediaTypeImageIndex, Manifests: []ocispec.Descriptor{subj}})
+	parent, _ := json.Marshal(
+		ocispec.Index{
+			Versioned: subjVersioned(),
+			MediaType: ocispec.MediaTypeImageIndex,
+			Manifests: []ocispec.Descriptor{subj},
+		},
+	)
 	pd := content.NewDescriptorFromBytes(ocispec.MediaTypeImageIndex, parent)
 	_ = store.Push(ctx, pd, bytesReader(parent))
 	refs, err := verify.StoreSource{Store: store}.Referrers(ctx, subj, "")
 	if err != nil || len(refs) != 1 {
 		t.Fatalf("%v %d", err, len(refs))
 	}
-	if refs, _ := (verify.StoreSource{Store: store}).Referrers(ctx, subj, "application/other"); len(refs) != 0 {
+	if refs, _ := (verify.StoreSource{Store: store}).Referrers(
+		ctx,
+		subj,
+		"application/other",
+	); len(
+		refs,
+	) != 0 {
 		t.Fatal("artifactType filter ignored")
 	}
-	if _, err := (verify.StoreSource{Store: failingGraph{Store: store, predErr: errBoom}}).Referrers(ctx, subj, ""); !errors.Is(err, errBoom) {
+	if _, err := (verify.StoreSource{Store: failingGraph{Store: store, predErr: errBoom}}).Referrers(
+		ctx,
+		subj,
+		"",
+	); !errors.Is(
+		err,
+		errBoom,
+	) {
 		t.Fatal(err)
 	}
-	if _, err := (verify.StoreSource{Store: failingGraph{Store: store, fetchErr: errBoom}}).Referrers(ctx, subj, ""); !errors.Is(err, errBoom) {
+	if _, err := (verify.StoreSource{Store: failingGraph{Store: store, fetchErr: errBoom}}).Referrers(
+		ctx,
+		subj,
+		"",
+	); !errors.Is(
+		err,
+		errBoom,
+	) {
 		t.Fatal(err)
 	}
-	if _, err := (verify.StoreSource{Store: store}).FetchAll(ctx, ocispec.Descriptor{Digest: digest.FromString("absent"), Size: 1}); err == nil {
+	if _, err := (verify.StoreSource{Store: store}).FetchAll(
+		ctx,
+		ocispec.Descriptor{Digest: digest.FromString("absent"), Size: 1},
+	); err == nil {
 		t.Fatal("absent blob fetched")
 	}
 }
@@ -249,30 +331,92 @@ func TestFromProfile(t *testing.T) {
 	trPath := writeFile(t, dir, "trusted_root.json", trRaw)
 	notRoot := writeFile(t, dir, "signing-as-root.pub", sp)
 
-	cosign := profile.Profile{Signing: profile.Signing{Provider: profile.SigningCosignKey},
+	cosign := profile.Profile{
+		Signing: profile.Signing{Provider: profile.SigningCosignKey},
 		Verify:  profile.Verify{Mode: profile.VerifyBoth, PublicKeys: []string{pubPath}},
-		Channel: profile.Channel{Manifest: manifest, Anchors: []profile.Anchor{{Name: "org", PublicKey: rootPath}}}}
+		Channel: profile.Channel{
+			Manifest: manifest,
+			Anchors:  []profile.Anchor{{Name: "org", PublicKey: rootPath}},
+		},
+	}
 	pol, err := verify.FromProfile(ctx, cosign, "r", "", nil)
-	if err != nil || pol.Keys == nil || pol.Channel == nil || len(pol.Anchors) != 1 || pol.Repository != "r" {
+	if err != nil || pol.Keys == nil || pol.Channel == nil || len(pol.Anchors) != 1 ||
+		pol.Repository != "r" {
 		t.Fatalf("%v %+v", err, pol)
 	}
-	if pol, err := verify.FromProfile(ctx, cosign, "r", profile.VerifyNone, nil); err != nil || pol.Keys != nil {
+	if pol, err := verify.FromProfile(
+		ctx,
+		cosign,
+		"r",
+		profile.VerifyNone,
+		nil,
+	); err != nil ||
+		pol.Keys != nil {
 		t.Fatal("none override")
 	}
-	gh := profile.Profile{Signing: profile.Signing{Provider: profile.SigningGitHubAttestation},
-		Verify: profile.Verify{Mode: profile.VerifySignature, Identity: &profile.Identity{Issuer: "i", SubjectRegexp: ".*", TrustedRoot: trPath}}}
+	gh := profile.Profile{
+		Signing: profile.Signing{Provider: profile.SigningGitHubAttestation},
+		Verify: profile.Verify{
+			Mode:     profile.VerifySignature,
+			Identity: &profile.Identity{Issuer: "i", SubjectRegexp: ".*", TrustedRoot: trPath},
+		},
+	}
 	if pol, err := verify.FromProfile(ctx, gh, "r", "", nil); err != nil || pol.Identity == nil {
 		t.Fatalf("attestation: %v", err)
 	}
 	bad := []profile.Profile{
-		{Signing: profile.Signing{Provider: profile.SigningCosignKey}, Verify: profile.Verify{Mode: profile.VerifySignature, PublicKeys: []string{filepath.Join(dir, "none.pub")}}},
-		{Signing: profile.Signing{Provider: profile.SigningGitHubAttestation}, Verify: profile.Verify{Mode: profile.VerifySignature, Identity: &profile.Identity{Issuer: "i"}}},
-		{Signing: profile.Signing{Provider: profile.SigningGitHubAttestation}, Verify: profile.Verify{Mode: profile.VerifySignature, Identity: &profile.Identity{Issuer: "i", TrustedRoot: pubPath}}},
-		{Signing: profile.Signing{Provider: profile.SigningNone}, Verify: profile.Verify{Mode: profile.VerifySignature}},
-		{Verify: profile.Verify{Mode: profile.VerifyChannel}, Channel: profile.Channel{Manifest: manifest, Anchors: []profile.Anchor{{Name: "a", PublicKey: filepath.Join(dir, "missing.pub")}}}},
-		{Verify: profile.Verify{Mode: profile.VerifyChannel}, Channel: profile.Channel{Manifest: manifest, Anchors: []profile.Anchor{{Name: "a", PublicKey: notRoot}}}},
-		{Verify: profile.Verify{Mode: profile.VerifyChannel}, Channel: profile.Channel{Anchors: []profile.Anchor{{Name: "a", PublicKey: rootPath}}}},
-		{Verify: profile.Verify{Mode: profile.VerifyChannel}, Channel: profile.Channel{Manifest: filepath.Join(dir, "missing.json"), Anchors: []profile.Anchor{{Name: "a", PublicKey: rootPath}}}},
+		{
+			Signing: profile.Signing{Provider: profile.SigningCosignKey},
+			Verify: profile.Verify{
+				Mode:       profile.VerifySignature,
+				PublicKeys: []string{filepath.Join(dir, "none.pub")},
+			},
+		},
+		{
+			Signing: profile.Signing{Provider: profile.SigningGitHubAttestation},
+			Verify: profile.Verify{
+				Mode:     profile.VerifySignature,
+				Identity: &profile.Identity{Issuer: "i"},
+			},
+		},
+		{
+			Signing: profile.Signing{Provider: profile.SigningGitHubAttestation},
+			Verify: profile.Verify{
+				Mode:     profile.VerifySignature,
+				Identity: &profile.Identity{Issuer: "i", TrustedRoot: pubPath},
+			},
+		},
+		{
+			Signing: profile.Signing{Provider: profile.SigningNone},
+			Verify:  profile.Verify{Mode: profile.VerifySignature},
+		},
+		{
+			Verify: profile.Verify{Mode: profile.VerifyChannel},
+			Channel: profile.Channel{
+				Manifest: manifest,
+				Anchors: []profile.Anchor{
+					{Name: "a", PublicKey: filepath.Join(dir, "missing.pub")},
+				},
+			},
+		},
+		{
+			Verify: profile.Verify{Mode: profile.VerifyChannel},
+			Channel: profile.Channel{
+				Manifest: manifest,
+				Anchors:  []profile.Anchor{{Name: "a", PublicKey: notRoot}},
+			},
+		},
+		{
+			Verify:  profile.Verify{Mode: profile.VerifyChannel},
+			Channel: profile.Channel{Anchors: []profile.Anchor{{Name: "a", PublicKey: rootPath}}},
+		},
+		{
+			Verify: profile.Verify{Mode: profile.VerifyChannel},
+			Channel: profile.Channel{
+				Manifest: filepath.Join(dir, "missing.json"),
+				Anchors:  []profile.Anchor{{Name: "a", PublicKey: rootPath}},
+			},
+		},
 	}
 	for i, p := range bad {
 		if _, err := verify.FromProfile(ctx, p, "r", "", nil); !errors.Is(err, verify.ErrConfig) {

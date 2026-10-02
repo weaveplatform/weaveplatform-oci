@@ -40,11 +40,18 @@ type fixture struct {
 }
 
 // publish packs a linux bundle with the given seed and pushes it as repo:tag.
-func (f fixture) publish(t *testing.T, repo, tag string, seed uint64) (client.Reference, ocispec.Descriptor) {
+func (f fixture) publish(
+	t *testing.T,
+	repo, tag string,
+	seed uint64,
+) (client.Reference, ocispec.Descriptor) {
 	t.Helper()
 	ctx := context.Background()
 	dir := filepath.Join(t.TempDir(), "b")
-	if err := testbundle.Write(dir, testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchAMD64, Seed: seed}); err != nil {
+	if err := testbundle.Write(
+		dir,
+		testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchAMD64, Seed: seed},
+	); err != nil {
 		t.Fatal(err)
 	}
 	b, _ := pack.LoadBundle(dir)
@@ -64,7 +71,13 @@ func (f fixture) publish(t *testing.T, repo, tag string, seed uint64) (client.Re
 	}
 	// a signature-like referrer, to check that pulls and exports carry it
 	r, _ := f.c.Repository(ref.Registry, ref.Repository)
-	if _, err := oras.PackManifest(ctx, r, oras.PackManifestVersion1_1, "application/vnd.test.sig", oras.PackManifestOptions{Subject: &idx}); err != nil {
+	if _, err := oras.PackManifest(
+		ctx,
+		r,
+		oras.PackManifestVersion1_1,
+		"application/vnd.test.sig",
+		oras.PackManifestOptions{Subject: &idx},
+	); err != nil {
 		t.Fatal(err)
 	}
 	return ref, idx
@@ -74,8 +87,15 @@ func newFixture(t *testing.T) fixture {
 	t.Helper()
 	reg := testregistry.New(testregistry.Options{})
 	t.Cleanup(reg.Close)
-	p := profile.Profile{Registry: profile.Registry{Host: reg.Host, Namespace: "weave-images", PlainHTTP: true}}
-	c := client.New(p, client.Options{Credentials: func(context.Context, string) (auth.Credential, error) { return auth.EmptyCredential, nil }})
+	p := profile.Profile{
+		Registry: profile.Registry{Host: reg.Host, Namespace: "weave-images", PlainHTTP: true},
+	}
+	c := client.New(
+		p,
+		client.Options{
+			Credentials: func(context.Context, string) (auth.Credential, error) { return auth.EmptyCredential, nil },
+		},
+	)
 	return fixture{reg: reg, c: c}
 }
 
@@ -86,7 +106,14 @@ func TestPullPinGC(t *testing.T) {
 	refB, idxB := f.publish(t, "b", "1", 2)
 	clock := time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)
 	dir := t.TempDir()
-	s, err := cache.Open(ctx, dir, cache.Options{Quota: 1, Now: func() time.Time { clock = clock.Add(time.Minute); return clock }})
+	s, err := cache.Open(
+		ctx,
+		dir,
+		cache.Options{
+			Quota: 1,
+			Now:   func() time.Time { clock = clock.Add(time.Minute); return clock },
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +192,11 @@ func TestSpaceGuard(t *testing.T) {
 	refB, _ := f.publish(t, "b", "1", 2)
 	dir := t.TempDir()
 	// plenty of space for A
-	s, _ := cache.Open(ctx, dir, cache.Options{Guard: guard{avail: func() int64 { return 1 << 40 }}})
+	s, _ := cache.Open(
+		ctx,
+		dir,
+		cache.Options{Guard: guard{avail: func() int64 { return 1 << 40 }}},
+	)
 	if _, err := s.Pull(ctx, f.c, refA); err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +223,11 @@ func TestSpaceGuard(t *testing.T) {
 		t.Fatalf("evict-then-pull: %v evicted=%v", err, evicted)
 	}
 	// guard failures surface
-	s, _ = cache.Open(ctx, t.TempDir(), cache.Options{Guard: guard{avail: func() int64 { return 0 }, err: errBoom}})
+	s, _ = cache.Open(
+		ctx,
+		t.TempDir(),
+		cache.Options{Guard: guard{avail: func() int64 { return 0 }, err: errBoom}},
+	)
 	if _, err := s.Pull(ctx, f.c, refA); !errors.Is(err, errBoom) {
 		t.Fatal(err)
 	}

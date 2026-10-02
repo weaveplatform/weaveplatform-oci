@@ -13,7 +13,13 @@ import (
 // FromProfile builds the consumer policy a profile describes, loading
 // public keys, the trusted root, channel anchors and the channel bundle.
 // mode overrides the profile's verify mode when not empty (the --verify flag).
-func FromProfile(ctx context.Context, p profile.Profile, repository string, mode profile.VerifyMode, hc *http.Client) (Policy, error) {
+func FromProfile(
+	ctx context.Context,
+	p profile.Profile,
+	repository string,
+	mode profile.VerifyMode,
+	hc *http.Client,
+) (Policy, error) {
 	pol := Policy{Mode: p.Verify.Mode, Provider: p.Signing.Provider, Repository: repository}
 	if mode != "" {
 		pol.Mode = mode
@@ -31,15 +37,27 @@ func FromProfile(ctx context.Context, p profile.Profile, repository string, mode
 			pol.Keys = ks
 		case profile.SigningGitHubAttestation:
 			if p.Verify.Identity == nil || p.Verify.Identity.TrustedRoot == "" {
-				return pol, fmt.Errorf("%w: attestation verification needs verify.identity.trustedRoot", ErrConfig)
+				return pol, fmt.Errorf(
+					"%w: attestation verification needs verify.identity.trustedRoot",
+					ErrConfig,
+				)
 			}
 			tr, err := LoadTrustedRoot(p.Verify.Identity.TrustedRoot)
 			if err != nil {
 				return pol, err
 			}
-			pol.Identity = &Identity{Trusted: tr, Issuer: p.Verify.Identity.Issuer, SubjectRegexp: p.Verify.Identity.SubjectRegexp, RequireSCT: true}
+			pol.Identity = &Identity{
+				Trusted:       tr,
+				Issuer:        p.Verify.Identity.Issuer,
+				SubjectRegexp: p.Verify.Identity.SubjectRegexp,
+				RequireSCT:    true,
+			}
 		default:
-			return pol, fmt.Errorf("%w: signing provider %q cannot be verified", ErrConfig, p.Signing.Provider)
+			return pol, fmt.Errorf(
+				"%w: signing provider %q cannot be verified",
+				ErrConfig,
+				p.Signing.Provider,
+			)
 		}
 	}
 	if pol.Mode == profile.VerifyChannel || pol.Mode == profile.VerifyBoth {
@@ -55,7 +73,10 @@ func FromProfile(ctx context.Context, p profile.Profile, repository string, mode
 			pol.Anchors = append(pol.Anchors, anchor)
 		}
 		if p.Channel.Manifest == "" || len(pol.Anchors) == 0 {
-			return pol, fmt.Errorf("%w: channel verification needs channel.manifest and anchors", ErrConfig)
+			return pol, fmt.Errorf(
+				"%w: channel verification needs channel.manifest and anchors",
+				ErrConfig,
+			)
 		}
 		b, err := channel.Load(ctx, p.Channel.Manifest, hc)
 		if err != nil {

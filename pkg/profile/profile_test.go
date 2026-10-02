@@ -29,7 +29,7 @@ profiles:
     kind: private
     registry: {host: "zot.example:5000", namespace: weave-images, plainHTTP: true}
     signing: {provider: cosign-key, key: cosign.key}
-    verify: {mode: signature, publicKeys: [cosign.pub, /abs/other.pub]}
+    verify: {mode: signature, publicKeys: [cosign.pub, ABSOLUTE]}
   - name: office
     kind: hybrid
     registry: {host: ghcr.io, namespace: deploymenttheory/weave-images}
@@ -41,7 +41,12 @@ profiles:
 func TestLoadResolvesRelativePaths(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "oci-profiles.yaml")
-	if err := os.WriteFile(path, []byte(valid), 0o600); err != nil {
+	abs := filepath.Join(t.TempDir(), "other.pub") // absolute on every OS
+	if err := os.WriteFile(
+		path,
+		[]byte(strings.Replace(valid, "ABSOLUTE", "'"+abs+"'", 1)),
+		0o600,
+	); err != nil {
 		t.Fatal(err)
 	}
 	f, err := profile.Load(path)
@@ -53,11 +58,13 @@ func TestLoadResolvesRelativePaths(t *testing.T) {
 		t.Fatalf("default: %v %v", p.Name, err)
 	}
 	if p.Signing.Key != filepath.Join(dir, "cosign.key") || p.Verify.PublicKeys[0] != filepath.Join(dir, "cosign.pub") ||
-		p.Verify.PublicKeys[1] != "/abs/other.pub" || !p.Registry.PlainHTTP {
+		p.Verify.PublicKeys[1] != abs ||
+		!p.Registry.PlainHTTP {
 		t.Fatalf("paths %+v", p)
 	}
 	g, _ := f.Select("github")
-	if g.Channel.Anchors[0].PublicKey != filepath.Join(dir, "keys", "root.pub") || !strings.HasPrefix(g.Channel.Manifest, "https://") {
+	if g.Channel.Anchors[0].PublicKey != filepath.Join(dir, "keys", "root.pub") ||
+		!strings.HasPrefix(g.Channel.Manifest, "https://") {
 		t.Fatalf("github %+v", g.Channel)
 	}
 	if _, err := f.Select("nope"); !errors.Is(err, profile.ErrInvalid) {
@@ -94,7 +101,10 @@ func TestPath(t *testing.T) {
 		t.Fatal(p)
 	}
 	t.Setenv(profile.EnvProfiles, "")
-	if p, err := profile.Path(""); err != nil || !strings.HasSuffix(p, filepath.Join("weave", "oci-profiles.yaml")) {
+	if p, err := profile.Path(
+		"",
+	); err != nil ||
+		!strings.HasSuffix(p, filepath.Join("weave", "oci-profiles.yaml")) {
 		t.Fatalf("%q %v", p, err)
 	}
 }
@@ -102,25 +112,99 @@ func TestPath(t *testing.T) {
 func TestValidationRules(t *testing.T) {
 	base := "  - {name: p, kind: %s, registry: {host: %s}, %s signing: {provider: %s%s}, verify: {%s}%s}\n"
 	cases := map[string][]string{
-		"unknown key":            {"github", "ghcr.io", "bogus: 1,", "none", "", "mode: none", ""},
-		"bad kind":               {"cloud", "ghcr.io", "", "none", "", "mode: none", ""},
-		"bad host":               {"github", "https://ghcr.io", "", "none", "", "mode: none", ""},
-		"bad mirror host":        {"hybrid", "ghcr.io", "mirrors: [{host: 'a b'}],", "none", "", "mode: none", ""},
-		"github with mirrors":    {"github", "ghcr.io", "mirrors: [{host: m}],", "none", "", "mode: none", ""},
-		"github cosign":          {"github", "ghcr.io", "", "cosign-key", ", key: k", "mode: none", ""},
-		"private attestation":    {"private", "zot", "", "github-attestation", "", "mode: none", ""},
+		"unknown key": {"github", "ghcr.io", "bogus: 1,", "none", "", "mode: none", ""},
+		"bad kind":    {"cloud", "ghcr.io", "", "none", "", "mode: none", ""},
+		"bad host":    {"github", "https://ghcr.io", "", "none", "", "mode: none", ""},
+		"bad mirror host": {
+			"hybrid",
+			"ghcr.io",
+			"mirrors: [{host: 'a b'}],",
+			"none",
+			"",
+			"mode: none",
+			"",
+		},
+		"github with mirrors": {
+			"github",
+			"ghcr.io",
+			"mirrors: [{host: m}],",
+			"none",
+			"",
+			"mode: none",
+			"",
+		},
+		"github cosign": {
+			"github",
+			"ghcr.io",
+			"",
+			"cosign-key",
+			", key: k",
+			"mode: none",
+			"",
+		},
+		"private attestation": {
+			"private",
+			"zot",
+			"",
+			"github-attestation",
+			"",
+			"mode: none",
+			"",
+		},
 		"hybrid without mirrors": {"hybrid", "ghcr.io", "", "none", "", "mode: none", ""},
-		"hybrid cosign":          {"hybrid", "ghcr.io", "mirrors: [{host: m}],", "cosign-key", "", "mode: none", ""},
-		"bad provider":           {"github", "ghcr.io", "", "magic", "", "mode: none", ""},
-		"key without cosign":     {"github", "ghcr.io", "", "none", ", key: k", "mode: none", ""},
-		"bad mode":               {"github", "ghcr.io", "", "none", "", "mode: trust-me", ""},
-		"channel without anchors": {"github", "ghcr.io", "", "none", "", "mode: channel", ", channel: {manifest: m}"},
-		"anchor without key":     {"github", "ghcr.io", "", "none", "", "mode: channel", ", channel: {manifest: m, anchors: [{name: a}]}"},
-		"cosign without keys":    {"private", "zot", "", "cosign-key", "", "mode: signature", ""},
-		"attest without identity": {"github", "ghcr.io", "", "github-attestation", "", "mode: signature", ""},
-		"bad subject regexp": {"github", "ghcr.io", "", "github-attestation", "",
-			"mode: signature, identity: {issuer: i, subjectRegexp: '('}", ""},
-		"signature with none": {"github", "ghcr.io", "", "none", "", "mode: both", ", channel: {manifest: m, anchors: [{name: a, publicKey: k}]}"},
+		"hybrid cosign": {
+			"hybrid",
+			"ghcr.io",
+			"mirrors: [{host: m}],",
+			"cosign-key",
+			"",
+			"mode: none",
+			"",
+		},
+		"bad provider":       {"github", "ghcr.io", "", "magic", "", "mode: none", ""},
+		"key without cosign": {"github", "ghcr.io", "", "none", ", key: k", "mode: none", ""},
+		"bad mode":           {"github", "ghcr.io", "", "none", "", "mode: trust-me", ""},
+		"channel without anchors": {
+			"github",
+			"ghcr.io",
+			"",
+			"none",
+			"",
+			"mode: channel",
+			", channel: {manifest: m}",
+		},
+		"anchor without key": {
+			"github",
+			"ghcr.io",
+			"",
+			"none",
+			"",
+			"mode: channel",
+			", channel: {manifest: m, anchors: [{name: a}]}",
+		},
+		"cosign without keys": {"private", "zot", "", "cosign-key", "", "mode: signature", ""},
+		"attest without identity": {
+			"github",
+			"ghcr.io",
+			"",
+			"github-attestation",
+			"",
+			"mode: signature",
+			"",
+		},
+		"bad subject regexp": {
+			"github", "ghcr.io", "", "github-attestation", "",
+			"mode: signature, identity: {issuer: i, subjectRegexp: '('}", "",
+		},
+		"signature with none": {
+			"github",
+			"ghcr.io",
+			"",
+			"none",
+			"",
+			"mode: both",
+			", channel: {manifest: m, anchors: [{name: a, publicKey: k}]}",
+		},
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -134,11 +218,17 @@ func TestValidationRules(t *testing.T) {
 		"  - {name: '', kind: github, registry: {host: ghcr.io}, signing: {provider: none}, verify: {mode: none}}\n" +
 		"  - {name: '', kind: github, registry: {host: ghcr.io}, signing: {provider: none}, verify: {mode: none}}\n"
 	_, err := profile.Parse([]byte(dup))
-	if err == nil || !strings.Contains(err.Error(), "duplicate") || !strings.Contains(err.Error(), "default profile") ||
+	if err == nil || !strings.Contains(err.Error(), "duplicate") ||
+		!strings.Contains(err.Error(), "default profile") ||
 		!strings.Contains(err.Error(), "name is required") {
 		t.Fatalf("%v", err)
 	}
-	if _, err := profile.Parse([]byte("schemaVersion: 1\nprofiles: []\n")); !errors.Is(err, profile.ErrInvalid) {
+	if _, err := profile.Parse(
+		[]byte("schemaVersion: 1\nprofiles: []\n"),
+	); !errors.Is(
+		err,
+		profile.ErrInvalid,
+	) {
 		t.Fatal("empty profiles accepted")
 	}
 }

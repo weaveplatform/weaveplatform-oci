@@ -92,10 +92,18 @@ func GenerateKey(keyID string) (keyFile, pubFile []byte, err error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("generate key: %w", err)
 	}
-	if keyFile, err = marshalFile(PrivateKeyFile{Schema: 1, KeyID: keyID, PrivateKey: base64.StdEncoding.EncodeToString(priv)}); err != nil {
+	if keyFile, err = marshalFile(
+		PrivateKeyFile{
+			Schema:     1,
+			KeyID:      keyID,
+			PrivateKey: base64.StdEncoding.EncodeToString(priv),
+		},
+	); err != nil {
 		return nil, nil, err
 	}
-	if pubFile, err = marshalFile(PublicKeyFile{Schema: 1, KeyID: keyID, PublicKey: base64.StdEncoding.EncodeToString(pub)}); err != nil {
+	if pubFile, err = marshalFile(
+		PublicKeyFile{Schema: 1, KeyID: keyID, PublicKey: base64.StdEncoding.EncodeToString(pub)},
+	); err != nil {
 		return nil, nil, err
 	}
 	return keyFile, pubFile, nil
@@ -109,7 +117,11 @@ func ParsePublicKey(data []byte) (string, ed25519.PublicKey, error) {
 	}
 	raw, err := base64.StdEncoding.DecodeString(f.PublicKey)
 	if err != nil || f.Schema != 1 || f.KeyID == "" || len(raw) != ed25519.PublicKeySize {
-		return "", nil, fmt.Errorf("%w: public key needs schema 1, a key_id and %d bytes", ErrFormat, ed25519.PublicKeySize)
+		return "", nil, fmt.Errorf(
+			"%w: public key needs schema 1, a key_id and %d bytes",
+			ErrFormat,
+			ed25519.PublicKeySize,
+		)
 	}
 	return f.KeyID, ed25519.PublicKey(raw), nil
 }
@@ -122,7 +134,11 @@ func ParsePrivateKey(data []byte) (string, ed25519.PrivateKey, error) {
 	}
 	raw, err := base64.StdEncoding.DecodeString(f.PrivateKey)
 	if err != nil || f.Schema != 1 || f.KeyID == "" || len(raw) != ed25519.PrivateKeySize {
-		return "", nil, fmt.Errorf("%w: private key needs schema 1, a key_id and %d bytes", ErrFormat, ed25519.PrivateKeySize)
+		return "", nil, fmt.Errorf(
+			"%w: private key needs schema 1, a key_id and %d bytes",
+			ErrFormat,
+			ed25519.PrivateKeySize,
+		)
 	}
 	return f.KeyID, ed25519.PrivateKey(raw), nil
 }
@@ -135,7 +151,11 @@ func ParseSignature(data []byte) (string, []byte, error) {
 	}
 	raw, err := base64.StdEncoding.DecodeString(f.Signature)
 	if err != nil || f.Schema != 1 || f.KeyID == "" || len(raw) != ed25519.SignatureSize {
-		return "", nil, fmt.Errorf("%w: signature needs schema 1, a key_id and %d bytes", ErrFormat, ed25519.SignatureSize)
+		return "", nil, fmt.Errorf(
+			"%w: signature needs schema 1, a key_id and %d bytes",
+			ErrFormat,
+			ed25519.SignatureSize,
+		)
 	}
 	return f.KeyID, raw, nil
 }
@@ -147,7 +167,9 @@ func Sign(keyFile []byte, context string, data []byte) ([]byte, error) {
 		return nil, err
 	}
 	sig := ed25519.Sign(priv, SigningMessage(context, data))
-	return marshalFile(SignatureFile{Schema: 1, KeyID: id, Signature: base64.StdEncoding.EncodeToString(sig)})
+	return marshalFile(
+		SignatureFile{Schema: 1, KeyID: id, Signature: base64.StdEncoding.EncodeToString(sig)},
+	)
 }
 
 // Endorse signs a signing key's .pub file with the root .key file.
@@ -155,7 +177,12 @@ func Endorse(rootKeyFile, signingPubFile []byte) ([]byte, error) {
 	if id, _, err := ParsePrivateKey(rootKeyFile); err != nil {
 		return nil, err
 	} else if id != RootKeyID {
-		return nil, fmt.Errorf("%w: endorsing key must have key_id %q, has %q", ErrFormat, RootKeyID, id)
+		return nil, fmt.Errorf(
+			"%w: endorsing key must have key_id %q, has %q",
+			ErrFormat,
+			RootKeyID,
+			id,
+		)
 	}
 	return Sign(rootKeyFile, EndorseContext, signingPubFile)
 }
@@ -199,8 +226,8 @@ type Platform struct {
 
 // Signer names the build-time signature consumers should also expect.
 type Signer struct {
-	Provider      string `json:"provider"`                 // cosign-key or github-attestation
-	KeyID         string `json:"key_id,omitempty"`         //nolint:tagliatelle // existing wire format
+	Provider      string `json:"provider"`         // cosign-key or github-attestation
+	KeyID         string `json:"key_id,omitempty"` //nolint:tagliatelle // existing wire format
 	Issuer        string `json:"issuer,omitempty"`
 	SubjectRegexp string `json:"subject_regexp,omitempty"` //nolint:tagliatelle // existing wire format
 }
@@ -213,11 +240,18 @@ func Parse(data []byte) (*Manifest, error) {
 		return nil, fmt.Errorf("%w: manifest: %w", ErrFormat, err)
 	}
 	if m.Schema != 1 || m.Channel == "" || m.Protocol.Min == 0 || m.Protocol.Max < m.Protocol.Min {
-		return nil, fmt.Errorf("%w: manifest needs schema 1, a channel and a valid protocol window", ErrFormat)
+		return nil, fmt.Errorf(
+			"%w: manifest needs schema 1, a channel and a valid protocol window",
+			ErrFormat,
+		)
 	}
 	for _, img := range m.Images {
 		if _, err := digest.Parse(img.Digest); err != nil || img.Repository == "" {
-			return nil, fmt.Errorf("%w: image %q has an invalid repository or digest", ErrFormat, img.Repository)
+			return nil, fmt.Errorf(
+				"%w: image %q has an invalid repository or digest",
+				ErrFormat,
+				img.Repository,
+			)
 		}
 	}
 	return &m, nil
@@ -237,7 +271,8 @@ func (m *Manifest) Expired(now time.Time) bool {
 // repository path, for example deploymenttheory/weave-images/ubuntu-24.04).
 func (m *Manifest) Image(repository string, d digest.Digest) (*Image, error) {
 	for i := range m.Images {
-		if m.Images[i].Digest == d.String() && (repository == "" || m.Images[i].Repository == repository) {
+		if m.Images[i].Digest == d.String() &&
+			(repository == "" || m.Images[i].Repository == repository) {
 			return &m.Images[i], nil
 		}
 	}
@@ -265,7 +300,13 @@ func ParseAnchor(name string, pubFile []byte) (Anchor, error) {
 		return Anchor{}, err
 	}
 	if id != RootKeyID {
-		return Anchor{}, fmt.Errorf("%w: anchor %q has key_id %q, want %q", ErrFormat, name, id, RootKeyID)
+		return Anchor{}, fmt.Errorf(
+			"%w: anchor %q has key_id %q, want %q",
+			ErrFormat,
+			name,
+			id,
+			RootKeyID,
+		)
 	}
 	return Anchor{Name: name, Key: k}, nil
 }
@@ -287,17 +328,28 @@ func Verify(anchors []Anchor, b Bundle, o Options) (*Manifest, Anchor, error) {
 		return nil, Anchor{}, err
 	}
 	if endorserID != RootKeyID {
-		return nil, Anchor{}, fmt.Errorf("%w: endorsement signed by %q, not the root", ErrSignature, endorserID)
+		return nil, Anchor{}, fmt.Errorf(
+			"%w: endorsement signed by %q, not the root",
+			ErrSignature,
+			endorserID,
+		)
 	}
 	var anchor *Anchor
 	for i := range anchors {
-		if ed25519.Verify(anchors[i].Key, SigningMessage(EndorseContext, b.SigningKey), endorsement) {
+		if ed25519.Verify(
+			anchors[i].Key,
+			SigningMessage(EndorseContext, b.SigningKey),
+			endorsement,
+		) {
 			anchor = &anchors[i]
 			break
 		}
 	}
 	if anchor == nil {
-		return nil, Anchor{}, fmt.Errorf("%w: signing key is not endorsed by any configured anchor", ErrSignature)
+		return nil, Anchor{}, fmt.Errorf(
+			"%w: signing key is not endorsed by any configured anchor",
+			ErrSignature,
+		)
 	}
 	signingID, signingKey, err := ParsePublicKey(b.SigningKey)
 	if err != nil {
@@ -308,7 +360,12 @@ func Verify(anchors []Anchor, b Bundle, o Options) (*Manifest, Anchor, error) {
 		return nil, Anchor{}, err
 	}
 	if sigID != signingID {
-		return nil, Anchor{}, fmt.Errorf("%w: manifest signed by %q, endorsed key is %q", ErrSignature, sigID, signingID)
+		return nil, Anchor{}, fmt.Errorf(
+			"%w: manifest signed by %q, endorsed key is %q",
+			ErrSignature,
+			sigID,
+			signingID,
+		)
 	}
 	if !ed25519.Verify(signingKey, SigningMessage(ManifestContext, b.Manifest), sig) {
 		return nil, Anchor{}, fmt.Errorf("%w: manifest signature", ErrSignature)

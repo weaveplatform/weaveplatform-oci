@@ -157,7 +157,11 @@ func (s *Store) Dir() string { return s.root }
 // Pull fetches ref into the cache (with referrers) unless its root is
 // already present, checking free space first and evicting least-recently-used
 // unpinned images when needed. It returns the root descriptor.
-func (s *Store) Pull(ctx context.Context, c *client.Client, ref client.Reference) (ocispec.Descriptor, error) {
+func (s *Store) Pull(
+	ctx context.Context,
+	c *client.Client,
+	ref client.Reference,
+) (ocispec.Descriptor, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	need, err := c.Size(ctx, ref, s.oci)
@@ -232,19 +236,22 @@ func (s *Store) Unpin(owner string) error {
 // Usage returns the bytes held in the layout's blob store.
 func (s *Store) Usage() (int64, error) {
 	var n int64
-	err := filepath.WalkDir(filepath.Join(s.root, "layout", "blobs"), func(_ string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !d.IsDir() {
-			info, err := d.Info()
+	err := filepath.WalkDir(
+		filepath.Join(s.root, "layout", "blobs"),
+		func(_ string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
-			n += info.Size()
-		}
-		return nil
-	})
+			if !d.IsDir() {
+				info, err := d.Info()
+				if err != nil {
+					return err
+				}
+				n += info.Size()
+			}
+			return nil
+		},
+	)
 	if errors.Is(err, fs.ErrNotExist) {
 		return 0, nil
 	}
@@ -363,7 +370,12 @@ func (s *Store) ensureSpace(ctx context.Context, need int64) error {
 		return fmt.Errorf("check free space: %w", err)
 	}
 	if a < need {
-		return fmt.Errorf("%w: need %d bytes, %d available after evicting unpinned images", ErrNoSpace, need, a)
+		return fmt.Errorf(
+			"%w: need %d bytes, %d available after evicting unpinned images",
+			ErrNoSpace,
+			need,
+			a,
+		)
 	}
 	return nil
 }

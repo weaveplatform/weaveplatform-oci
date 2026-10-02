@@ -88,7 +88,10 @@ func (ks *KeySet) Verify(bundleJSON []byte, subject digest.Digest) (*SignatureRe
 	if err != nil || subject.Algorithm() != digest.SHA256 {
 		return nil, fmt.Errorf("%w: subject %q is not a sha256 digest", ErrConfig, subject)
 	}
-	res, err := v.Verify(&b, sgverify.NewPolicy(sgverify.WithArtifactDigest("sha256", raw), sgverify.WithKey()))
+	res, err := v.Verify(
+		&b,
+		sgverify.NewPolicy(sgverify.WithArtifactDigest("sha256", raw), sgverify.WithKey()),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrUnverified, err)
 	}

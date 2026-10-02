@@ -29,7 +29,11 @@ var (
 
 // Source lists and fetches referrers of a subject in one repository.
 type Source interface {
-	Referrers(ctx context.Context, subject ocispec.Descriptor, artifactType string) ([]ocispec.Descriptor, error)
+	Referrers(
+		ctx context.Context,
+		subject ocispec.Descriptor,
+		artifactType string,
+	) ([]ocispec.Descriptor, error)
 	FetchAll(ctx context.Context, d ocispec.Descriptor) ([]byte, error)
 }
 
@@ -48,7 +52,8 @@ func bundles(ctx context.Context, src Source, subject ocispec.Descriptor) ([][]b
 			return nil, fmt.Errorf("referrer %s: %w", r.Digest, err)
 		}
 		m, err := decodeManifest(raw)
-		if err != nil || len(m.Layers) != 1 || !strings.HasPrefix(m.Layers[0].MediaType, "application/vnd.dev.sigstore.bundle") {
+		if err != nil || len(m.Layers) != 1 ||
+			!strings.HasPrefix(m.Layers[0].MediaType, "application/vnd.dev.sigstore.bundle") {
 			continue
 		}
 		b, err := src.FetchAll(ctx, m.Layers[0])
@@ -97,7 +102,12 @@ type Policy struct {
 
 // Verify gathers the evidence the policy's mode requires for subject and
 // fails closed when any of it is missing or invalid.
-func Verify(ctx context.Context, p Policy, src Source, subject ocispec.Descriptor) (Evidence, error) {
+func Verify(
+	ctx context.Context,
+	p Policy,
+	src Source,
+	subject ocispec.Descriptor,
+) (Evidence, error) {
 	e := Evidence{Subject: subject.Digest}
 	wantChannel := p.Mode == profile.VerifyChannel || p.Mode == profile.VerifyBoth
 	wantSig := p.Mode == profile.VerifySignature || p.Mode == profile.VerifyBoth
@@ -128,7 +138,10 @@ func Verify(ctx context.Context, p Policy, src Source, subject ocispec.Descripto
 // InChannel verifies the channel chain and finds subject in it.
 func InChannel(p Policy, subject digest.Digest) (*ChannelResult, error) {
 	if p.Channel == nil || len(p.Anchors) == 0 {
-		return nil, fmt.Errorf("%w: channel verification needs a channel bundle and anchors", ErrConfig)
+		return nil, fmt.Errorf(
+			"%w: channel verification needs a channel bundle and anchors",
+			ErrConfig,
+		)
 	}
 	m, anchor, err := channel.Verify(p.Anchors, *p.Channel, p.Options)
 	if err != nil {
@@ -138,12 +151,22 @@ func InChannel(p Policy, subject digest.Digest) (*ChannelResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrUnverified, err)
 	}
-	return &ChannelResult{Anchor: anchor.Name, Channel: m.Channel, Sequence: m.Sequence, Image: *img}, nil
+	return &ChannelResult{
+		Anchor:   anchor.Name,
+		Channel:  m.Channel,
+		Sequence: m.Sequence,
+		Image:    *img,
+	}, nil
 }
 
 // Signature finds a referrer bundle on subject that verifies under the
 // policy's signing provider.
-func Signature(ctx context.Context, p Policy, src Source, subject ocispec.Descriptor) (*SignatureResult, error) {
+func Signature(
+	ctx context.Context,
+	p Policy,
+	src Source,
+	subject ocispec.Descriptor,
+) (*SignatureResult, error) {
 	bs, err := bundles(ctx, src, subject)
 	if err != nil {
 		return nil, err
@@ -159,11 +182,18 @@ func Signature(ctx context.Context, p Policy, src Source, subject ocispec.Descri
 			r, err = p.Keys.Verify(b, subject.Digest)
 		case profile.SigningGitHubAttestation:
 			if p.Identity == nil {
-				return nil, fmt.Errorf("%w: attestation verification needs an identity and trusted root", ErrConfig)
+				return nil, fmt.Errorf(
+					"%w: attestation verification needs an identity and trusted root",
+					ErrConfig,
+				)
 			}
 			r, err = p.Identity.Verify(b, subject.Digest)
 		default:
-			return nil, fmt.Errorf("%w: signing provider %q cannot be verified", ErrConfig, p.Provider)
+			return nil, fmt.Errorf(
+				"%w: signing provider %q cannot be verified",
+				ErrConfig,
+				p.Provider,
+			)
 		}
 		if err == nil {
 			return r, nil

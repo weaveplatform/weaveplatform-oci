@@ -27,12 +27,18 @@ import (
 // fakeKMS is a kms.SignerVerifier backed by an in-memory ECDSA key.
 type fakeKMS struct {
 	signature.SignerVerifier
-	key     *ecdsa.PrivateKey
-	csErr   error
+	key   *ecdsa.PrivateKey
+	csErr error
 }
 
-func (f fakeKMS) CreateKey(context.Context, string) (crypto.PublicKey, error) { return f.key.Public(), nil }
-func (f fakeKMS) CryptoSigner(context.Context, func(error)) (crypto.Signer, crypto.SignerOpts, error) {
+func (f fakeKMS) CreateKey(context.Context, string) (crypto.PublicKey, error) {
+	return f.key.Public(), nil
+}
+
+func (f fakeKMS) CryptoSigner(
+	context.Context,
+	func(error),
+) (crypto.Signer, crypto.SignerOpts, error) {
 	if f.csErr != nil {
 		return nil, nil, f.csErr
 	}
@@ -44,15 +50,22 @@ func (f fakeKMS) DefaultAlgorithm() string      { return "ecdsa-p256" }
 func init() {
 	k, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	sv, _ := signature.LoadECDSASignerVerifier(k, crypto.SHA256)
-	kms.AddProvider("weavetestkms://", func(_ context.Context, ref string, _ crypto.Hash, _ ...signature.RPCOption) (kms.SignerVerifier, error) {
-		switch ref {
-		case "weavetestkms://broken":
-			return nil, errors.New("provider init failed")
-		case "weavetestkms://nosigner":
-			return fakeKMS{SignerVerifier: sv, key: k, csErr: errors.New("no crypto signer")}, nil
-		}
-		return fakeKMS{SignerVerifier: sv, key: k}, nil
-	})
+	kms.AddProvider(
+		"weavetestkms://",
+		func(_ context.Context, ref string, _ crypto.Hash, _ ...signature.RPCOption) (kms.SignerVerifier, error) {
+			switch ref {
+			case "weavetestkms://broken":
+				return nil, errors.New("provider init failed")
+			case "weavetestkms://nosigner":
+				return fakeKMS{
+					SignerVerifier: sv,
+					key:            k,
+					csErr:          errors.New("no crypto signer"),
+				}, nil
+			}
+			return fakeKMS{SignerVerifier: sv, key: k}, nil
+		},
+	)
 }
 
 func TestLoadKeyFromKMS(t *testing.T) {
@@ -99,7 +112,15 @@ func TestSigningFailures(t *testing.T) {
 	if _, err := s.Bundle(ctx, digest.FromString("x")); err == nil {
 		t.Fatal("bundle with a failing signer succeeded")
 	}
-	if _, err := s.Sign(ctx, memory.New(), ocispec.Descriptor{MediaType: ocispec.MediaTypeImageIndex, Digest: digest.FromString("x"), Size: 1}); err == nil {
+	if _, err := s.Sign(
+		ctx,
+		memory.New(),
+		ocispec.Descriptor{
+			MediaType: ocispec.MediaTypeImageIndex,
+			Digest:    digest.FromString("x"),
+			Size:      1,
+		},
+	); err == nil {
 		t.Fatal("sign with a failing signer succeeded")
 	}
 	if string(sign.PAE("t", []byte("p"))) != "DSSEv1 1 t 1 p" {
@@ -113,9 +134,23 @@ func TestSignTwiceReusesBundleAndRejectsBadSubject(t *testing.T) {
 	s, _ := sign.New(k)
 	store := memory.New()
 	// a subject missing from the store makes the referrer push fail after the bundle blob exists
-	subj := ocispec.Descriptor{MediaType: ocispec.MediaTypeImageIndex, Digest: digest.FromString("absent"), Size: 3}
+	subj := ocispec.Descriptor{
+		MediaType: ocispec.MediaTypeImageIndex,
+		Digest:    digest.FromString("absent"),
+		Size:      3,
+	}
 	_, _ = s.Sign(ctx, store, subj)
-	if _, err := s.Sign(ctx, store, ocispec.Descriptor{MediaType: "not a media type!!", Digest: digest.FromString("y"), Size: 3}); err == nil {
-		t.Log("registry accepted an odd subject media type") // exercises the manifest push path either way
+	if _, err := s.Sign(
+		ctx,
+		store,
+		ocispec.Descriptor{
+			MediaType: "not a media type!!",
+			Digest:    digest.FromString("y"),
+			Size:      3,
+		},
+	); err == nil {
+		t.Log(
+			"registry accepted an odd subject media type",
+		) // exercises the manifest push path either way
 	}
 }

@@ -33,7 +33,10 @@ func TestPublishSignerFailure(t *testing.T) {
 	c, dirs, _ := setup(t, profile.SigningCosignKey, testregistry.Options{})
 	k, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	s, _ := sign.New(brokenSigner{pub: k.Public()})
-	if _, err := publish.Run(context.Background(), publish.Request{Client: c, Bundles: dirs[:1], Repository: "r", Tag: "t", Signer: s}); err == nil {
+	if _, err := publish.Run(
+		context.Background(),
+		publish.Request{Client: c, Bundles: dirs[:1], Repository: "r", Tag: "t", Signer: s},
+	); err == nil {
 		t.Fatal("broken signer published")
 	}
 }
@@ -41,12 +44,32 @@ func TestPublishSignerFailure(t *testing.T) {
 func TestPublishTempDirFailures(t *testing.T) {
 	c, dirs, s := setup(t, profile.SigningCosignKey, testregistry.Options{})
 	work := t.TempDir()
-	t.Setenv("TMPDIR", filepath.Join(t.TempDir(), "missing"))
-	if _, err := publish.Run(context.Background(), publish.Request{Client: c, Bundles: dirs[:1], Repository: "r", Tag: "t", Signer: s}); err == nil {
+	missing := filepath.Join(t.TempDir(), "missing")
+	t.Setenv("TMPDIR", missing) // POSIX
+	t.Setenv("TMP", missing)    // Windows reads TMP, then TEMP
+	t.Setenv("TEMP", missing)
+	if _, err := publish.Run(
+		context.Background(),
+		publish.Request{Client: c, Bundles: dirs[:1], Repository: "r", Tag: "t", Signer: s},
+	); err == nil {
 		t.Fatal("missing temp dir accepted")
 	}
 	// with an explicit work dir, the self-check's temp dir fails after push
-	if _, err := publish.Run(context.Background(), publish.Request{Client: c, Bundles: dirs[:1], Repository: "r", Tag: "t2", Signer: s, WorkDir: work, Chunk: chunk.Options{TempDir: work}}); !errors.Is(err, publish.ErrSelfCheck) {
+	if _, err := publish.Run(
+		context.Background(),
+		publish.Request{
+			Client:     c,
+			Bundles:    dirs[:1],
+			Repository: "r",
+			Tag:        "t2",
+			Signer:     s,
+			WorkDir:    work,
+			Chunk:      chunk.Options{TempDir: work},
+		},
+	); !errors.Is(
+		err,
+		publish.ErrSelfCheck,
+	) {
 		t.Fatalf("want ErrSelfCheck, got %v", err)
 	}
 }
@@ -54,7 +77,10 @@ func TestPublishTempDirFailures(t *testing.T) {
 func TestPublishInvalidBundle(t *testing.T) {
 	c, _, s := setup(t, profile.SigningCosignKey, testregistry.Options{})
 	dir := filepath.Join(t.TempDir(), "darwin")
-	if err := testbundle.Write(dir, testbundle.Options{OS: spec.OSDarwin, Arch: spec.ArchARM64}); err != nil {
+	if err := testbundle.Write(
+		dir,
+		testbundle.Options{OS: spec.OSDarwin, Arch: spec.ArchARM64},
+	); err != nil {
 		t.Fatal(err)
 	}
 	p := filepath.Join(dir, "bundle.json")
@@ -64,7 +90,13 @@ func TestPublishInvalidBundle(t *testing.T) {
 	delete(doc["firmware"].(map[string]any), "hardwareModel")
 	raw, _ = json.Marshal(doc)
 	_ = os.WriteFile(p, raw, 0o600)
-	if _, err := publish.Run(context.Background(), publish.Request{Client: c, Bundles: []string{dir}, Repository: "r", Tag: "t", Signer: s}); !errors.Is(err, spec.ErrInvalid) {
+	if _, err := publish.Run(
+		context.Background(),
+		publish.Request{Client: c, Bundles: []string{dir}, Repository: "r", Tag: "t", Signer: s},
+	); !errors.Is(
+		err,
+		spec.ErrInvalid,
+	) {
 		t.Fatalf("invalid bundle published: %v", err)
 	}
 }

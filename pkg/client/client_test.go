@@ -23,9 +23,13 @@ import (
 
 func prof(host string, mirrors ...string) profile.Profile {
 	p := profile.Profile{
-		Name: "t", Kind: profile.KindPrivate,
+		Name:     "t",
+		Kind:     profile.KindPrivate,
 		Registry: profile.Registry{Host: host, Namespace: "weave-images", PlainHTTP: true},
-		Signing:  profile.Signing{Provider: profile.SigningCosignKey}, Verify: profile.Verify{Mode: profile.VerifyNone},
+		Signing: profile.Signing{
+			Provider: profile.SigningCosignKey,
+		},
+		Verify: profile.Verify{Mode: profile.VerifyNone},
 	}
 	for _, m := range mirrors {
 		p.Mirrors = append(p.Mirrors, profile.Registry{Host: m, PlainHTTP: true})
@@ -44,7 +48,10 @@ func packed(t *testing.T) (*memory.Store, ocispec.Descriptor) {
 	t.Helper()
 	ctx := context.Background()
 	dir := filepath.Join(t.TempDir(), "b")
-	if err := testbundle.Write(dir, testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchAMD64, ExtraDisk: true}); err != nil {
+	if err := testbundle.Write(
+		dir,
+		testbundle.Options{OS: spec.OSLinux, Arch: spec.ArchAMD64, ExtraDisk: true},
+	); err != nil {
 		t.Fatal(err)
 	}
 	b, err := pack.LoadBundle(dir)
@@ -69,20 +76,29 @@ func packed(t *testing.T) (*memory.Store, ocispec.Descriptor) {
 func TestParse(t *testing.T) {
 	c := client.New(prof("reg.example:5000", "mirror.example"), client.Options{})
 	cases := map[string]client.Reference{
-		"ubuntu-24.04:24.04-r1":                         {Repository: "weave-images/ubuntu-24.04", Tag: "24.04-r1"},
-		"reg.example:5000/other/repo:t":                 {Repository: "other/repo", Tag: "t"},
-		"ubuntu:t@sha256:" + hex64:                      {Repository: "weave-images/ubuntu", Tag: "t", Digest: "sha256:" + hex64},
-		"ubuntu@sha256:" + hex64:                        {Repository: "weave-images/ubuntu", Digest: "sha256:" + hex64},
-		"nested/path/name:1":                            {Repository: "weave-images/nested/path/name", Tag: "1"},
+		"ubuntu-24.04:24.04-r1":         {Repository: "weave-images/ubuntu-24.04", Tag: "24.04-r1"},
+		"reg.example:5000/other/repo:t": {Repository: "other/repo", Tag: "t"},
+		"ubuntu:t@sha256:" + hex64: {
+			Repository: "weave-images/ubuntu",
+			Tag:        "t",
+			Digest:     "sha256:" + hex64,
+		},
+		"ubuntu@sha256:" + hex64: {
+			Repository: "weave-images/ubuntu",
+			Digest:     "sha256:" + hex64,
+		},
+		"nested/path/name:1": {Repository: "weave-images/nested/path/name", Tag: "1"},
 	}
 	for in, want := range cases {
 		got, err := c.Parse(in)
-		if err != nil || got.Repository != want.Repository || got.Tag != want.Tag || got.Digest != want.Digest {
+		if err != nil || got.Repository != want.Repository || got.Tag != want.Tag ||
+			got.Digest != want.Digest {
 			t.Errorf("%s: %+v %v", in, got, err)
 		}
 	}
 	r, _ := c.Parse("ubuntu:t@sha256:" + hex64)
-	if r.Ref() != "sha256:"+hex64 || r.String() != "reg.example:5000/weave-images/ubuntu:t@sha256:"+hex64 {
+	if r.Ref() != "sha256:"+hex64 ||
+		r.String() != "reg.example:5000/weave-images/ubuntu:t@sha256:"+hex64 {
 		t.Fatalf("%s %s", r.Ref(), r)
 	}
 	for _, bad := range []string{"", "UPPER:t", "ubuntu", "ubuntu:bad tag", "ubuntu@sha256:short", "mirror.example/x:t"} {
@@ -100,9 +116,14 @@ const hex64 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 func TestPushPullTagsReferrers(t *testing.T) {
 	ctx := context.Background()
 	for _, noRef := range []bool{false, true} {
-		reg := testregistry.New(testregistry.Options{Username: "u", Password: "p", NoReferrers: noRef, FailFirst: 2})
+		reg := testregistry.New(
+			testregistry.Options{Username: "u", Password: "p", NoReferrers: noRef, FailFirst: 2},
+		)
 		defer reg.Close()
-		c := client.New(prof(reg.Host), client.Options{Credentials: static("u", "p"), Concurrency: 2, UserAgent: "test"})
+		c := client.New(
+			prof(reg.Host),
+			client.Options{Credentials: static("u", "p"), Concurrency: 2, UserAgent: "test"},
+		)
 		src, idx := packed(t)
 		ref, err := c.Parse("ubuntu-24.04:24.04-r1")
 		if err != nil {
@@ -113,10 +134,25 @@ func TestPushPullTagsReferrers(t *testing.T) {
 			t.Fatalf("push: %v", err)
 		}
 		// the build tag is immutable by policy
-		if _, err := c.Push(ctx, src, "src", ref, client.PushOptions{}); !errors.Is(err, client.ErrTagExists) {
+		if _, err := c.Push(
+			ctx,
+			src,
+			"src",
+			ref,
+			client.PushOptions{},
+		); !errors.Is(
+			err,
+			client.ErrTagExists,
+		) {
 			t.Fatalf("second push: %v", err)
 		}
-		if _, err := c.Push(ctx, src, "src", ref, client.PushOptions{AllowExisting: true}); err != nil {
+		if _, err := c.Push(
+			ctx,
+			src,
+			"src",
+			ref,
+			client.PushOptions{AllowExisting: true},
+		); err != nil {
 			t.Fatal(err)
 		}
 		if err := c.Tag(ctx, ref, idx, "stable"); err != nil {
@@ -146,7 +182,13 @@ func TestPushPullTagsReferrers(t *testing.T) {
 		}
 		// attach a referrer and discover it through the API or the fallback tag
 		repo, _ := c.Repository(ref.Registry, ref.Repository)
-		sig, err := oras.PackManifest(ctx, repo, oras.PackManifestVersion1_1, "application/vnd.test.sig", oras.PackManifestOptions{Subject: &idx})
+		sig, err := oras.PackManifest(
+			ctx,
+			repo,
+			oras.PackManifestVersion1_1,
+			"application/vnd.test.sig",
+			oras.PackManifestOptions{Subject: &idx},
+		)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -176,7 +218,10 @@ func TestMirrorsAreReadFirstAndFallBack(t *testing.T) {
 	if _, err := mc.Push(ctx, src, "src", mref, client.PushOptions{}); err != nil {
 		t.Fatal(err)
 	}
-	c := client.New(prof(canon.Host, down, mirror.Host), client.Options{Credentials: static("", "")})
+	c := client.New(
+		prof(canon.Host, down, mirror.Host),
+		client.Options{Credentials: static("", "")},
+	)
 	before := canon.Requests()
 	root, s, err := c.Pull(ctx, ref, memory.New(), client.PullOptions{Tag: "x"})
 	if err != nil || root.Digest != idx.Digest || !s.Mirror || s.Registry.Host != mirror.Host {
@@ -204,16 +249,39 @@ func TestMirrorsAreReadFirstAndFallBack(t *testing.T) {
 	if _, _, err := c.Resolve(ctx, r3); !errors.Is(err, client.ErrUnavailable) {
 		t.Fatal(err)
 	}
-	if _, _, err := c.Pull(ctx, r3, memory.New(), client.PullOptions{}); !errors.Is(err, client.ErrUnavailable) {
+	if _, _, err := c.Pull(
+		ctx,
+		r3,
+		memory.New(),
+		client.PullOptions{},
+	); !errors.Is(
+		err,
+		client.ErrUnavailable,
+	) {
 		t.Fatal(err)
 	}
 	if _, err := c.Size(ctx, r3, memory.New()); !errors.Is(err, client.ErrUnavailable) {
 		t.Fatal(err)
 	}
-	if _, err := c.FetchAll(ctx, r3, ocispec.Descriptor{Digest: "sha256:" + hex64, Size: 1}); !errors.Is(err, client.ErrUnavailable) {
+	if _, err := c.FetchAll(
+		ctx,
+		r3,
+		ocispec.Descriptor{Digest: "sha256:" + hex64, Size: 1},
+	); !errors.Is(
+		err,
+		client.ErrUnavailable,
+	) {
 		t.Fatal(err)
 	}
-	if _, err := c.Referrers(ctx, r3, ocispec.Descriptor{MediaType: spec.MediaTypeIndex, Digest: "sha256:" + hex64, Size: 1}, ""); !errors.Is(err, client.ErrUnavailable) {
+	if _, err := c.Referrers(
+		ctx,
+		r3,
+		ocispec.Descriptor{MediaType: spec.MediaTypeIndex, Digest: "sha256:" + hex64, Size: 1},
+		"",
+	); !errors.Is(
+		err,
+		client.ErrUnavailable,
+	) {
 		t.Fatal(err)
 	}
 	dead := client.New(prof(down), client.Options{Credentials: static("", "")})
@@ -237,14 +305,41 @@ func TestPushErrors(t *testing.T) {
 		t.Fatal("missing source tag accepted")
 	}
 	digestOnly, _ := ok.Parse("ubuntu@sha256:" + hex64)
-	if _, err := ok.Push(ctx, src, "src", digestOnly, client.PushOptions{}); !errors.Is(err, client.ErrReference) {
+	if _, err := ok.Push(
+		ctx,
+		src,
+		"src",
+		digestOnly,
+		client.PushOptions{},
+	); !errors.Is(
+		err,
+		client.ErrReference,
+	) {
 		t.Fatal(err)
 	}
-	if err := ok.Tag(ctx, ref, ocispec.Descriptor{MediaType: spec.MediaTypeIndex, Digest: "sha256:" + hex64, Size: 3}, "x"); err == nil {
+	if err := ok.Tag(
+		ctx,
+		ref,
+		ocispec.Descriptor{MediaType: spec.MediaTypeIndex, Digest: "sha256:" + hex64, Size: 3},
+		"x",
+	); err == nil {
 		t.Fatal("tagging an absent manifest succeeded")
 	}
-	bad := client.Reference{Registry: profile.Registry{Host: reg.Host, PlainHTTP: true}, Repository: "UPPER", Tag: "t"}
-	if _, err := ok.Push(ctx, src, "src", bad, client.PushOptions{}); !errors.Is(err, client.ErrReference) {
+	bad := client.Reference{
+		Registry:   profile.Registry{Host: reg.Host, PlainHTTP: true},
+		Repository: "UPPER",
+		Tag:        "t",
+	}
+	if _, err := ok.Push(
+		ctx,
+		src,
+		"src",
+		bad,
+		client.PushOptions{},
+	); !errors.Is(
+		err,
+		client.ErrReference,
+	) {
 		t.Fatal(err)
 	}
 	if err := ok.Tag(ctx, bad, ocispec.Descriptor{}, "x"); !errors.Is(err, client.ErrReference) {
@@ -266,7 +361,12 @@ func TestPushErrors(t *testing.T) {
 	if _, _, err := ok.Resolve(cctx, ref); err == nil {
 		t.Fatal("cancelled resolve succeeded")
 	}
-	if _, _, err := ok.Pull(cctx, ref, memory.New(), client.PullOptions{Referrers: true}); err == nil {
+	if _, _, err := ok.Pull(
+		cctx,
+		ref,
+		memory.New(),
+		client.PullOptions{Referrers: true},
+	); err == nil {
 		t.Fatal("cancelled pull succeeded")
 	}
 }
