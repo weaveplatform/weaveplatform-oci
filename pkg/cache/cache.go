@@ -37,7 +37,19 @@ var (
 	ErrNoSpace = errors.New("not enough disk space")
 	// ErrNotCached reports a reference the cache does not hold.
 	ErrNotCached = errors.New("not in cache")
+	// ErrPinned reports an image an owner still holds.
+	ErrPinned = errors.New("image is pinned")
 )
+
+// Entry describes one cached image for listings and prune decisions.
+type Entry struct {
+	Root       digest.Digest
+	Refs       []string
+	LastAccess time.Time
+	// PinnedBy lists the owners holding the image, sorted; empty when it
+	// may be evicted.
+	PinnedBy []string
+}
 
 // Guard reports free bytes for the volume holding path. guestweave-cli-macos
 // supplies an implementation that counts purgeable APFS space.
@@ -230,6 +242,60 @@ func (s *Store) Unpin(owner string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.state.Pins, owner)
+	return s.save()
+}
+
+// Entries lists the cached images, least recently used first.
+func (s *Store) Entries() []Entry {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	owners := map[digest.Digest][]string{}
+	for o, d := range s.state.Pins {
+		owners[d] = append(owners[d], o)
+	}
+	out := make([]Entry, 0, len(s.state.Roots))
+	for d, ri := range s.state.Roots {
+		by := owners[d]
+		sort.Strings(by)
+		out = append(
+			out,
+			Entry{
+				Root:       d,
+				Refs:       append([]string(nil), ri.Refs...),
+				LastAccess: ri.LastAccess,
+				PinnedBy:   by,
+			},
+		)
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if !out[i].LastAccess.Equal(out[j].LastAccess) {
+			return out[i].LastAccess.Before(out[j].LastAccess)
+		}
+		return out[i].Root < out[j].Root
+	})
+	return out
+}
+
+// Remove evicts one image and its signatures, then collects unreferenced
+// blobs. It refuses a pinned image: a consumer's VM may be built on it.
+func (s *Store) Remove(ctx context.Context, root digest.Digest) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, ok := s.state.Roots[root]; !ok {
+		return fmt.Errorf("%w: %s", ErrNotCached, root)
+	}
+	for o, d := range s.state.Pins {
+		if d == root {
+			return fmt.Errorf("%w: %s by %s", ErrPinned, root, o)
+		}
+	}
+	if err := s.evict(ctx, root); err != nil {
+		return err
+	}
+	delete(s.state.Roots, root)
+	if err := s.oci.GC(ctx); err != nil {
+		return fmt.Errorf("gc: %w", err)
+	}
 	return s.save()
 }
 
