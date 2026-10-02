@@ -16,6 +16,27 @@ disabled (zot's default is 60 s), garbage collection waits 24 h before
 deleting unreferenced blobs so a long push cannot lose its early chunks, and
 untagged manifests are removed by retention, so always push with a tag.
 
+## Published image
+
+Each release publishes `ghcr.io/weaveplatform/weave-zot` (and the
+`ghcr.io/weaveplatform/weaveoci` CLI image) for linux/amd64 and linux/arm64,
+tagged `X.Y.Z`, `X.Y` and `latest`, signed keyless and with an SPDX SBOM
+attestation. Check an image before running it:
+
+```sh
+cosign verify ghcr.io/weaveplatform/weave-zot:latest \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp '^https://github\.com/weaveplatform/weaveplatform-oci/\.github/workflows/release-images\.yml@refs/tags/v'
+```
+
+## Compose
+
+`compose.yaml` runs the private role, and the mirror role under the `mirror`
+profile. `WEAVE_ZOT_PORT` (default 5000) and `WEAVE_ZOT_MIRROR_PORT` (default
+5001) move the host ports; on macOS, port 5000 belongs to AirPlay Receiver.
+
+## Building locally
+
 ```sh
 docker build -f deploy/zot/Dockerfile -t weave-zot .      # from the repository root (the Dockerfile copies the module, including pkg/ and internal/)
 docker run --rm weave-zot verify /etc/zot/roles/private.json
