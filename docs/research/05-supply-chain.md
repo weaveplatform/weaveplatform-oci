@@ -245,14 +245,23 @@ What images need, and what phase 2 implemented (2026-10-02):
    admits the image whether it is pulled from GHCR, a zot mirror or an air-gapped
    layout. `weaveoci channel new|keygen|endorse|promote|sign|verify` lets an
    organisation run its own channel without the agent-core tooling.
-4. **Still required elsewhere.** agent-core's `schema/channel-manifest.schema.json`
-   (top-level `additionalProperties: false`) must gain `images`, and already lacks
-   `sequence`, `expires` and module `subscribes`, which CI writes today; the
-   weaveplatform-channels promote workflow must learn to write image entries; and no
-   real root key exists yet (core's embedded `keys/root.pub` is empty).
-3. **A new dispatch event**, `image-published`, carrying repository, tag, index
-   digest and the attestation reference, mirroring the existing
-   `module-published` event in `module-release.yml`.
+4. **The schema and the promotion path.** agent-core's
+   `schema/channel-manifest.schema.json` (`additionalProperties: false` throughout)
+   gains `images`, plus the `sequence`, `expires` and module `subscribes` fields CI
+   already wrote but the schema rejected, and core's `sdk/manifest` parses and checks
+   image entries
+   ([weaveplatform-agent-core#56](https://github.com/weaveplatform/weaveplatform-agent-core/pull/56)).
+   The channels promote workflow handles a new `image-published` dispatch whose
+   payload is the entry `weaveoci publish --promotion-out` writes. It validates the
+   entry, re-resolves the tag from the registry and refuses a payload whose index or
+   platform digests differ, then adds or replaces the entry by repository and tag as
+   `channel.Promote` does
+   ([weaveplatform-channels#14](https://github.com/weaveplatform/weaveplatform-channels/pull/14)).
+   `pkg/channel` validates everything it writes against a byte-for-byte copy of
+   agent-core's schema (`make channel-schema` refreshes it), and uses core's expiry
+   rule: the `expires` instant itself is still valid.
+5. **Still required.** No real root key exists yet (core's embedded `keys/root.pub`
+   is empty, Q29).
 
 ## 5. Provenance predicate for VM images
 
