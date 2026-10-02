@@ -105,6 +105,16 @@ Alternatives considered:
 - hostweave `agent/runtime/qemu` tests: pull from an in-process registry, overlay
   created with `-F raw`, seed attached, `HOSTWEAVE_QEMU_IMAGES` no longer read.
 - Checksum verification test per distribution against recorded fixtures.
+- **Implemented 2026-10-02 (cloud-image path, Ubuntu 24.04):**
+  `images/linux/ubuntu-24.04/` pins Canonical's signing key by fingerprint;
+  `weaveoci source fetch` verifies `SHA256SUMS.gpg` and the image hash;
+  `scripts/linux/build-cloud-image.sh` converts to raw and runs `weaveoci bundle init`;
+  `scripts/linux/boot-test.sh` boots the raw base through a qcow2 overlay with OVMF and
+  a NoCloud seed; `build-linux.yml` and `image-ubuntu-24.04.yml` run it.
+  `phase3_linux_publish.feature` covers verified fetch to promoted pull on weave-zot and
+  the refusals. A local build of serial `20260926` produced a 3.50 GiB disk in 7 chunks
+  (514 MiB to fetch) that passes `inspect --strict --deep`. Still to do: the bootc path,
+  the agent baked in (which also triggers the Ubuntu trademark rename) and arm64 boot tests.
 - Existing evidence: `deploymenttheory/weaveplatform-agent-modules@main handoff/linux-bring-up.md`
   (agent installed via NoCloud seed, channel authenticated against a real Debian guest).
 

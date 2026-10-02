@@ -61,6 +61,8 @@ func newRoot(stdout, stderr io.Writer) *cobra.Command {
 		newUnpack(stdout),
 		newHealthcheck(stdout),
 		newVersion(stdout),
+		newSource(stdout),
+		newBundle(stdout),
 	)
 	g := &globals{}
 	g.register(root)
