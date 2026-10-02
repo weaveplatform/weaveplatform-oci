@@ -20,6 +20,8 @@ const (
 	adminPassword     = "admin-test-password"
 )
 
+var passwords = map[string]string{"publisher": publisherPassword, "admin": adminPassword}
+
 type registry struct {
 	kind      string // weave-zot or distribution
 	host      string // host:port
@@ -27,8 +29,10 @@ type registry struct {
 }
 
 type registrySet struct {
-	mu      sync.Mutex
-	running map[string]*registry
+	mu       sync.Mutex
+	running  map[string]*registry
+	zotImage string   // the weave-zot image the scenarios run
+	networks []string // Docker networks created for mirror scenarios
 }
 
 var registries = &registrySet{running: map[string]*registry{}}
@@ -45,7 +49,7 @@ func (s *registrySet) get(ctx context.Context, kind string) (*registry, error) {
 	)
 	switch kind {
 	case "weave-zot":
-		c, err = startZot(ctx)
+		c, err = s.startZot(ctx)
 	case "distribution":
 		c, err = testcontainers.Run(
 			ctx,
@@ -76,9 +80,12 @@ func (s *registrySet) terminate() {
 	for _, r := range s.running {
 		_ = testcontainers.TerminateContainer(r.container)
 	}
+	for _, n := range s.networks {
+		_ = exec.Command("docker", "network", "rm", n).Run()
+	}
 }
 
-func startZot(ctx context.Context) (testcontainers.Container, error) {
+func (s *registrySet) startZot(ctx context.Context) (testcontainers.Container, error) {
 	dir, err := os.MkdirTemp("", "weave-zot-")
 	if err != nil {
 		return nil, err
@@ -134,5 +141,6 @@ func startZot(ctx context.Context) (testcontainers.Container, error) {
 			return nil, fmt.Errorf("docker build weave-zot: %w\n%s", err, out)
 		}
 	}
+	s.zotImage = image
 	return testcontainers.Run(ctx, image, opts...)
 }

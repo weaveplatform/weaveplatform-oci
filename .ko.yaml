@@ -1,0 +1,20 @@
+# ko builds ghcr.io/weaveplatform/weaveoci (decision 0012). The base is a
+# tag, not a digest: ko resolves it at build time and records the digest in
+# the image's org.opencontainers.image.base.digest annotation, so every
+# release starts from the current distroless and the record says which.
+defaultBaseImage: gcr.io/distroless/static-debian13:nonroot
+defaultPlatforms:
+  - linux/amd64
+  - linux/arm64
+builds:
+  - id: weaveoci
+    main: ./cmd/weaveoci
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/weaveplatform/weaveplatform-oci/internal/buildinfo.version={{.Env.VERSION}}
+      - -X github.com/weaveplatform/weaveplatform-oci/internal/buildinfo.commit={{.Env.COMMIT}}
+      - -X github.com/weaveplatform/weaveplatform-oci/internal/buildinfo.buildDate={{.Env.BUILD_DATE}}

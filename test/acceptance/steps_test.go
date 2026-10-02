@@ -37,6 +37,7 @@ type world struct {
 	stdout  string
 	stderr  string
 	reg     *registry
+	mirror  *registry
 	copyErr error
 }
 
@@ -45,7 +46,7 @@ func newWorld(t *testing.T) *world { return &world{t: t} }
 func (w *world) register(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		dir, err := os.MkdirTemp("", "weaveoci-scenario-")
-		w.root, w.reg, w.copyErr = dir, nil, nil
+		w.root, w.reg, w.mirror, w.copyErr = dir, nil, nil, nil
 		w.env = map[string]string{
 			"WEAVEOCI_CACHE": filepath.Join(dir, "cache"),
 			"DOCKER_CONFIG":  filepath.Join(dir, "docker"),
@@ -96,6 +97,21 @@ func (w *world) register(sc *godog.ScenarioContext) {
 	sc.Step(`^a profile file "([^"]+)":$`, w.profileFile)
 	sc.Step(`^cosign verifies "([^"]+)" with key "([^"]+)"$`, w.cosignVerifies)
 	sc.Step(`^I remember the published digest as "([^"]+)"$`, w.rememberDigest)
+	sc.Step(`^an anonymous request to "([^"]+)" is refused$`, w.anonymousRefused)
+	sc.Step(
+		`^a request to "([^"]+)" as "([^"]+)" with a wrong password is refused$`,
+		w.wrongPasswordRefused,
+	)
+	sc.Step(`^a request to "([^"]+)" as "([^"]+)" succeeds$`, w.authenticatedSucceeds)
+	sc.Step(`^a weave-zot mirror of the registry is running$`, w.mirrorRunning)
+	sc.Step(
+		`^I copy "([^"]+)" from the mirror as "([^"]+)" into layout "([^"]+)"$`,
+		w.copyDownMirror,
+	)
+	sc.Step(
+		`^a signature referrer is discoverable for "([^"]+)" on the mirror$`,
+		w.referrerOnMirror,
+	)
 }
 
 // path maps a scenario-local name to a path under the scenario directory.
@@ -374,7 +390,10 @@ func (w *world) repo(name, user string) (*remote.Repository, error) {
 		return nil, err
 	}
 	r.PlainHTTP = true
-	pw := map[string]string{"publisher": publisherPassword, "admin": adminPassword}[user]
+	if user == "anonymous" {
+		user = ""
+	}
+	pw := passwords[user]
 	r.Client = &auth.Client{
 		Client: retry.DefaultClient,
 		Cache:  auth.NewCache(),
@@ -394,6 +413,7 @@ func splitRef(ref string) (string, string) {
 }
 
 func (w *world) copyUp(layout, tag, ref, user string) error {
+	ref = w.expand(ref)
 	src, err := pack.OpenLayout(context.Background(), w.path(layout))
 	if err != nil {
 		return err
@@ -418,6 +438,7 @@ func (w *world) copyResult(want string) error {
 }
 
 func (w *world) copyDown(ref, user, layout string) error {
+	ref = w.expand(ref)
 	name, tag := splitRef(ref)
 	src, err := w.repo(name, user)
 	if err != nil {
@@ -464,6 +485,7 @@ func (w *world) sameDigest(a, b string) error {
 const sigArtifactType = "application/vnd.dev.sigstore.bundle.v0.3+json"
 
 func (w *world) attachReferrer(ref string) error {
+	ref = w.expand(ref)
 	ctx := context.Background()
 	name, tag := splitRef(ref)
 	r, err := w.repo(name, "publisher")
@@ -494,6 +516,7 @@ func (w *world) attachReferrer(ref string) error {
 }
 
 func (w *world) referrersAPI(mode, ref string) error {
+	ref = w.expand(ref)
 	ctx := context.Background()
 	name, tag := splitRef(ref)
 	r, err := w.repo(name, "publisher")
@@ -529,6 +552,7 @@ func (w *world) referrersAPI(mode, ref string) error {
 }
 
 func (w *world) referrerDiscoverable(ref string) error {
+	ref = w.expand(ref)
 	ctx := context.Background()
 	name, tag := splitRef(ref)
 	r, err := w.repo(name, "publisher")
