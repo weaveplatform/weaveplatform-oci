@@ -16,10 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * **channel:** validate channel output against agent-core's schema ([f09110f](https://github.com/weaveplatform/weaveplatform-oci/commit/f09110f0e408a9739503ba8534acac75d2c36c53))
 * **channel:** validate channel output against agent-core's schema ([e877072](https://github.com/weaveplatform/weaveplatform-oci/commit/e877072c94d46a9ef74fcf1e32b4bcaaaec3a272))
-* guest artifact contract, registry client, signing and quality gate (phases 1-2) ([e2119e1](https://github.com/weaveplatform/weaveplatform-oci/commit/e2119e127d972fccb63710430ffcb0a75a45303f))
-* guest artifact contract, registry client, signing and quality gate (phases 1-2) ([f3fb7aa](https://github.com/weaveplatform/weaveplatform-oci/commit/f3fb7aa1b4b5aecb8face2cfb5e1c6d721e262ee))
-* phase 2b, publish the weaveoci and weave-zot images ([5b4f7d2](https://github.com/weaveplatform/weaveplatform-oci/commit/5b4f7d2870497bd1ab469d6589bdf070d9b2dbeb))
-* phase 2b, publish the weaveoci and weave-zot images ([af763b9](https://github.com/weaveplatform/weaveplatform-oci/commit/af763b9cda647fad81230a1b53a5c9930b584006))
+* guest artifact contract, registry client, signing and quality gate ([e2119e1](https://github.com/weaveplatform/weaveplatform-oci/commit/e2119e127d972fccb63710430ffcb0a75a45303f))
+* guest artifact contract, registry client, signing and quality gate ([f3fb7aa](https://github.com/weaveplatform/weaveplatform-oci/commit/f3fb7aa1b4b5aecb8face2cfb5e1c6d721e262ee))
+* publish the weaveoci and weave-zot images ([5b4f7d2](https://github.com/weaveplatform/weaveplatform-oci/commit/5b4f7d2870497bd1ab469d6589bdf070d9b2dbeb))
+* publish the weaveoci and weave-zot images ([af763b9](https://github.com/weaveplatform/weaveplatform-oci/commit/af763b9cda647fad81230a1b53a5c9930b584006))
 
 
 ### Bug Fixes
