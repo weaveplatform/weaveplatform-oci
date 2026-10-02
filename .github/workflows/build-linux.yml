@@ -157,7 +157,8 @@ jobs:
             echo "WEAVEOCI_PROFILES=$WORK/profiles.yaml"
             echo "WEAVEOCI_CACHE=$WORK/cache"
           } >> "$GITHUB_ENV"
-          "$WEAVEOCI" profile validate
+          # GITHUB_ENV takes effect from the next step, so name the file here.
+          "$WEAVEOCI" profile validate --profiles "$WORK/profiles.yaml"
 
       - name: Publish
         id: publish
