@@ -21,6 +21,7 @@ func OpenFile(path string) (*File, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open disk: %w", err)
 	}
+	markSparse(f)
 	return &File{File: f}, nil
 }
 
