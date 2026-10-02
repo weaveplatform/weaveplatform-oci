@@ -15,7 +15,7 @@ owns the artifact specification, a shared Go module and the publication workflow
 
 ## Decision
 
-Module path `github.com/deploymenttheory/weaveplatform-oci`, Go 1.27, `CGO_ENABLED=0`,
+Module path `github.com/weaveplatform/weaveplatform-oci`, Go 1.27, `CGO_ENABLED=0`,
 `oras.land/oras-go/v2` pinned at v2.6.2 as the registry library, `github.com/klauspost/compress/zstd`
 for compression, `github.com/sigstore/sigstore-go` for bundle verification and
 `github.com/sigstore/sigstore/pkg/signature` for key-based signing. The template
@@ -131,7 +131,7 @@ Alternatives considered:
 - oras-go v2: <https://github.com/oras-project/oras-go>, <https://github.com/oras-project/oras-go/blob/v2/pack.go>; chunked push in v3 only: <https://github.com/oras-project/oras-go/pull/1434>
 - regclient: <https://github.com/regclient/regclient>; go-containerregistry: <https://github.com/google/go-containerregistry>
 - sigstore-go: <https://github.com/sigstore/sigstore-go>
-- `deploymenttheory/guestweave-cli-macos@main internal/oci/oci_registry.go`, `internal/oci/format.go`, `internal/vm/storage/registry.go:71-163`
-- `deploymenttheory/guestweave-cli-windows@main internal/oci/oci.go`, `internal/oci/layer.go`, `internal/oci/cache/cache.go`
-- `deploymenttheory/hostweave@main pkg/images/vm.go`, `pkg/images/registry.go:103-236`, `agent/runtime/qemu/qemu.go`
+- `weaveplatform/guestweave-cli-macos@main internal/oci/oci_registry.go`, `internal/oci/format.go`, `internal/vm/storage/registry.go:71-163`
+- `weaveplatform/guestweave-cli-windows@main internal/oci/oci.go`, `internal/oci/layer.go`, `internal/oci/cache/cache.go`
+- `weaveplatform/hostweave@main pkg/images/vm.go`, `pkg/images/registry.go:103-236`, `agent/runtime/qemu/qemu.go`
 - `deploymenttheory/weaveplatform-agent-modules@main handoff/repositories.md` (dependency direction, `GOWORK=off`)

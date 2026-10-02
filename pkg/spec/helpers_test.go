@@ -11,7 +11,7 @@ import (
 	"github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // validConfig returns a conformant config for a guest OS with one disk of
@@ -56,7 +56,7 @@ func validConfig(osName string) spec.Config {
 		},
 		Build: spec.Build{
 			Template:    "macos-26-vanilla",
-			TemplateRef: "deploymenttheory/weaveplatform-oci@0123abc",
+			TemplateRef: "weaveplatform/weaveplatform-oci@0123abc",
 			SourceMedia: []spec.SourceMedia{
 				{
 					Kind:   "ipsw",
@@ -136,7 +136,7 @@ func manifestFor(t testing.TB, cfg spec.Config) (ocispec.Manifest, []byte) {
 		Annotations: map[string]string{
 			spec.AnnotationVersion:  "26.0-25A354-r1",
 			spec.AnnotationRevision: "0123abc",
-			spec.AnnotationSource:   "https://github.com/deploymenttheory/weaveplatform-oci",
+			spec.AnnotationSource:   "https://github.com/weaveplatform/weaveplatform-oci",
 			spec.AnnotationTitle:    cfg.Build.Template,
 		},
 	}

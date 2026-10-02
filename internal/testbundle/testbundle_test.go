@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 func TestWriteEveryOS(t *testing.T) {

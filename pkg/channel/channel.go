@@ -268,7 +268,7 @@ func (m *Manifest) Expired(now time.Time) bool {
 }
 
 // Image returns the entry promoting index digest d in repository (the
-// repository path, for example deploymenttheory/weave-images/ubuntu-24.04).
+// repository path, for example weaveplatform/weave-images/ubuntu-24.04).
 func (m *Manifest) Image(repository string, d digest.Digest) (*Image, error) {
 	for i := range m.Images {
 		if m.Images[i].Digest == d.String() &&

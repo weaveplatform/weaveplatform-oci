@@ -12,7 +12,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // Source supplies compressed chunk blobs (a cache or a registry).

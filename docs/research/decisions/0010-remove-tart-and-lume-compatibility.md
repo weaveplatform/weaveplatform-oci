@@ -98,10 +98,10 @@ Alternatives considered:
   replaced by `weave-guest-v1` fixtures.
 - `cmd/weaveoci` test: `republish` converts a recorded legacy manifest fixture into an
   artifact that passes the conformance suite and contains no `ecid` or `macAddress`.
-- Existing evidence: `deploymenttheory/guestweave-cli-macos@main internal/oci/oci_manifest.go:17-44`
+- Existing evidence: `weaveplatform/guestweave-cli-macos@main internal/oci/oci_manifest.go:17-44`
   (Tart media types kept as "a wire contract"), `internal/oci/format.go:111`
   (`DetectImageFormat`), `internal/docs/registries-and-image-formats.md` (formats
-  table); `deploymenttheory/hostweave@main pkg/images/vm.go:36-61`.
+  table); `weaveplatform/hostweave@main pkg/images/vm.go:36-61`.
 
 ## References
 

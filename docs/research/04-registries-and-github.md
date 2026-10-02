@@ -42,7 +42,7 @@ mirrors). The artifact shape it assumes is defined in
 | Immutable tags | Not available. GitHub's "immutable releases" feature covers Git releases and tags, not packages. The GHCR request is unanswered | [GitHub changelog 2025-10-28](https://github.blog/changelog/2025-10-28-immutable-releases-are-now-generally-available/); [community discussion #181783](https://github.com/orgs/community/discussions/181783) |
 | Pull rate limits | Not publicly documented. Users of a public macOS VM image tool saw `503 Egress is over the account limit` from the Azure backend on 50–60 GB pulls | Prior-art issues #783 and #944 (links in [02-prior-art.md](02-prior-art.md)) |
 | Manifest annotations rendered | `org.opencontainers.image.source` (≤256 chars, links the package to a repository), `description` (≤512), `licenses` (≤256). For multi-arch images, put the description on the index | [GitHub docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) |
-| Package names | A `/` inside the package name works: the in-house modules already publish `ghcr.io/deploymenttheory/weaveplatform-modules/<id>` | `deploymenttheory/weaveplatform-agent-modules@main` `.github/workflows/module-release.yml:115` |
+| Package names | A `/` inside the package name works: the in-house modules already publish `ghcr.io/weaveplatform/weaveplatform-modules/<id>` | `deploymenttheory/weaveplatform-agent-modules@main` `.github/workflows/module-release.yml:115` |
 | Anonymous pull | Allowed for public packages | [GitHub docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) |
 | Pricing | "Container image storage and bandwidth for the Container registry is currently free", with at least one month's notice before any change. Public packages are free. Downloads from Actions with `GITHUB_TOKEN` do not count toward transfer. Plan quotas (Free 500 MB storage / 1 GB transfer, Enterprise Cloud 50 GB / 100 GB) apply to the other Packages registries | [GitHub Packages billing](https://docs.github.com/en/billing/concepts/product-billing/github-packages) |
 
@@ -87,18 +87,18 @@ skipped with a `HEAD` when the registry already holds it. Because GHCR honours
 - On devices, credentials should sit in the OS keychain through Docker credential
   helpers (`docker-credential-osxkeychain`, `docker-credential-wincred`), which
   guestweave-macos already honours
-  (`deploymenttheory/guestweave-cli-macos@main` `internal/oci/oci_authentication.go`).
+  (`weaveplatform/guestweave-cli-macos@main` `internal/oci/oci_authentication.go`).
 - hostweave never uses ambient credentials on the server. It seals basic
   credentials per registry connection and exchanges provider identities for ECR,
   ACR and Artifact Registry tokens at dispatch time
-  (`deploymenttheory/hostweave@main` `pkg/images/registry.go:34-80`,
+  (`weaveplatform/hostweave@main` `pkg/images/registry.go:34-80`,
   `pkg/provider/registry.go:18-48`). That model carries over unchanged.
 
 ### 2.3 Registry profiles
 
 guestweave-macos already separates *where blobs live* from *how a VM is encoded*,
 and names registries with profiles in `$XDG_CONFIG_HOME/weave/config.yaml`
-(`deploymenttheory/guestweave-cli-macos@main`
+(`weaveplatform/guestweave-cli-macos@main`
 `internal/docs/registries-and-image-formats.md`):
 
 ```yaml
@@ -118,7 +118,7 @@ reference → bare name against the default profile. Credentials resolve per hos
 
 hostweave's `RegistryConnection` is narrower: one connection covers exactly one
 repository, and the authentication mode is one of `anonymous`, `basic`, `ecr`,
-`acr` or `gar` (`deploymenttheory/hostweave@main` `pkg/types/image.go:44-100`).
+`acr` or `gar` (`weaveplatform/hostweave@main` `pkg/types/image.go:44-100`).
 It has no concept of a mirror, a pull-through cache or a profile shared with the
 agents. [Decision 0008](decisions/0008-device-cache-gc-and-mirrors.md) adds an
 ordered mirror list to the shared profile type so that one definition serves the
@@ -179,7 +179,7 @@ chunk small enough that a failed upload is simply retried whole.
 
 ```mermaid
 flowchart LR
-    gh["ghcr.io/deploymenttheory<br/>canonical, published by Actions"]
+    gh["ghcr.io/weaveplatform<br/>canonical, published by Actions"]
     zot["site mirror<br/>zot sync (on-demand, preserveDigest)<br/>or Harbor proxy cache"]
     cache["device cache<br/>blobs/sha256 · refs · pins · LRU"]
     layout["oci-layout tarball<br/>oras copy --to-oci-layout"]
@@ -229,7 +229,7 @@ The same artifacts, tools and trust chain run in three deployment profiles
 | Profile | Canonical registry | Publisher | Build-time signature | Site registry |
 |---|---|---|---|---|
 | GitHub | GHCR | GitHub Actions wrapping `weaveoci publish` | GitHub artifact attestation | none |
-| Private | zot (`ghcr.io/deploymenttheory/weave-zot`), or Harbor / distribution v3 | `weaveoci publish` from any CI or a workstation | cosign-format bundle signed with a file or KMS key | optional zot mirror |
+| Private | zot (`ghcr.io/weaveplatform/weave-zot`), or Harbor / distribution v3 | `weaveoci publish` from any CI or a workstation | cosign-format bundle signed with a file or KMS key | optional zot mirror |
 | Hybrid | GHCR | GitHub Actions | GitHub artifact attestation | zot per site, `sync` on demand with `preserveDigest` |
 
 zot is the reference private registry because it is a single container with the
@@ -250,7 +250,7 @@ Observed layouts **(probed)**, publishers named in [02-prior-art.md](02-prior-ar
 
 The weave layout is defined in [09-artifact-contract-v1.md](09-artifact-contract-v1.md)
 and fixed by [decision 0002](decisions/0002-registry-repositories-tags-visibility.md):
-`ghcr.io/deploymenttheory/weave-images/<family>-<major>[-<variant>]`, immutable
+`ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]`, immutable
 tags `<osver>-<build>-r<rev>` plus moving `stable`, `edge` and `latest`. Because
 GHCR cannot enforce tag immutability, the channel manifest records digests and
 every consumer pins by digest.
@@ -360,6 +360,6 @@ above.
 - Apple macOS Tahoe SLA: <https://www.apple.com/legal/sla/docs/macOSTahoe.pdf>
 - Windows 11 OEM licence terms: <https://microsoft.com/content/dam/microsoft/usetm/documents/windows/11/oem-(pre-installed)/UseTerms_OEM_Windows_11_English.pdf>
 - Microsoft reimaging rights: <https://www.microsoft.com/licensing/guidance/Reimaging-rights>
-- `deploymenttheory/hostweave@main`: `pkg/types/image.go`, `pkg/images/registry.go`, `pkg/provider/registry.go`
-- `deploymenttheory/guestweave-cli-macos@main`: `internal/docs/registries-and-image-formats.md`, `internal/oci/oci_authentication.go`
+- `weaveplatform/hostweave@main`: `pkg/types/image.go`, `pkg/images/registry.go`, `pkg/provider/registry.go`
+- `weaveplatform/guestweave-cli-macos@main`: `internal/docs/registries-and-image-formats.md`, `internal/oci/oci_authentication.go`
 - `deploymenttheory/weaveplatform-agent-modules@main`: `.github/workflows/module-release.yml`

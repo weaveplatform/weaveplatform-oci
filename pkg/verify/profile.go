@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 )
 
 // FromProfile builds the consumer policy a profile describes, loading

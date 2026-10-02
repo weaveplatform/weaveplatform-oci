@@ -38,7 +38,7 @@ flowchart TB
     end
 
     subgraph reg["Registries"]
-        ghcr["ghcr.io/deploymenttheory/weave-images/*<br/>(canonical)"]
+        ghcr["ghcr.io/weaveplatform/weave-images/*<br/>(canonical)"]
         mirror["mirror / pull-through<br/>(zot · Harbor · oci-layout)"]
         ghcr -. sync .-> mirror
     end
@@ -86,9 +86,9 @@ flowchart TB
 | Artifact spec | `weaveplatform-oci` (`pkg/spec`, [09](09-artifact-contract-v1.md)) | The only VM artifact encoding any weave project publishes or consumes: `application/vnd.weave.guest.config.v1+json` config and artifactType, `application/vnd.weave.guest.disk.v1.raw+zstd` chunks, typed state blobs, one index per OS build |
 | Shared Go module | `weaveplatform-oci` ([10](10-shared-go-module.md)) | `chunk`, `pack`, `client` (oras-go v2), `cache`, `verify`, `disk/vhd`, `cmd/weaveoci`, plus `profile`, `sign` and `publish`. Replaces the three OCI clients that exist today |
 | Publication workflows | `weaveplatform-oci/.github/workflows/` ([07](07-build-pipelines.md)) | Reusable `build-macos.yml`, `build-windows.yml`, `build-linux.yml`, `publish.yml`. Mirror the shape of `weaveplatform-agent-modules/.github/workflows/module-release.yml` |
-| `weaveoci` container image | `ghcr.io/deploymenttheory/weaveoci` ([0012](decisions/0012-container-images.md)) | Static, nonroot multi-arch image of the CLI. Runs `weaveoci publish` on any CI system, not only GitHub Actions, and supplies the `healthcheck` probe binary inside `weave-zot` |
-| `weave-zot` container image | `ghcr.io/deploymenttheory/weave-zot`, built `FROM ghcr.io/project-zot/zot:v2.1.21@sha256:…` with weave config roles ([13](13-deployment-profiles.md)) | Reference private registry and site mirror. Config roles `private` (canonical store, htpasswd or OpenID, create-without-update tag immutability, cosign trust extension) and `mirror` (on-demand `sync` from GHCR with `preserveDigest`). Docker Compose file in `deploy/zot/` |
-| Canonical registry | `ghcr.io/deploymenttheory/weave-images/<family>-<major>[-<variant>]` ([04](04-registries-and-github.md)) | Linux repositories public; macOS and Windows repositories org-private. Tags are immutable `<osver>-<build>-r<rev>` plus moving `stable`, `edge`, `latest` |
+| `weaveoci` container image | `ghcr.io/weaveplatform/weaveoci` ([0012](decisions/0012-container-images.md)) | Static, nonroot multi-arch image of the CLI. Runs `weaveoci publish` on any CI system, not only GitHub Actions, and supplies the `healthcheck` probe binary inside `weave-zot` |
+| `weave-zot` container image | `ghcr.io/weaveplatform/weave-zot`, built `FROM ghcr.io/project-zot/zot:v2.1.21@sha256:…` with weave config roles ([13](13-deployment-profiles.md)) | Reference private registry and site mirror. Config roles `private` (canonical store, htpasswd or OpenID, create-without-update tag immutability, cosign trust extension) and `mirror` (on-demand `sync` from GHCR with `preserveDigest`). Docker Compose file in `deploy/zot/` |
+| Canonical registry | `ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]` ([04](04-registries-and-github.md)) | Linux repositories public; macOS and Windows repositories org-private. Tags are immutable `<osver>-<build>-r<rev>` plus moving `stable`, `edge`, `latest` |
 | Mirrors | operator-run zot or Harbor; `oci-layout` directories for air gap | Registry profiles name a mirror list; digests are preserved so attestations and channel pins stay valid |
 | Build-time trust | Profile-dependent signing provider ([05](05-supply-chain.md), [0011](decisions/0011-deployment-profiles-and-reference-registry.md)): GitHub artifact attestations (`actions/attest`) in the github profile, cosign v3 key-based signing (file or KMS key, no transparency log) in the private profile | A Sigstore bundle pushed as an OCI 1.1 referrer with artifactType `application/vnd.dev.sigstore.bundle.v0.3+json`; zot serves it through the referrers API, GHCR and distribution v3 through the `sha256-<hex>` fallback tag |
 | Promotion-time trust | `weaveplatform-manifest` channel manifest, minisign root → signing key → `channels/stable.json` | The channel lists promoted image digests. hostweave and guestweave trust the channel; an air-gapped host verifies with the root key already embedded in core |
@@ -104,14 +104,14 @@ changes where images are pushed, who signs them and how devices reach the regist
 
 | Profile | Canonical registry | Publishes from | Build-time signature | Promotion | Devices pull from |
 |---|---|---|---|---|---|
-| github | `ghcr.io/deploymenttheory` | GitHub Actions reusable workflows wrapping `weaveoci publish` | GitHub artifact attestation (keyless, GitHub OIDC) | `weaveplatform-manifest` channel | GHCR, with a service PAT |
+| github | `ghcr.io/weaveplatform` | GitHub Actions reusable workflows wrapping `weaveoci publish` | GitHub artifact attestation (keyless, GitHub OIDC) | `weaveplatform-manifest` channel | GHCR, with a service PAT |
 | private | `weave-zot` in the `private` role | Any CI or a workstation running `weaveoci publish` (binary or container) | cosign key-based signature (file or KMS key) | the organisation's own channel manifest | `weave-zot`, with htpasswd, OpenID or API-key credentials |
-| hybrid | `ghcr.io/deploymenttheory` | GitHub Actions | GitHub artifact attestation | `weaveplatform-manifest` channel | a site `weave-zot` in the `mirror` role, syncing on demand with digests preserved |
+| hybrid | `ghcr.io/weaveplatform` | GitHub Actions | GitHub artifact attestation | `weaveplatform-manifest` channel | a site `weave-zot` in the `mirror` role, syncing on demand with digests preserved |
 
 ```mermaid
 flowchart LR
     subgraph github["github profile"]
-        GA["GitHub Actions<br/>weaveoci publish"] --> GHCR1["ghcr.io/deploymenttheory"]
+        GA["GitHub Actions<br/>weaveoci publish"] --> GHCR1["ghcr.io/weaveplatform"]
         GA -.-> ATT["actions/attest<br/>bundle as fallback-tag referrer"]
         ATT -.-> GHCR1
         GHCR1 --> D1["hostweave agents<br/>guestweave CLIs"]
@@ -123,7 +123,7 @@ flowchart LR
         ZP --> D2["hostweave agents<br/>guestweave CLIs"]
     end
     subgraph hybrid["hybrid profile"]
-        GA2["GitHub Actions"] --> GHCR2["ghcr.io/deploymenttheory"]
+        GA2["GitHub Actions"] --> GHCR2["ghcr.io/weaveplatform"]
         GHCR2 -->|"on-demand sync<br/>preserveDigest"| ZM["site weave-zot<br/>role mirror"]
         ZM --> D3["office devices"]
     end
@@ -162,7 +162,7 @@ sequenceDiagram
     participant Src as Source media<br/>(Apple CDN · go-sdk-winmediafoundry · distro mirror · bootc image)
     participant Runner as Runner<br/>(self-hosted Apple silicon · ubuntu KVM)
     participant WO as weaveoci
-    participant GHCR as ghcr.io/deploymenttheory/weave-images
+    participant GHCR as ghcr.io/weaveplatform/weave-images
     participant Att as actions/attest
     participant Man as weaveplatform-manifest
 
@@ -242,7 +242,7 @@ sequenceDiagram
 
 hostweave never accepts a free-form image string for VM jobs in the target: `Workload.Image` is
 always `repo@sha256:…` set by the server. Container jobs keep the moby runtime's engine pull
-([0009 in hostweave](https://github.com/deploymenttheory/hostweave/blob/main/docs/research/decisions/0009-container-runtime-moby.md))
+([0009 in hostweave](https://github.com/weaveplatform/hostweave/blob/main/docs/research/decisions/0009-container-runtime-moby.md))
 and are outside the VM contract.
 
 ### guestweave pull and clone

@@ -13,8 +13,8 @@ import (
 	"oras.land/oras-go/v2"
 	"oras.land/oras-go/v2/content"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // MaxStateSize caps a state file; state blobs are small and never chunked.

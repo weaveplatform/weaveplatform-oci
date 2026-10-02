@@ -98,13 +98,13 @@ A freshly installed guest disk is mostly zeros. The contract handles that at two
 
 - **Whole-zero chunks** are detected at pack time. They are emitted as the single canonical
   zstd encoding of 512 MiB of zeros, so every zero chunk in every image shares one digest, and
-  the layer carries `com.deploymenttheory.weave.guest.disk.chunk.zero: "true"`. A consumer that
+  the layer carries `run.weaveplatform.guest.disk.chunk.zero: "true"`. A consumer that
   has the chunk's offset and size may skip the fetch entirely and leave a hole.
 - **Zero runs inside a chunk** are skipped by the reassembler. After decompressing a chunk
   it compares fixed windows against a zero buffer and punches holes instead of writing them
   (`fcntl F_PUNCHHOLE` on APFS, `FSCTL_SET_ZERO_DATA` on NTFS, `fallocate(PUNCH_HOLE)` on
   ext4/XFS). guestweave-macos already does this at 4 MiB granularity when reassembling a disk
-  (`deploymenttheory/guestweave-cli-macos@main` `internal/oci/oci_layerizer_diskv2.go:35-48`),
+  (`weaveplatform/guestweave-cli-macos@main` `internal/oci/oci_layerizer_diskv2.go:35-48`),
   and the target file is pre-truncated to its logical size so writes land at the right offset.
 
 The result is that a 64 GiB logical disk with ~36 GiB of data occupies ~36 GiB on the host,
@@ -143,7 +143,7 @@ Four mechanisms, from cheapest to most involved:
 | **HEAD before push** | publisher | A `HEAD /v2/<repo>/blobs/<digest>` per chunk skips uploading anything the registry already holds. Unchanged chunks of a rebuilt image, and every zero chunk, cost one request. |
 | **Cross-repository mount** | publisher | `POST …/blobs/uploads/?mount=<digest>&from=<repo>` reuses a blob held in another repository of the same registry without re-uploading, for example when `macos-26-base` derives from `macos-26-vanilla`. |
 | **Content-addressed local cache** | consumer | Blobs are stored once by digest ([decisions/0008](decisions/0008-device-cache-gc-and-mirrors.md)). A second image that shares chunks with a cached one fetches only the difference, and reassembly reads shared chunks from local disk. |
-| **Lineage at the hypervisor** | consumer | Clones never copy the base disk: APFS `clonefile` copy-on-write on macOS (`deploymenttheory/guestweave-cli-macos@main` `internal/fsutil/clone.go:22`), differencing VHDX children on Windows HCS (about 4 MiB per VM, `deploymenttheory/guestweave-cli-windows@main` `internal/oci/cache/cache.go`), and qcow2 overlays with `qemu-img create -b` for QEMU (`deploymenttheory/hostweave@main` `agent/runtime/qemu/qemu.go:229-293`). |
+| **Lineage at the hypervisor** | consumer | Clones never copy the base disk: APFS `clonefile` copy-on-write on macOS (`weaveplatform/guestweave-cli-macos@main` `internal/fsutil/clone.go:22`), differencing VHDX children on Windows HCS (about 4 MiB per VM, `weaveplatform/guestweave-cli-windows@main` `internal/oci/cache/cache.go`), and qcow2 overlays with `qemu-img create -b` for QEMU (`weaveplatform/hostweave@main` `agent/runtime/qemu/qemu.go:229-293`). |
 
 Lineage is what makes a per-attempt VM cheap; the first three are what make a new image
 version cheap to publish and fetch. The prior-art "stacked" overlay format (an immutable base
@@ -170,7 +170,7 @@ magnitude, and under GHCR's 10-minute upload window at any realistic uplink.
 ## Local cache and garbage collection
 
 Today no weave component manages image storage as a whole: hostweave never prunes anything
-(`deploymenttheory/hostweave@main` `agent/runtime/moby/moby.go`, `agent/runtime/qemu`),
+(`weaveplatform/hostweave@main` `agent/runtime/moby/moby.go`, `agent/runtime/qemu`),
 guestweave-macos has an LRU prune and a disk-space guard but only for its own cache
 (`internal/vm/storage/diskspace.go`), and guestweave-windows pins in-use parents but has no
 quota ([03-current-state.md](03-current-state.md)). The shared `cache` package
@@ -195,7 +195,7 @@ replaces all three with one design:
   implementation stays in guestweave-macos behind an interface.
 - **Prewarm.** A host can be asked to pull a digest ahead of demand so a pool's first job does
   not pay the download; hostweave's capacity readiness work is the natural caller
-  (`deploymenttheory/hostweave@main` `docs/research/decisions/0027-scheduled-capacity-readiness.md`).
+  (`weaveplatform/hostweave@main` `docs/research/decisions/0027-scheduled-capacity-readiness.md`).
 
 ```mermaid
 flowchart LR
@@ -238,5 +238,5 @@ the public prior-art image measured in [02-prior-art.md](02-prior-art.md): 94 di
 - Nydus: <https://github.com/dragonflyoss/nydus/blob/master/docs/nydus-image.md>
 - SOCI: <https://github.com/awslabs/soci-snapshotter>
 - Prior-art chunking, sparse writes and resume (macOS VM publishers): [02-prior-art.md](02-prior-art.md)
-- Current weave sparse reassembly: `deploymenttheory/guestweave-cli-macos@main` `internal/oci/oci_layerizer_diskv2.go`
-- Current weave clone mechanisms: `deploymenttheory/guestweave-cli-macos@main` `internal/fsutil/clone.go`; `deploymenttheory/guestweave-cli-windows@main` `internal/oci/cache/cache.go`; `deploymenttheory/hostweave@main` `agent/runtime/qemu/qemu.go`
+- Current weave sparse reassembly: `weaveplatform/guestweave-cli-macos@main` `internal/oci/oci_layerizer_diskv2.go`
+- Current weave clone mechanisms: `weaveplatform/guestweave-cli-macos@main` `internal/fsutil/clone.go`; `weaveplatform/guestweave-cli-windows@main` `internal/oci/cache/cache.go`; `weaveplatform/hostweave@main` `agent/runtime/qemu/qemu.go`

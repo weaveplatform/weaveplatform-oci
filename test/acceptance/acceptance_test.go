@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 				args,
 				"-cover",
 				"-covermode=atomic",
-				"-coverpkg=github.com/deploymenttheory/weaveplatform-oci/...",
+				"-coverpkg=github.com/weaveplatform/weaveplatform-oci/...",
 			)
 		}
 		cmd := exec.Command("go", append(args, "../../cmd/weaveoci")...)

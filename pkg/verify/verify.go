@@ -15,9 +15,9 @@ import (
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
 )
 
 var (

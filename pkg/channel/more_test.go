@@ -6,7 +6,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
 )
 
 func TestEndorsedGarbageAndSortByTag(t *testing.T) {
@@ -46,7 +46,7 @@ func TestEndorsedGarbageAndSortByTag(t *testing.T) {
 	m, _ := channel.Promote(
 		promoted(t),
 		channel.Image{
-			Repository: "deploymenttheory/weave-images/ubuntu-24.04",
+			Repository: "weaveplatform/weave-images/ubuntu-24.04",
 			Tag:        "24.04-r0",
 			Digest:     digest.FromString("old").String(),
 		},

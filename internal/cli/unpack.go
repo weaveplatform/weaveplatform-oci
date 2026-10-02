@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 	"oras.land/oras-go/v2/content"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 type unpackResult struct {

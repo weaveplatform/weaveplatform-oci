@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/cache"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/client"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/cache"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 )
 
 // EnvCache overrides the cache directory.

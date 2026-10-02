@@ -14,14 +14,14 @@ import (
 
 	"oras.land/oras-go/v2/registry/remote/auth"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/client"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/publish"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/publish"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 func setup(

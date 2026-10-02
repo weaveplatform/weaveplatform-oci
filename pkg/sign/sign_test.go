@@ -22,7 +22,7 @@ import (
 	"oras.land/oras-go/v2/content"
 	"oras.land/oras-go/v2/content/memory"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
 )
 
 var errBoom = errors.New("boom")

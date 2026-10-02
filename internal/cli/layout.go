@@ -9,7 +9,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"oras.land/oras-go/v2/content/oci"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 )
 
 // resolveRoot opens a layout and resolves ref, or the layout's only tag when

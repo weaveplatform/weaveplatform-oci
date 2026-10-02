@@ -15,7 +15,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
 )
 
 var now = time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
@@ -74,7 +74,7 @@ const existing = `{
 func promoted(t *testing.T) []byte {
 	t.Helper()
 	out, err := channel.Promote([]byte(existing), channel.Image{
-		Repository: "deploymenttheory/weave-images/ubuntu-24.04",
+		Repository: "weaveplatform/weave-images/ubuntu-24.04",
 		Tag:        "24.04-r1",
 		Digest:     testDigest.String(),
 		Platforms: []channel.Platform{
@@ -103,7 +103,7 @@ func TestPromotePreservesEverythingElse(t *testing.T) {
 	again, _ := channel.Promote(
 		out,
 		channel.Image{
-			Repository: "deploymenttheory/weave-images/ubuntu-24.04",
+			Repository: "weaveplatform/weave-images/ubuntu-24.04",
 			Tag:        "24.04-r1",
 			Digest:     digest.FromString("new").String(),
 		},
@@ -112,7 +112,7 @@ func TestPromotePreservesEverythingElse(t *testing.T) {
 	more, _ := channel.Promote(
 		again,
 		channel.Image{
-			Repository: "deploymenttheory/weave-images/a",
+			Repository: "weaveplatform/weave-images/a",
 			Tag:        "1",
 			Digest:     testDigest.String(),
 		},
@@ -120,7 +120,7 @@ func TestPromotePreservesEverythingElse(t *testing.T) {
 	)
 	m, err := channel.Parse(more)
 	if err != nil || len(m.Images) != 2 ||
-		m.Images[0].Repository != "deploymenttheory/weave-images/a" ||
+		m.Images[0].Repository != "weaveplatform/weave-images/a" ||
 		m.Sequence != 10 {
 		t.Fatalf("%v %+v", err, m)
 	}
@@ -168,7 +168,7 @@ func TestVerifyChain(t *testing.T) {
 	if err != nil || a.Name != "org" || m.Sequence != 8 {
 		t.Fatalf("%v %+v", err, m)
 	}
-	img, err := m.Image("deploymenttheory/weave-images/ubuntu-24.04", testDigest)
+	img, err := m.Image("weaveplatform/weave-images/ubuntu-24.04", testDigest)
 	if err != nil || img.Signature.KeyID != "hint" {
 		t.Fatal(err)
 	}

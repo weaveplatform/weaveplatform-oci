@@ -5,14 +5,14 @@
   "manifests": [
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "digest": "sha256:d2446ec5b65e44c175498b56827feb21568ccc5528da4ee49c4d8330c1349fa2",
-      "size": 77599,
+      "digest": "sha256:8ed4d3ecf98dc93006e4e938aa93f59640c4ca5dd291b6ea7d054248c68eff52",
+      "size": 71710,
       "annotations": {
-        "com.deploymenttheory.weave.guest.arch": "arm64",
-        "com.deploymenttheory.weave.guest.distro": "ubuntu",
-        "com.deploymenttheory.weave.guest.os": "linux",
-        "com.deploymenttheory.weave.guest.osBuild": "20260915",
-        "com.deploymenttheory.weave.guest.osVersion": "24.04"
+        "run.weaveplatform.guest.arch": "arm64",
+        "run.weaveplatform.guest.distro": "ubuntu",
+        "run.weaveplatform.guest.os": "linux",
+        "run.weaveplatform.guest.osBuild": "20260915",
+        "run.weaveplatform.guest.osVersion": "24.04"
       },
       "platform": {
         "architecture": "arm64",
@@ -22,14 +22,14 @@
     },
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "digest": "sha256:37d323153931ff4efa52f5553f6e089a296d18b49d71d0bfd74db46a5098de0c",
-      "size": 77599,
+      "digest": "sha256:3dfa59064c821f11b1f8167595dcf5f68adcb983eaa50a6c7ba23e14666c2f1a",
+      "size": 71710,
       "annotations": {
-        "com.deploymenttheory.weave.guest.arch": "amd64",
-        "com.deploymenttheory.weave.guest.distro": "ubuntu",
-        "com.deploymenttheory.weave.guest.os": "linux",
-        "com.deploymenttheory.weave.guest.osBuild": "20260915",
-        "com.deploymenttheory.weave.guest.osVersion": "24.04"
+        "run.weaveplatform.guest.arch": "amd64",
+        "run.weaveplatform.guest.distro": "ubuntu",
+        "run.weaveplatform.guest.os": "linux",
+        "run.weaveplatform.guest.osBuild": "20260915",
+        "run.weaveplatform.guest.osVersion": "24.04"
       },
       "platform": {
         "architecture": "x86_64",

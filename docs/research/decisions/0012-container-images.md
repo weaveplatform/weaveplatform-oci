@@ -25,7 +25,7 @@ The `weaveoci` CLI is CGO-free Go.
 
 ## Decision
 
-**`ghcr.io/deploymenttheory/weaveoci`.**
+**`ghcr.io/weaveplatform/weaveoci`.**
 
 - Built with ko v0.19.1 from `./cmd/weaveoci`.
 - Base `gcr.io/distroless/static-debian12:nonroot`.
@@ -34,9 +34,9 @@ The `weaveoci` CLI is CGO-free Go.
   windows/amd64, windows/arm64, linux/amd64 and linux/arm64 as release archives with
   SHA-256 sums.
 - The image's entrypoint is `weaveoci`. A private-profile pipeline in any CI system can
-  run `docker run ghcr.io/deploymenttheory/weaveoci publish …`.
+  run `docker run ghcr.io/weaveplatform/weaveoci publish …`.
 
-**`ghcr.io/deploymenttheory/weave-zot`.**
+**`ghcr.io/weaveplatform/weave-zot`.**
 
 - Built with `docker/build-push-action` v7.4.0 from `deploy/zot/Dockerfile`.
 - The Dockerfile starts `FROM ghcr.io/project-zot/zot:v2.1.21@sha256:<index digest>`,
@@ -126,8 +126,8 @@ Alternatives considered:
 - `release-images.yml` builds both images on every pull request without pushing.
 - The acceptance suite runs against the freshly built `weave-zot` image.
 - After push, the workflow runs these and fails the release on error:
-  - `cosign verify --certificate-identity-regexp '^https://github.com/deploymenttheory/weaveplatform-oci/.github/workflows/release-images.yml@refs/tags/v' --certificate-oidc-issuer https://token.actions.githubusercontent.com <image>@<digest>`
-  - `gh attestation verify oci://<image>@<digest> -R deploymenttheory/weaveplatform-oci`
+  - `cosign verify --certificate-identity-regexp '^https://github.com/weaveplatform/weaveplatform-oci/.github/workflows/release-images.yml@refs/tags/v' --certificate-oidc-issuer https://token.actions.githubusercontent.com <image>@<digest>`
+  - `gh attestation verify oci://<image>@<digest> -R weaveplatform/weaveplatform-oci`
 - A container test starts `weave-zot` and checks that the healthcheck reports healthy.
 - `zot verify` passes for both config roles.
 

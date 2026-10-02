@@ -11,7 +11,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/spf13/cobra"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
 )
 
 // newChannel lets an organisation run its own channel (decision 0011): the

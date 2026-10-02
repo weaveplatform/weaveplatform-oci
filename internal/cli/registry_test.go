@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/cli"
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/internal/cli"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // env isolates a test from the user's profile, cache and docker credentials.

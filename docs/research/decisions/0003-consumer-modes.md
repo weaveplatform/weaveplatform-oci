@@ -99,13 +99,13 @@ Alternatives considered:
   in-process registry into the cache and create the overlay.
 - guestweave: acceptance scenario "create from IPSW with no network" passes with the
   registry client disabled; `weave capabilities` JSON schema test.
-- Existing evidence: `deploymenttheory/hostweave@main agent/runtime/moby/moby.go:311-339`
+- Existing evidence: `weaveplatform/hostweave@main agent/runtime/moby/moby.go:311-339`
   (pull skipped when image present), `agent/runtime/qemu/qemu.go:63,230-240` (path map),
   `pkg/scheduler/filter.go:36-98` (VM filter ignores QEMU).
 
 ## References
 
 - [03-current-state.md](../03-current-state.md), [08-target-architecture.md](../08-target-architecture.md), [10-shared-go-module.md](../10-shared-go-module.md)
-- hostweave decision 0010 and 0029: `deploymenttheory/hostweave@main docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md`, `0029-image-identities-and-builds.md`
-- hostweave image lifecycle status: `deploymenttheory/hostweave@main docs/implementation/image-lifecycle.md`
-- `deploymenttheory/hostweave@main agent/runtime/guestweave/capabilities.go`, `pkg/types/image.go:117-226`
+- hostweave decision 0010 and 0029: `weaveplatform/hostweave@main docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md`, `0029-image-identities-and-builds.md`
+- hostweave image lifecycle status: `weaveplatform/hostweave@main docs/implementation/image-lifecycle.md`
+- `weaveplatform/hostweave@main agent/runtime/guestweave/capabilities.go`, `pkg/types/image.go:117-226`

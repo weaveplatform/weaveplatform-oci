@@ -18,7 +18,7 @@ const (
 )
 
 // AnnotationPrefix is the reverse-DNS namespace for weave annotation keys.
-const AnnotationPrefix = "com.deploymenttheory.weave.guest."
+const AnnotationPrefix = "run.weaveplatform.guest."
 
 // Layer annotations (contract §5 and §6).
 const (

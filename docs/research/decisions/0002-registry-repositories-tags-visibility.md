@@ -7,7 +7,7 @@ Status: Proposed
 Images must be published from one place and consumed by hostweave agents and
 guestweave CLIs on macOS, Windows and Linux devices, some of them in offices with limited
 bandwidth and some air-gapped. The organisation already publishes agent modules to
-`ghcr.io/deploymenttheory/weaveplatform-modules/<id>` with ORAS from GitHub Actions.
+`ghcr.io/weaveplatform/weaveplatform-modules/<id>` with ORAS from GitHub Actions.
 Apple's and Microsoft's licence terms forbid redistributing macOS and Windows outside the
 licensee, while community Linux distributions may be redistributed unmodified. GHCR has no
 referrers API, no immutable tags and accepts only classic personal access tokens or
@@ -17,7 +17,7 @@ referrers API, no immutable tags and accepts only classic personal access tokens
 
 **Canonical registry by profile.** The canonical registry depends on the deployment
 profile ([0011](0011-deployment-profiles-and-reference-registry.md)). In the `github`
-profile, and as the upstream of the `hybrid` profile, it is `ghcr.io/deploymenttheory`,
+profile, and as the upstream of the `hybrid` profile, it is `ghcr.io/weaveplatform`,
 published from GitHub Actions in `weaveplatform-oci`. In the `private` profile it is an
 organisation's `weave-zot` (or a supported Harbor or distribution v3), published by
 `weaveoci publish` from any CI system or workstation
@@ -26,7 +26,7 @@ is configured as a registry profile on the consumer, never as a fork of the publ
 pipeline. The repository and tag grammar below is the same in every profile; only the
 host and organisation prefix change.
 
-**Repositories.** `ghcr.io/deploymenttheory/weave-images/<family>-<major>[-<variant>]`, for
+**Repositories.** `ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]`, for
 example `macos-26-vanilla`, `macos-26-base`, `windows-11-base`, `windows-server-2025-base`,
 `ubuntu-24.04`, `fedora-bootc-46`. One repository holds one OS family and variant; the
 image index inside a tag separates architectures. Container images for the hostweave
@@ -111,7 +111,7 @@ Alternatives considered:
   any blob upload.
 - Live evidence, 2026-10-02: GHCR `GET /v2/<repo>/referrers/<digest>` returns 404;
   ranged blob GET returns 206 from `pkg-containers.githubusercontent.com`;
-  `ghcr.io/deploymenttheory/weaveplatform-modules/<id>` demonstrates nested package
+  `ghcr.io/weaveplatform/weaveplatform-modules/<id>` demonstrates nested package
   names.
 - Mirror drill (migration phase 8): pull through a zot `sync` instance with
   `preserveDigest: true` and confirm the digest and the fallback-tag referrers match.

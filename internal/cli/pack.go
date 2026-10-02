@@ -8,8 +8,8 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 )
 
 type packResult struct {

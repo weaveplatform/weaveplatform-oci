@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/buildinfo"
+	"github.com/weaveplatform/weaveplatform-oci/internal/buildinfo"
 )
 
 // Exit codes.

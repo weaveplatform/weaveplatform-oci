@@ -34,7 +34,7 @@ runner labels and channels.
 **All stages live in `weaveoci publish`.** Every stage below is implemented once in the
 shared module's `publish` package and exposed as `weaveoci publish --profile <name>`. It
 runs the same way from GitHub Actions, any other CI system, a self-hosted runner or a
-workstation, natively or as `docker run ghcr.io/deploymenttheory/weaveoci publish …`
+workstation, natively or as `docker run ghcr.io/weaveplatform/weaveoci publish …`
 ([0012](0012-container-images.md)). The GitHub reusable workflows are thin wrappers that
 install `weaveoci`, call it and add the GitHub-only steps (`actions/attest`, the
 `repository_dispatch`). In the `private` profile the signature stage signs with a
@@ -128,5 +128,5 @@ Alternatives considered:
 - [07-build-pipelines.md](../07-build-pipelines.md), [06-large-artifacts.md](../06-large-artifacts.md)
 - GitHub-hosted runners: <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>, <https://docs.github.com/en/actions/reference/runners/larger-runners>; KVM on Linux runners: <https://github.blog/changelog/2024-04-02-github-actions-hardware-accelerated-android-virtualization-now-available/>; no nested virtualisation on Windows runners: <https://github.com/actions/runner-images/issues/183>; Apple on nested macOS guests: <https://developer.apple.com/forums/thread/827663>
 - `actions/attest`: <https://github.com/actions/attest>; `oras-project/setup-oras`: <https://github.com/oras-project/setup-oras>
-- `deploymenttheory/weaveplatform-manifest@main docs/trust-chain.md` (promotion)
+- `weaveplatform/weaveplatform-channels@main docs/trust-chain.md` (promotion)
 - `deploymenttheory/go-sdk-winmediafoundry@main` (Windows media acquisition)

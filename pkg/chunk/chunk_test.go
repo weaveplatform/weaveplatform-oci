@@ -17,8 +17,8 @@ import (
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 const testChunk = 64 << 10

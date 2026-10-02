@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/conformance"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/conformance"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 type inspectResult struct {

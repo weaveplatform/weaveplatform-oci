@@ -93,13 +93,13 @@ Alternatives considered:
   (Linux) and two different MACs.
 - Pipeline test: a packed Linux image contains no `/etc/ssh/ssh_host_*` and an empty
   `/etc/machine-id`.
-- Existing evidence: `deploymenttheory/guestweave-cli-macos@main internal/vm/storage/registry.go:114-126`
+- Existing evidence: `weaveplatform/guestweave-cli-macos@main internal/vm/storage/registry.go:114-126`
   (push hard-codes `nvram.bin`), `internal/vm/config/platformdarwin.go:69-70` (ECID and
-  hardware model in config); `deploymenttheory/guestweave-cli-windows@main internal/vm/layout/layout.go`
+  hardware model in config); `weaveplatform/guestweave-cli-windows@main internal/vm/layout/layout.go`
   (`guest.vmgs` present in the bundle, absent from the artifact).
 
 ## References
 
 - [09-artifact-contract-v1.md](../09-artifact-contract-v1.md), [03-current-state.md](../03-current-state.md)
-- hostweave decision 0010 on Windows first-run elevation: `deploymenttheory/hostweave@main docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md`
+- hostweave decision 0010 on Windows first-run elevation: `weaveplatform/hostweave@main docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md`
 - Apple Virtualization documentation for `VZMacHardwareModel`, `VZMacMachineIdentifier` and `VZMacAuxiliaryStorage`: <https://developer.apple.com/documentation/virtualization>

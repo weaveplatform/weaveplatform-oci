@@ -128,7 +128,7 @@ derived from it; otherwise an upstream cloud image is verified, converted to raw
 ```mermaid
 flowchart LR
     subgraph bootc["bootc route"]
-      bimg["Build bootc image<br/>(Containerfile, LABEL containers.bootc=1)"] --> bpush["Push bootc image<br/>ghcr.io/deploymenttheory/…"]
+      bimg["Build bootc image<br/>(Containerfile, LABEL containers.bootc=1)"] --> bpush["Push bootc image<br/>ghcr.io/weaveplatform/…"]
       bpush --> bib["image-builder / bootc-image-builder<br/>--type raw"]
     end
     subgraph cloud["cloud-image route"]
@@ -209,7 +209,7 @@ Steps and the facts behind them:
    repository Write, which is the failure cirruslabs hit (`403 permission_denied: write_package`,
    [macos-image-templates #361](https://github.com/cirruslabs/macos-image-templates/issues/361), following the token migration in #351).
 3. **Attest.** `actions/attest@v4.2.2` (the `attest-build-provenance` action is now a wrapper over it)
-   with `subject-name: ghcr.io/deploymenttheory/weave-images/<repo>` (no tag), `subject-digest` set
+   with `subject-name: ghcr.io/weaveplatform/weave-images/<repo>` (no tag), `subject-digest` set
    to the index digest, and `push-to-registry: true`. GHCR has no referrers API, so the bundle lands
    under the `sha256-<digest>` fallback tag ([05-supply-chain.md](05-supply-chain.md),
    [actions/attest](https://github.com/actions/attest)). Permissions: `id-token: write`,
@@ -226,7 +226,7 @@ Steps and the facts behind them:
 6. **Dispatch.** `repository_dispatch` with `event_type=image-published` and
    `{repository, tag, digest, platforms}` to weaveplatform-manifest, which opens a promotion PR
    that adds the digest to `channels/stable.json` and re-signs it; merging promotes
-   ([trust chain](https://github.com/deploymenttheory/weaveplatform-manifest/blob/main/docs/trust-chain.md)).
+   ([trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md)).
    The modules pipeline uses a `RELEASE_PLEASE_PAT` for this cross-repository call because
    `GITHUB_TOKEN` cannot dispatch to another repository
    (`weaveplatform-agent-modules@main docs/release-pipeline.md`).
@@ -257,7 +257,7 @@ Differences from the GitHub profile:
 - **Immutability is enforced by the registry**, not only by `weaveoci publish` refusing an
   existing build tag, because the publisher has no `update` permission.
 - **Promotion** goes to the organisation's own channel repository on any Git host, signed
-  under its own `weavemanifest` root, or to deploymenttheory's channel when the organisation
+  under its own `weavemanifest` root, or to weaveplatform's channel when the organisation
   only mirrors.
 - **Boot smoke test** runs on whatever hardware the organisation provides; the macOS and
   Windows constraints in [Runner constraints](#runner-constraints) still apply.
@@ -269,8 +269,8 @@ release ([decision 0012](decisions/0012-container-images.md)):
 
 | Image | Builder | Base | Platforms |
 |---|---|---|---|
-| `ghcr.io/deploymenttheory/weaveoci` | ko v0.19.1 (no Dockerfile; SPDX SBOM by default) | `gcr.io/distroless/static-debian12:nonroot` | linux/amd64, linux/arm64 |
-| `ghcr.io/deploymenttheory/weave-zot` | `docker/build-push-action` v7.4.0 with buildx (copy-only Dockerfile, no QEMU) | `ghcr.io/project-zot/zot:v2.1.21` pinned by digest | linux/amd64, linux/arm64 |
+| `ghcr.io/weaveplatform/weaveoci` | ko v0.19.1 (no Dockerfile; SPDX SBOM by default) | `gcr.io/distroless/static-debian12:nonroot` | linux/amd64, linux/arm64 |
+| `ghcr.io/weaveplatform/weave-zot` | `docker/build-push-action` v7.4.0 with buildx (copy-only Dockerfile, no QEMU) | `ghcr.io/project-zot/zot:v2.1.21` pinned by digest | linux/amd64, linux/arm64 |
 
 Both are signed keyless with cosign v3.1.3 (`id-token: write`) and receive provenance and SBOM
 attestations from `actions/attest` with `push-to-registry: true`. The `weave-zot` job also runs
@@ -306,7 +306,7 @@ image under testcontainers to check `/readyz` before pushing. Sources:
 | Push to GHCR from the pipeline | `GITHUB_TOKEN`, `permissions: packages: write`; package "Manage Actions access" set to Write for the publishing repository | Downloads with `GITHUB_TOKEN` inside Actions do not count toward transfer ([billing](https://docs.github.com/en/billing/concepts/product-billing/github-packages)) |
 | Attestations | `id-token: write`, `attestations: write`, `artifact-metadata: write` | Private repos: GHEC ([attestations docs](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)) |
 | Dispatch to weaveplatform-manifest | PAT with `repo` scope on that repository (`RELEASE_PLEASE_PAT` precedent) | `GITHUB_TOKEN` cannot cross repositories |
-| Channel signing key | Lives only in weaveplatform-manifest CI; the images pipeline never signs the channel | [trust chain](https://github.com/deploymenttheory/weaveplatform-manifest/blob/main/docs/trust-chain.md) |
+| Channel signing key | Lives only in weaveplatform-manifest CI; the images pipeline never signs the channel | [trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md) |
 | Fleet pulls of private images | A service account's classic PAT with `read:packages`; GitHub App installation tokens are not accepted by GHCR | [permissions](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages), [discussion #171423](https://github.com/orgs/community/discussions/171423) |
 | Apple signing identity (agent LaunchDaemon) | Developer ID + notarization on the self-hosted macOS runner | `weaveplatform-agent-modules@main handoff/macos-follow-on.md` |
 | Windows media | No secret; retail ISO from Microsoft's public download flow | VL media, if used, is an org secret and stays private |

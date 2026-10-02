@@ -15,8 +15,8 @@ import (
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	"github.com/sigstore/sigstore/pkg/signature"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
 )
 
 // KeySet is the public keys trusted for cosign-key signatures, matched by

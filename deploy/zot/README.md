@@ -9,7 +9,7 @@ roles and a health check. Design: [decision 0011](../../docs/research/decisions/
 | Role | Config | Use |
 |---|---|---|
 | `private` (default) | `/etc/zot/roles/private.json` | Canonical store. htpasswd auth; `publisher` may create but not update tags (immutability); `admin` may do everything, including uploading cosign public keys |
-| `mirror` | `/etc/zot/roles/mirror.json` | Site mirror of `ghcr.io/deploymenttheory/weave-images/**`, synced on demand with digests preserved; anonymous read |
+| `mirror` | `/etc/zot/roles/mirror.json` | Site mirror of `ghcr.io/weaveplatform/weave-images/**`, synced on demand with digests preserved; anonymous read |
 
 Settings that matter for multi-GiB artifacts: HTTP read and write timeouts are
 disabled (zot's default is 60 s), garbage collection waits 24 h before

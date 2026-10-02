@@ -11,8 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // ContractSize is 1.25 GiB: two full chunks (the second all zero with the
@@ -71,14 +71,14 @@ func Write(dir string, o Options) error {
 		},
 		Provisioning: spec.Provisioning{CredentialHint: "none"},
 		Build: spec.Build{
-			Template: "test", TemplateRef: "deploymenttheory/weaveplatform-oci@test",
+			Template: "test", TemplateRef: "weaveplatform/weaveplatform-oci@test",
 			SourceMedia: []spec.SourceMedia{}, Created: "2026-10-02T00:00:00Z",
 		},
 		Disks: []pack.BundleDisk{{Name: "disk0", Role: "system", Path: "disk0.img"}},
 		Annotations: map[string]string{
 			spec.AnnotationVersion:  o.Version,
 			spec.AnnotationRevision: "test",
-			spec.AnnotationSource:   "https://github.com/deploymenttheory/weaveplatform-oci",
+			spec.AnnotationSource:   "https://github.com/weaveplatform/weaveplatform-oci",
 		},
 	}
 	switch o.OS {

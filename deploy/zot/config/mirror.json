@@ -34,7 +34,7 @@
           "maxRetries": 3,
           "retryDelay": "30s",
           "syncTimeout": "6h",
-          "content": [{ "prefix": "deploymenttheory/weave-images/**" }]
+          "content": [{ "prefix": "weaveplatform/weave-images/**" }]
         }
       ]
     },

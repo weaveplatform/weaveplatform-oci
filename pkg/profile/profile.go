@@ -80,7 +80,7 @@ type Profile struct {
 // Registry is a registry endpoint.
 type Registry struct {
 	Host string `yaml:"host"`
-	// Namespace prefixes bare repository names, e.g. deploymenttheory/weave-images.
+	// Namespace prefixes bare repository names, e.g. weaveplatform/weave-images.
 	Namespace string `yaml:"namespace,omitempty"`
 	// PlainHTTP talks HTTP instead of HTTPS (local and test registries only).
 	PlainHTTP bool `yaml:"plainHTTP,omitempty"`

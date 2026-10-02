@@ -26,13 +26,13 @@ authenticity (key-based bundles) and ecosystem interoperability. The channel man
 gives an air-gap-capable promotion gate that already exists for agent modules. The
 platform's own trust-chain document rules out depending on Sigstore infrastructure
 for the gate: "no Fulcio, no Rekor, no CA"
-(`deploymenttheory/weaveplatform-manifest@main` `docs/trust-chain.md`).
+(`weaveplatform/weaveplatform-channels@main` `docs/trust-chain.md`).
 
 ## 1. Why both
 
 - **The gate must work offline.** An air-gapped deployment verifies the channel
   manifest with the root public key baked into core
-  (`deploymenttheory/weaveplatform-manifest@main` `README.md`, "Trust model").
+  (`weaveplatform/weaveplatform-channels@main` `README.md`, "Trust model").
   Sigstore verification needs a current trusted root that includes timestamp
   authority material, because Rekor v2 entries require a signed timestamp
   ([cosign CHANGELOG, v3.0.5](https://raw.githubusercontent.com/sigstore/cosign/main/CHANGELOG.md)),
@@ -174,7 +174,7 @@ second. Full table in [04-registries-and-github.md §3](04-registries-and-github
 
 ## 4. The channel manifest chain
 
-Reproduced from `deploymenttheory/weaveplatform-manifest@main` `docs/trust-chain.md`:
+Reproduced from `weaveplatform/weaveplatform-channels@main` `docs/trust-chain.md`:
 
 ```mermaid
 flowchart TD
@@ -232,7 +232,7 @@ What images need, and what phase 2 implemented (2026-10-02):
 
    ```json
    "images": [{
-     "repository": "deploymenttheory/weave-images/ubuntu-24.04",
+     "repository": "weaveplatform/weave-images/ubuntu-24.04",
      "tag": "24.04-20260915-r1",
      "digest": "sha256:…index…",
      "platforms": [{"os": "linux", "arch": "arm64", "digest": "sha256:…"}],
@@ -296,7 +296,7 @@ same way as the provenance bundle.
 |---|---|---|---|
 | CI, after push | `weaveoci publish` (wrapped by the workflow in the GitHub profile) | Pull the manifest by digest; verify the build-time bundle (attestation identity or public key) through the referrers API or fallback tag; verify every chunk digest; run the contract validator ([09](09-artifact-contract-v1.md)) | Workflow fails; no dispatch is sent |
 | Promotion | Reviewer of the promotion PR plus `weavemanifest verify` in CI | Digest in the PR matches the promotion request; the build-time signature verifies against the expected workflow identity or key ID; `stable.json` re-signs cleanly | PR not merged |
-| hostweave server, at pin time | `pkg/images` through the shared `verify` package | Digest is listed in a channel signed under a configured trust anchor (mandatory); build-time signature verifies as the channel entry specifies (recorded as evidence); platform and artifact type match the request | Version recorded as `unsupported` or `unavailable` (`deploymenttheory/hostweave@main` `pkg/types/image.go:117-135`) |
+| hostweave server, at pin time | `pkg/images` through the shared `verify` package | Digest is listed in a channel signed under a configured trust anchor (mandatory); build-time signature verifies as the channel entry specifies (recorded as evidence); platform and artifact type match the request | Version recorded as `unsupported` or `unavailable` (`weaveplatform/hostweave@main` `pkg/types/image.go:117-135`) |
 | hostweave agent, at pull | Runtime driver through `cache` + `verify` | Manifest digest equals the dispatched digest; every chunk's compressed and uncompressed digests match; channel listing re-checked when the agent has a channel | Attempt fails as a capacity-independent error; no clone |
 | guestweave CLI, at pull | `weave pull` with `--verify=channel\|signature\|both\|none` | Same chunk checks always; channel and/or build-time signature (attestation identity or public key) as configured | Pull refused unless `--verify=none` was requested |
 | Offline device | Same code with the configured channel anchors and, for attestations, a downloaded `trusted_root.jsonl` | Channel always; key-based bundles always (no network needed); attestations when a trusted root is present | As above |
@@ -349,7 +349,7 @@ v, err := verify.NewVerifier(tr,
 
 id, _ := verify.NewShortCertificateIdentity(
     "https://token.actions.githubusercontent.com", "", "",
-    `^https://github.com/deploymenttheory/weaveplatform-oci/\.github/workflows/publish\.yml@refs/(heads/main|tags/v.*)$`)
+    `^https://github.com/weaveplatform/weaveplatform-oci/\.github/workflows/publish\.yml@refs/(heads/main|tags/v.*)$`)
 
 res, err := v.Verify(bundle, verify.NewPolicy(
     verify.WithArtifactDigest("sha256", manifestDigestBytes),
@@ -385,7 +385,7 @@ Discovery is the caller's job and runs in this order:
    registry holds nothing, for example on a mirror that did not copy referrers.
 
 **Channel manifest.** Fetch `stable.json` and its `.sig`, verify the signing key's
-endorsement against one of the configured channel trust anchors (deploymenttheory's
+endorsement against one of the configured channel trust anchors (weaveplatform's
 root by default; a private organisation adds its own `weavemanifest` root,
 [13 §Channel trust](13-deployment-profiles.md#channel-trust-in-private-deployments)), verify the manifest signature,
 then look the digest up. The key and envelope formats are those documented in
@@ -428,10 +428,10 @@ fallback-tag referrers; the SBOM strategy for APFS and NTFS guests.
 
 ## References
 
-- `deploymenttheory/weaveplatform-manifest@main`: `docs/trust-chain.md`, `README.md`
+- `weaveplatform/weaveplatform-channels@main`: `docs/trust-chain.md`, `README.md`
 - `deploymenttheory/weaveplatform-api@main`: `schema/channel-manifest.schema.json`
 - `deploymenttheory/weaveplatform-agent-modules@main`: `docs/release-pipeline.md`, `.github/workflows/module-release.yml`
-- `deploymenttheory/hostweave@main`: `pkg/types/image.go`, `pkg/images/registry.go`
+- `weaveplatform/hostweave@main`: `pkg/types/image.go`, `pkg/images/registry.go`
 - actions/attest: <https://github.com/actions/attest>
 - GitHub artifact attestations: <https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations>
 - Offline verification: <https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/secure-your-work/use-artifact-attestations/verify-attestations-offline>

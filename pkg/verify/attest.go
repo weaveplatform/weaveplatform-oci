@@ -9,7 +9,7 @@ import (
 	"github.com/sigstore/sigstore-go/pkg/root"
 	sgverify "github.com/sigstore/sigstore-go/pkg/verify"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 )
 
 // SLSAProvenanceV1 is the predicate type of GitHub build provenance attestations.

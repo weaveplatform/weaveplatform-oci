@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/cli"
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/internal/cli"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 func run(t *testing.T, args ...string) (int, string, string) {

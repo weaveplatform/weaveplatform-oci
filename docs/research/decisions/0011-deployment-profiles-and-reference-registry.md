@@ -37,20 +37,20 @@ hostweave agent, both guestweave CLIs and `weaveoci pull`.
 
 | Profile | Canonical registry | Build-time signature | Promotion | Typical user |
 |---|---|---|---|---|
-| `github` | `ghcr.io/deploymenttheory` | GitHub artifact attestation (Sigstore bundle, keyless) | channel manifest | open-source baseline, public Linux images |
-| `private` | an organisation's `weave-zot` (or Harbor, or distribution v3) | cosign-compatible key-based bundle (file or KMS key) | channel manifest under the organisation's own root, or the deploymenttheory root | enterprises, air-gapped sites, macOS and Windows images |
-| `hybrid` | GHCR upstream, `weave-zot` per site in the mirror role | as published upstream | channel manifest from upstream | offices with limited bandwidth that consume deploymenttheory images |
+| `github` | `ghcr.io/weaveplatform` | GitHub artifact attestation (Sigstore bundle, keyless) | channel manifest | open-source baseline, public Linux images |
+| `private` | an organisation's `weave-zot` (or Harbor, or distribution v3) | cosign-compatible key-based bundle (file or KMS key) | channel manifest under the organisation's own root, or the weaveplatform root | enterprises, air-gapped sites, macOS and Windows images |
+| `hybrid` | GHCR upstream, `weave-zot` per site in the mirror role | as published upstream | channel manifest from upstream | offices with limited bandwidth that consume weaveplatform images |
 
 The profile names the canonical registry, the ordered mirror list, the signature
 provider and its verification material, the channel URL, and the channel trust anchors.
-The default anchor is the deploymenttheory root key embedded in core. An organisation
+The default anchor is the weaveplatform root key embedded in core. An organisation
 running the private profile may mint its own root with `weavemanifest keygen` and add it
 as an anchor. Consumers accept a channel signed by any configured anchor and nothing
 else.
 
 **Reference private registry.** zot v2.1.21, the full image `ghcr.io/project-zot/zot`
 (not `zot-minimal`, which lacks the sync and trust extensions), is shipped as
-`ghcr.io/deploymenttheory/weave-zot` with two configuration roles under
+`ghcr.io/weaveplatform/weave-zot` with two configuration roles under
 `deploy/zot/config/`:
 
 - **store:** canonical private registry. It has local filesystem or S3 storage, auth,

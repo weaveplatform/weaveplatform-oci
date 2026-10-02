@@ -39,16 +39,18 @@ All media types live under `application/vnd.weave.guest.*`. The org already publ
 (`deploymenttheory/weaveplatform-agent-modules@main`,
 `.github/workflows/module-release.yml:116`), the vendor tree needs no IANA
 registration, and the name survives a GitHub organisation rename. Annotation keys use
-`com.deploymenttheory.weave.guest.*`, because OCI requires reverse-DNS annotation keys
+`run.weaveplatform.guest.*`, because OCI requires reverse-DNS annotation keys
 ([annotations.md](https://github.com/opencontainers/image-spec/blob/v1.1.1/annotations.md))
-and `com.deploymenttheory.guestweave.*` is the existing precedent in
-guestweave-cli-windows. The split between media types (`vnd.weave`) and annotation
-keys (`com.deploymenttheory`) is deliberate and permanent.
+and the project owns the domain `weaveplatform.run`. The keys were set before any
+artifact was published, when the repositories moved from the `deploymenttheory` to the
+`weaveplatform` GitHub organisation, so no published image carries the earlier
+`com.deploymenttheory.weave.guest.*` keys. The split between media types (`vnd.weave`)
+and annotation keys (`run.weaveplatform`) is deliberate and permanent.
 
 The noun is `guest`, not `vm`, for one reason: guestweave-cli-windows still recognises
 two legacy strings, `application/vnd.weave.vm.config.v1+json` and
 `application/vnd.weave.vm.disk.v1.vhdx+gzip`
-(`deploymenttheory/guestweave-cli-windows@main internal/oci/oci.go:59-60`, see
+(`weaveplatform/guestweave-cli-windows@main internal/oci/oci.go:59-60`, see
 [03-current-state.md](03-current-state.md)). A `vnd.weave.vm.*.v1` contract would be
 byte-identical to a format with different semantics. `guest` also matches the project
 naming (guestweave) and reads correctly for Linux guests on QEMU.
@@ -115,11 +117,11 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
       "size": 201326592,
       "annotations": {
         "org.opencontainers.image.title": "disk0.chunk.000000",
-        "com.deploymenttheory.weave.guest.disk.name": "disk0",
-        "com.deploymenttheory.weave.guest.disk.chunk.index": "0",
-        "com.deploymenttheory.weave.guest.disk.chunk.offset": "0",
-        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
-        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:77e4…"
+        "run.weaveplatform.guest.disk.name": "disk0",
+        "run.weaveplatform.guest.disk.chunk.index": "0",
+        "run.weaveplatform.guest.disk.chunk.offset": "0",
+        "run.weaveplatform.guest.disk.chunk.size": "536870912",
+        "run.weaveplatform.guest.disk.chunk.digest": "sha256:77e4…"
       }
     },
     {
@@ -128,12 +130,12 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
       "size": 1234,
       "annotations": {
         "org.opencontainers.image.title": "disk0.chunk.000001",
-        "com.deploymenttheory.weave.guest.disk.name": "disk0",
-        "com.deploymenttheory.weave.guest.disk.chunk.index": "1",
-        "com.deploymenttheory.weave.guest.disk.chunk.offset": "536870912",
-        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
-        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:<zero-512mib-digest>",
-        "com.deploymenttheory.weave.guest.disk.chunk.zero": "true"
+        "run.weaveplatform.guest.disk.name": "disk0",
+        "run.weaveplatform.guest.disk.chunk.index": "1",
+        "run.weaveplatform.guest.disk.chunk.offset": "536870912",
+        "run.weaveplatform.guest.disk.chunk.size": "536870912",
+        "run.weaveplatform.guest.disk.chunk.digest": "sha256:<zero-512mib-digest>",
+        "run.weaveplatform.guest.disk.chunk.zero": "true"
       }
     },
     { "...": "chunks 2 … 127 omitted" },
@@ -143,8 +145,8 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
       "size": 33554432,
       "annotations": {
         "org.opencontainers.image.title": "nvram.bin",
-        "com.deploymenttheory.weave.guest.state.name": "auxstorage",
-        "com.deploymenttheory.weave.guest.state.semantics": "carry"
+        "run.weaveplatform.guest.state.name": "auxstorage",
+        "run.weaveplatform.guest.state.semantics": "carry"
       }
     }
   ],
@@ -152,17 +154,17 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
     "org.opencontainers.image.created": "2026-10-02T09:14:00Z",
     "org.opencontainers.image.version": "26.0-25A354-r1",
     "org.opencontainers.image.revision": "4c1e9d7f",
-    "org.opencontainers.image.source": "https://github.com/deploymenttheory/weaveplatform-oci",
+    "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
     "org.opencontainers.image.title": "macos-26-vanilla",
     "org.opencontainers.image.description": "macOS 26.0 (25A354) vanilla, weave agent 0.2.0 baked",
-    "org.opencontainers.image.vendor": "deploymenttheory",
+    "org.opencontainers.image.vendor": "weaveplatform",
     "org.opencontainers.image.licenses": "LicenseRef-Apple-macOS-SLA",
-    "com.deploymenttheory.weave.guest.os": "darwin",
-    "com.deploymenttheory.weave.guest.arch": "arm64",
-    "com.deploymenttheory.weave.guest.osVersion": "26.0",
-    "com.deploymenttheory.weave.guest.osBuild": "25A354",
-    "com.deploymenttheory.weave.guest.disk.totalSize": "68719476736",
-    "com.deploymenttheory.weave.guest.hypervisors": "vz"
+    "run.weaveplatform.guest.os": "darwin",
+    "run.weaveplatform.guest.arch": "arm64",
+    "run.weaveplatform.guest.osVersion": "26.0",
+    "run.weaveplatform.guest.osBuild": "25A354",
+    "run.weaveplatform.guest.disk.totalSize": "68719476736",
+    "run.weaveplatform.guest.hypervisors": "vz"
   }
 }
 ```
@@ -217,7 +219,7 @@ The config document for this manifest:
   },
   "build": {
     "template": "macos-vanilla",
-    "templateRef": "github.com/deploymenttheory/weaveplatform-oci@4c1e9d7f",
+    "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
     "sourceMedia": [
       {
         "kind": "ipsw",
@@ -232,7 +234,7 @@ The config document for this manifest:
 
 The `hardwareModel` value above is illustrative; the real value is the base64 of
 `VZMacHardwareModel.dataRepresentation` captured at install time
-(`deploymenttheory/guestweave-cli-macos@main`, `internal/vm/config/platformdarwin.go:69-70`).
+(`weaveplatform/guestweave-cli-macos@main`, `internal/vm/config/platformdarwin.go:69-70`).
 
 ### 3.2 Windows example
 
@@ -258,8 +260,8 @@ UEFI variable store and a firmware policy that tells the HCS consumer to create 
       "size": 385024,
       "annotations": {
         "org.opencontainers.image.title": "NVRAM.dat",
-        "com.deploymenttheory.weave.guest.state.name": "uefivars",
-        "com.deploymenttheory.weave.guest.state.semantics": "carry"
+        "run.weaveplatform.guest.state.name": "uefivars",
+        "run.weaveplatform.guest.state.semantics": "carry"
       }
     },
     {
@@ -268,8 +270,8 @@ UEFI variable store and a firmware policy that tells the HCS consumer to create 
       "size": 96,
       "annotations": {
         "org.opencontainers.image.title": "firmware-policy.json",
-        "com.deploymenttheory.weave.guest.state.name": "firmware-policy",
-        "com.deploymenttheory.weave.guest.state.semantics": "regenerate"
+        "run.weaveplatform.guest.state.name": "firmware-policy",
+        "run.weaveplatform.guest.state.semantics": "regenerate"
       }
     }
   ],
@@ -277,17 +279,17 @@ UEFI variable store and a firmware policy that tells the HCS consumer to create 
     "org.opencontainers.image.created": "2026-10-02T10:02:00Z",
     "org.opencontainers.image.version": "11-25H2-26200.6584-r1",
     "org.opencontainers.image.revision": "4c1e9d7f",
-    "org.opencontainers.image.source": "https://github.com/deploymenttheory/weaveplatform-oci",
+    "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
     "org.opencontainers.image.title": "windows-11-base",
     "org.opencontainers.image.description": "Windows 11 Pro 25H2 base, weave agent 0.2.0 baked",
-    "org.opencontainers.image.vendor": "deploymenttheory",
+    "org.opencontainers.image.vendor": "weaveplatform",
     "org.opencontainers.image.licenses": "LicenseRef-Microsoft-Windows-11",
-    "com.deploymenttheory.weave.guest.os": "windows",
-    "com.deploymenttheory.weave.guest.arch": "amd64",
-    "com.deploymenttheory.weave.guest.osVersion": "10.0.26200.6584",
-    "com.deploymenttheory.weave.guest.osBuild": "26200.6584",
-    "com.deploymenttheory.weave.guest.disk.totalSize": "68719476736",
-    "com.deploymenttheory.weave.guest.hypervisors": "hcs,kvm,hvf"
+    "run.weaveplatform.guest.os": "windows",
+    "run.weaveplatform.guest.arch": "amd64",
+    "run.weaveplatform.guest.osVersion": "10.0.26200.6584",
+    "run.weaveplatform.guest.osBuild": "26200.6584",
+    "run.weaveplatform.guest.disk.totalSize": "68719476736",
+    "run.weaveplatform.guest.hypervisors": "hcs,kvm,hvf"
   }
 }
 ```
@@ -314,7 +316,7 @@ Config excerpt (fields that differ from §3.1):
   ],
   "provisioning": { "defaultUser": "weave", "credentialHint": "baked",
                     "agent": { "name": "guestweave", "version": "0.2.0" } },
-  "build": { "template": "windows-11-base", "templateRef": "github.com/deploymenttheory/weaveplatform-oci@4c1e9d7f",
+  "build": { "template": "windows-11-base", "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
              "sourceMedia": [ { "kind": "iso", "uri": "softwaredownload:Win11_25H2_English_x64", "digest": "sha256:1a2b…" } ],
              "created": "2026-10-02T10:02:00Z" }
 }
@@ -342,18 +344,18 @@ state blobs (a QEMU or VZ consumer creates fresh UEFI variables).
     "org.opencontainers.image.created": "2026-10-02T06:30:00Z",
     "org.opencontainers.image.version": "24.04-20260915-r1",
     "org.opencontainers.image.revision": "4c1e9d7f",
-    "org.opencontainers.image.source": "https://github.com/deploymenttheory/weaveplatform-oci",
+    "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
     "org.opencontainers.image.title": "ubuntu-24.04",
     "org.opencontainers.image.description": "Ubuntu 24.04 cloud image 20260915, weave agent 0.2.0 baked",
-    "org.opencontainers.image.vendor": "deploymenttheory",
+    "org.opencontainers.image.vendor": "weaveplatform",
     "org.opencontainers.image.licenses": "Ubuntu-IPRights",
-    "com.deploymenttheory.weave.guest.os": "linux",
-    "com.deploymenttheory.weave.guest.arch": "arm64",
-    "com.deploymenttheory.weave.guest.distro": "ubuntu",
-    "com.deploymenttheory.weave.guest.osVersion": "24.04",
-    "com.deploymenttheory.weave.guest.osBuild": "20260915",
-    "com.deploymenttheory.weave.guest.disk.totalSize": "21474836480",
-    "com.deploymenttheory.weave.guest.hypervisors": "kvm,vz,hvf,hcs"
+    "run.weaveplatform.guest.os": "linux",
+    "run.weaveplatform.guest.arch": "arm64",
+    "run.weaveplatform.guest.distro": "ubuntu",
+    "run.weaveplatform.guest.osVersion": "24.04",
+    "run.weaveplatform.guest.osBuild": "20260915",
+    "run.weaveplatform.guest.disk.totalSize": "21474836480",
+    "run.weaveplatform.guest.hypervisors": "kvm,vz,hvf,hcs"
   }
 }
 ```
@@ -370,7 +372,7 @@ Config excerpt:
   "state": [],
   "provisioning": { "defaultUser": "ubuntu", "credentialHint": "cloud-init",
                     "agent": { "name": "guestweave", "version": "0.2.0" } },
-  "build": { "template": "linux-cloud-image", "templateRef": "github.com/deploymenttheory/weaveplatform-oci@4c1e9d7f",
+  "build": { "template": "linux-cloud-image", "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
              "sourceMedia": [ { "kind": "cloud-image",
                "uri": "https://cloud-images.ubuntu.com/noble/20260915/noble-server-cloudimg-arm64.img",
                "digest": "sha256:9e8f…" } ],
@@ -383,7 +385,7 @@ Config excerpt:
 One index per repository tag
 ([image-index.md](https://github.com/opencontainers/image-spec/blob/v1.1.1/image-index.md)).
 Each child is one VM manifest; children carry the `platform` object and the same
-`com.deploymenttheory.weave.guest.*` annotations as their manifest so that listings
+`run.weaveplatform.guest.*` annotations as their manifest so that listings
 never need to fetch children.
 
 ```json
@@ -399,11 +401,11 @@ never need to fetch children.
       "size": 61920,
       "platform": { "os": "linux", "architecture": "amd64" },
       "annotations": {
-        "com.deploymenttheory.weave.guest.os": "linux",
-        "com.deploymenttheory.weave.guest.arch": "amd64",
-        "com.deploymenttheory.weave.guest.distro": "ubuntu",
-        "com.deploymenttheory.weave.guest.osVersion": "24.04",
-        "com.deploymenttheory.weave.guest.osBuild": "20260915"
+        "run.weaveplatform.guest.os": "linux",
+        "run.weaveplatform.guest.arch": "amd64",
+        "run.weaveplatform.guest.distro": "ubuntu",
+        "run.weaveplatform.guest.osVersion": "24.04",
+        "run.weaveplatform.guest.osBuild": "20260915"
       }
     },
     {
@@ -418,7 +420,7 @@ never need to fetch children.
   "annotations": {
     "org.opencontainers.image.created": "2026-10-02T06:30:00Z",
     "org.opencontainers.image.version": "24.04-20260915-r1",
-    "org.opencontainers.image.source": "https://github.com/deploymenttheory/weaveplatform-oci",
+    "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
     "org.opencontainers.image.description": "Ubuntu 24.04 cloud image 20260915, weave agent 0.2.0 baked"
   }
 }
@@ -496,7 +498,7 @@ Embedded in the `spec` package and published as `pkg/spec/schema/vm-config-v1.sc
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/deploymenttheory/weaveplatform-oci/spec/schema/vm-config-v1.schema.json",
+  "$id": "https://github.com/weaveplatform/weaveplatform-oci/spec/schema/vm-config-v1.schema.json",
   "title": "weave VM artifact config v1",
   "type": "object",
   "additionalProperties": false,
@@ -665,7 +667,7 @@ converted from it). This is why one artifact serves every hypervisor.
    descriptor specification requires
    ([descriptor.md](https://github.com/opencontainers/image-spec/blob/v1.1.1/descriptor.md)).
 5. A chunk whose uncompressed bytes are all zero MUST be published as the **canonical
-   zero chunk** for its length, with `com.deploymenttheory.weave.guest.disk.chunk.zero`
+   zero chunk** for its length, with `run.weaveplatform.guest.disk.chunk.zero`
    set to `"true"`. The canonical zero chunk of `n` bytes is defined byte for byte, so
    its digest never depends on an encoder version:
 
@@ -713,12 +715,12 @@ converted from it). This is why one artifact serves every hypervisor.
 | Annotation key | Value | Required |
 |---|---|---|
 | `org.opencontainers.image.title` | `<disk>.chunk.<index padded to 6 digits>` | SHOULD (for ORAS/zot tooling) |
-| `com.deploymenttheory.weave.guest.disk.name` | `disk0` … | MUST |
-| `com.deploymenttheory.weave.guest.disk.chunk.index` | decimal integer | MUST |
-| `com.deploymenttheory.weave.guest.disk.chunk.offset` | decimal bytes | MUST |
-| `com.deploymenttheory.weave.guest.disk.chunk.size` | decimal bytes, uncompressed | MUST |
-| `com.deploymenttheory.weave.guest.disk.chunk.digest` | `sha256:<hex>` of uncompressed bytes | MUST |
-| `com.deploymenttheory.weave.guest.disk.chunk.zero` | `"true"` | MUST when all-zero; MUST be absent otherwise |
+| `run.weaveplatform.guest.disk.name` | `disk0` … | MUST |
+| `run.weaveplatform.guest.disk.chunk.index` | decimal integer | MUST |
+| `run.weaveplatform.guest.disk.chunk.offset` | decimal bytes | MUST |
+| `run.weaveplatform.guest.disk.chunk.size` | decimal bytes, uncompressed | MUST |
+| `run.weaveplatform.guest.disk.chunk.digest` | `sha256:<hex>` of uncompressed bytes | MUST |
+| `run.weaveplatform.guest.disk.chunk.zero` | `"true"` | MUST when all-zero; MUST be absent otherwise |
 
 Why 512 MiB and not content-defined chunking: fixed guest-LBA chunks are stable across
 rebuilds of block-level images (an installed OS does not shift its partitions), every
@@ -734,8 +736,8 @@ the `state.*` media types and these annotations:
 | Annotation key | Value | Required |
 |---|---|---|
 | `org.opencontainers.image.title` | file name on disk (`nvram.bin`, `NVRAM.dat`, `firmware-policy.json`) | SHOULD |
-| `com.deploymenttheory.weave.guest.state.name` | `auxstorage` \| `uefivars` \| `firmware-policy` | MUST |
-| `com.deploymenttheory.weave.guest.state.semantics` | `carry` \| `regenerate` | MUST; equals the config `state[]` entry |
+| `run.weaveplatform.guest.state.name` | `auxstorage` \| `uefivars` \| `firmware-policy` | MUST |
+| `run.weaveplatform.guest.state.semantics` | `carry` \| `regenerate` | MUST; equals the config `state[]` entry |
 
 - `auxstorage` is the Virtualization.framework macOS auxiliary storage file, created
   by `VZMacAuxiliaryStorage` at install time. It is bound to the installed OS and the
@@ -788,15 +790,15 @@ The guestweave CLIs already regenerate the MAC on clone (`--regenerate-random-ma
 | `org.opencontainers.image.source` | template repository URL (GHCR links the package to the repository through this key) | MUST |
 | `org.opencontainers.image.title` | repository short name | SHOULD |
 | `org.opencontainers.image.description` | ≤512 characters (GHCR limit) | SHOULD |
-| `org.opencontainers.image.vendor` | `deploymenttheory` | SHOULD |
+| `org.opencontainers.image.vendor` | `weaveplatform` | SHOULD |
 | `org.opencontainers.image.licenses` | SPDX expression or `LicenseRef-…` for proprietary OS images; ≤256 characters | SHOULD |
-| `com.deploymenttheory.weave.guest.os` | equals `guest.os` | MUST |
-| `com.deploymenttheory.weave.guest.arch` | equals `guest.arch` | MUST |
-| `com.deploymenttheory.weave.guest.osVersion` | equals `guest.osVersion` | MUST |
-| `com.deploymenttheory.weave.guest.osBuild` | equals `guest.osBuild` | MUST |
-| `com.deploymenttheory.weave.guest.distro` | equals `guest.distro` | MUST for linux |
-| `com.deploymenttheory.weave.guest.disk.totalSize` | sum of `disks[].logicalSize` | MUST |
-| `com.deploymenttheory.weave.guest.hypervisors` | comma-separated advisory list from `vz,hvf,hcs,kvm,tcg` | SHOULD |
+| `run.weaveplatform.guest.os` | equals `guest.os` | MUST |
+| `run.weaveplatform.guest.arch` | equals `guest.arch` | MUST |
+| `run.weaveplatform.guest.osVersion` | equals `guest.osVersion` | MUST |
+| `run.weaveplatform.guest.osBuild` | equals `guest.osBuild` | MUST |
+| `run.weaveplatform.guest.distro` | equals `guest.distro` | MUST for linux |
+| `run.weaveplatform.guest.disk.totalSize` | sum of `disks[].logicalSize` | MUST |
+| `run.weaveplatform.guest.hypervisors` | comma-separated advisory list from `vz,hvf,hcs,kvm,tcg` | SHOULD |
 
 Duplicating the guest fields from the config into manifest and index annotations is
 deliberate: `weave images`, hostweave's registry browser and `oras discover` can list and
@@ -806,7 +808,7 @@ MUST reject a manifest whose annotations disagree with its config.
 ### 8.2 Index annotations
 
 `org.opencontainers.image.{created,version,source,description}` as on the manifest.
-Child descriptors carry the `com.deploymenttheory.weave.guest.*` set.
+Child descriptors carry the `run.weaveplatform.guest.*` set.
 
 ### 8.3 Layer annotations
 
@@ -846,7 +848,7 @@ makes standard platform matching fail and encodes the hypervisor into the artifa
 ### 10.1 Repository naming
 
 ```
-ghcr.io/deploymenttheory/weave-images/<family>-<major>[-<variant>]
+ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]
 ```
 
 | Repository | Example contents |
@@ -888,7 +890,7 @@ Consumers MUST resolve a tag to an index digest once and record that digest. Eve
 subsequent fetch, verification and cache lookup uses the digest. A tag is a human
 convenience and a promotion handle, nothing more. This matches hostweave's existing
 `ImageVersion.Reference = repo@sha256:…` rule
-(`deploymenttheory/hostweave@main`, `pkg/types/image.go`).
+(`weaveplatform/hostweave@main`, `pkg/types/image.go`).
 
 ## 11. Referrers
 
@@ -1029,6 +1031,6 @@ a 50 GB disk ([prior art](02-prior-art.md)).
 - JSON Schema 2020-12: <https://json-schema.org/draft/2020-12/schema>
 - GHCR limits and annotation rendering: <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>
 - In-house artifactType precedent: `deploymenttheory/weaveplatform-agent-modules@main`, `.github/workflows/module-release.yml:116`
-- hostweave digest-pinning rule: `deploymenttheory/hostweave@main`, `pkg/types/image.go`; metadata cap `pkg/images/vm.go:18`
-- Hardware model capture: `deploymenttheory/guestweave-cli-macos@main`, `internal/vm/config/platformdarwin.go:69-70`
+- hostweave digest-pinning rule: `weaveplatform/hostweave@main`, `pkg/types/image.go`; metadata cap `pkg/images/vm.go:18`
+- Hardware model capture: `weaveplatform/guestweave-cli-macos@main`, `internal/vm/config/platformdarwin.go:69-70`
 - Related: [01-oci-primer.md](01-oci-primer.md), [06-large-artifacts.md](06-large-artifacts.md), [08-target-architecture.md](08-target-architecture.md), [10-shared-go-module.md](10-shared-go-module.md), [11-migration.md](11-migration.md), decisions [0001](decisions/0001-vm-artifact-contract.md), [0002](decisions/0002-registry-repositories-tags-visibility.md), [0009](decisions/0009-guest-state-carry-vs-regenerate.md)

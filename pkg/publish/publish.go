@@ -20,15 +20,15 @@ import (
 	"oras.land/oras-go/v2/content"
 	"oras.land/oras-go/v2/content/oci"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/client"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/conformance"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/verify"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/conformance"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/verify"
 )
 
 var (

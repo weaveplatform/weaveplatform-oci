@@ -10,7 +10,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
 )
 
 func getIndex(t *testing.T, url string) (int, ocispec.Index, string) {

@@ -24,8 +24,8 @@ import (
 	"oras.land/oras-go/v2/registry/remote/auth"
 	"oras.land/oras-go/v2/registry/remote/retry"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 )
 
 type world struct {

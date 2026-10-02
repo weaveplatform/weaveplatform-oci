@@ -13,13 +13,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testbundle"
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/publish"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/spec"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testbundle"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/publish"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 type brokenSigner struct{ pub crypto.PublicKey }

@@ -46,7 +46,7 @@ The OCI image config media type is never used for a VM artifact.
 The media-type noun is `guest` rather than `vm` because guestweave-cli-windows already
 recognises legacy `application/vnd.weave.vm.config.v1+json` and
 `application/vnd.weave.vm.disk.v1.vhdx+gzip` strings
-(`deploymenttheory/guestweave-cli-windows@main internal/oci/oci.go:59-60`); a new
+(`weaveplatform/guestweave-cli-windows@main internal/oci/oci.go:59-60`); a new
 contract must not be byte-identical to an old format with different semantics.
 
 **Disk encoding.** A disk is the raw guest block device, cut into fixed 512 MiB chunks of
@@ -54,7 +54,7 @@ guest LBA space (the last chunk may be shorter). Each chunk is one zstd frame wi
 content size recorded in the frame header, so every chunk decompresses independently.
 Every chunk index from 0 to N-1 is present as a layer, in ascending order. A chunk that
 is entirely zero is encoded as the canonical zstd zeros blob, which gives it one shared
-digest across all images, and is annotated `com.deploymenttheory.weave.guest.disk.chunk.zero: "true"`
+digest across all images, and is annotated `run.weaveplatform.guest.disk.chunk.zero: "true"`
 so a consumer may skip the fetch and punch a hole. Consumers verify the compressed
 digest from the descriptor and the uncompressed digest from the annotation.
 
@@ -64,7 +64,7 @@ carries `ecid`, `machineIdentifier`, `macAddress`, TPM or `vmgs` bytes, or displ
 settings; those are per-instance values ([0009](0009-guest-state-carry-vs-regenerate.md)).
 Sizes are bytes.
 
-**State blobs** are typed layers with `com.deploymenttheory.weave.guest.state.name` and
+**State blobs** are typed layers with `run.weaveplatform.guest.state.name` and
 `.state.semantics` (`carry` or `regenerate`) annotations. macOS ships its auxiliary
 storage and its hardware model (in the config); nothing ships an identity.
 
@@ -72,12 +72,12 @@ storage and its hardware model (in the config); nothing ships an identity.
 actually built. `platform.os` and `platform.architecture` use GOOS/GOARCH values
 (`darwin|windows|linux`, `arm64|amd64`). `os.version` is `"26.0.1"` style for darwin,
 `"10.0.26200.6584"` style for windows, and omitted for linux. The hypervisor is not a
-platform axis because the disk is raw; `com.deploymenttheory.weave.guest.hypervisors` is an
+platform axis because the disk is raw; `run.weaveplatform.guest.hypervisors` is an
 advisory annotation.
 
-**Annotations.** Layer: `com.deploymenttheory.weave.guest.disk.{name,chunk.index,chunk.offset,chunk.size,chunk.digest,chunk.zero}`.
+**Annotations.** Layer: `run.weaveplatform.guest.disk.{name,chunk.index,chunk.offset,chunk.size,chunk.digest,chunk.zero}`.
 Manifest and index child: the `org.opencontainers.image.*` set plus
-`com.deploymenttheory.weave.guest.{guest.os,guest.arch,guest.osVersion,guest.osBuild,disk.totalSize,hypervisors}`
+`run.weaveplatform.guest.{os,arch,osVersion,osBuild,disk.totalSize,hypervisors}`
 so that `weave images` and the hostweave catalogue never need the config blob. Every
 descriptor carries `org.opencontainers.image.title`.
 
@@ -156,5 +156,5 @@ Alternatives considered:
 - OCI image-spec v1.1.1: <https://github.com/opencontainers/image-spec/blob/v1.1.1/manifest.md>, <https://github.com/opencontainers/image-spec/blob/v1.1.1/image-index.md>, <https://github.com/opencontainers/image-spec/blob/v1.1.1/artifacts-guidance.md>
 - GHCR limits: <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>
 - CNCF ModelPack as a template for typed layers: <https://github.com/modelpack/model-spec/blob/main/docs/spec.md>
-- `deploymenttheory/hostweave@main pkg/images/vm.go:22-150` (formats being replaced)
-- `deploymenttheory/guestweave-cli-windows@main internal/oci/layer.go` (file-offset VHDX chunks being replaced)
+- `weaveplatform/hostweave@main pkg/images/vm.go:22-150` (formats being replaced)
+- `weaveplatform/guestweave-cli-windows@main internal/oci/layer.go` (file-offset VHDX chunks being replaced)

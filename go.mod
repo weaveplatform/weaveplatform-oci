@@ -1,4 +1,4 @@
-module github.com/deploymenttheory/weaveplatform-oci
+module github.com/weaveplatform/weaveplatform-oci
 
 go 1.27
 

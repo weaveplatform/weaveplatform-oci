@@ -8,7 +8,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
 )
 
 func do(t *testing.T, method, url string, body []byte, user, pass string) int {

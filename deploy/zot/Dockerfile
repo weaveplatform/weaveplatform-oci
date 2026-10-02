@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath \
-      -ldflags "-s -w -X github.com/deploymenttheory/weaveplatform-oci/internal/buildinfo.version=${VERSION}" \
+      -ldflags "-s -w -X github.com/weaveplatform/weaveplatform-oci/internal/buildinfo.version=${VERSION}" \
       -o /out/weaveoci ./cmd/weaveoci
 
 FROM ${ZOT_IMAGE}
@@ -26,6 +26,6 @@ VOLUME ["/var/lib/registry"]
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
   CMD ["/usr/local/bin/weaveoci", "healthcheck", "--url", "http://127.0.0.1:5000/readyz"]
 LABEL org.opencontainers.image.title="weave-zot" \
-      org.opencontainers.image.source="https://github.com/deploymenttheory/weaveplatform-oci" \
+      org.opencontainers.image.source="https://github.com/weaveplatform/weaveplatform-oci" \
       org.opencontainers.image.description="zot registry preconfigured for weave guest artifacts" \
       org.opencontainers.image.licenses="MIT AND Apache-2.0"

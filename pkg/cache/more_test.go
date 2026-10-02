@@ -12,7 +12,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/cache"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/cache"
 )
 
 func writeState(t *testing.T, dir string, roots map[string]any) {

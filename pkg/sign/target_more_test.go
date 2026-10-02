@@ -13,7 +13,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"oras.land/oras-go/v2/content/memory"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
 )
 
 // manifestRefusing accepts blobs but refuses manifests; it can also claim

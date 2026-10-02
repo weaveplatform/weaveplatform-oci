@@ -26,7 +26,7 @@ import (
 	"oras.land/oras-go/v2/registry/remote/credentials"
 	"oras.land/oras-go/v2/registry/remote/retry"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 )
 
 // Environment variables read by DefaultCredentials. WEAVE_REGISTRY_HOSTNAME,

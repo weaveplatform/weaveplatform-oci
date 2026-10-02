@@ -28,7 +28,7 @@ import (
 	"oras.land/oras-go/v2/content/oci"
 	"oras.land/oras-go/v2/errdef"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/client"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
 )
 
 var (

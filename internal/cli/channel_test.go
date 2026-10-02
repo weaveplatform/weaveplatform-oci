@@ -8,7 +8,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/cli"
+	"github.com/weaveplatform/weaveplatform-oci/internal/cli"
 )
 
 func TestChannelCommands(t *testing.T) {

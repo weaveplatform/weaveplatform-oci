@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 )
 
 const valid = `schemaVersion: 1
@@ -15,16 +15,16 @@ default: private
 profiles:
   - name: github
     kind: github
-    registry: {host: ghcr.io, namespace: deploymenttheory/weave-images}
+    registry: {host: ghcr.io, namespace: weaveplatform/weave-images}
     signing: {provider: github-attestation}
     verify:
       mode: both
       identity:
         issuer: https://token.actions.githubusercontent.com
-        subjectRegexp: '^https://github.com/deploymenttheory/weaveplatform-oci/\.github/workflows/publish\.yml@refs/.*$'
+        subjectRegexp: '^https://github.com/weaveplatform/weaveplatform-oci/\.github/workflows/publish\.yml@refs/.*$'
     channel:
-      manifest: https://raw.githubusercontent.com/deploymenttheory/weaveplatform-manifest/main/channels/stable.json
-      anchors: [{name: deploymenttheory, publicKey: keys/root.pub}]
+      manifest: https://raw.githubusercontent.com/weaveplatform/weaveplatform-channels/main/channels/stable.json
+      anchors: [{name: weaveplatform, publicKey: keys/root.pub}]
   - name: private
     kind: private
     registry: {host: "zot.example:5000", namespace: weave-images, plainHTTP: true}
@@ -32,7 +32,7 @@ profiles:
     verify: {mode: signature, publicKeys: [cosign.pub, ABSOLUTE]}
   - name: office
     kind: hybrid
-    registry: {host: ghcr.io, namespace: deploymenttheory/weave-images}
+    registry: {host: ghcr.io, namespace: weaveplatform/weave-images}
     mirrors: [{host: "zot.office:5000", insecureSkipTLSVerify: true}]
     signing: {provider: none}
     verify: {mode: none}

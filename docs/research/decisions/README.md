@@ -57,6 +57,6 @@ include private hosting and quality gates:
 8. The private profile signs with cosign-compatible key-based signing (file or KMS key)
    plus the minisign channel manifest.
 9. `weaveplatform-oci` publishes its own container images to GHCR:
-   `ghcr.io/deploymenttheory/weaveoci` and `ghcr.io/deploymenttheory/weave-zot`.
+   `ghcr.io/weaveplatform/weaveoci` and `ghcr.io/weaveplatform/weave-zot`.
 10. The implementation is Go, gated at ≥95% merged test coverage, and every
     implementation phase delivers its own acceptance tests.

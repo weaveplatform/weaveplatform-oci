@@ -115,10 +115,10 @@ Alternatives considered:
 - Acceptance: pull through `weave-zot` in the mirror role started by testcontainers-go
   and compare digests and referrers with the upstream ([0013](0013-quality-gates.md)).
 - Migration phase 8 drill against a zot `sync` instance and an `oci-layout` tarball.
-- Existing evidence: `deploymenttheory/guestweave-cli-macos@main internal/vm/storage/oci.go`,
-  `internal/vm/storage/diskspace.go`; `deploymenttheory/guestweave-cli-windows@main internal/oci/cache/cache.go`
+- Existing evidence: `weaveplatform/guestweave-cli-macos@main internal/vm/storage/oci.go`,
+  `internal/vm/storage/diskspace.go`; `weaveplatform/guestweave-cli-windows@main internal/oci/cache/cache.go`
   (in-use parent protection); hostweave has no cache management
-  (`deploymenttheory/hostweave@main agent/health.go:157-166` is the only disk check).
+  (`weaveplatform/hostweave@main agent/health.go:157-166` is the only disk check).
 
 ## References
 

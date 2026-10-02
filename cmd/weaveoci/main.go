@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/cli"
+	"github.com/weaveplatform/weaveplatform-oci/internal/cli"
 )
 
 func main() {

@@ -45,7 +45,7 @@ flowchart TD
   "digest": "sha256:9c8f…",
   "size": 187654321,
   "annotations": {
-    "com.deploymenttheory.weave.guest.disk.chunk.index": "0"
+    "run.weaveplatform.guest.disk.chunk.index": "0"
   }
 }
 ```
@@ -73,11 +73,11 @@ layers (<https://github.com/opencontainers/image-spec/blob/v1.1.1/manifest.md>).
       "digest": "sha256:9c8f…",
       "size": 187654321,
       "annotations": {
-        "com.deploymenttheory.weave.guest.disk.name": "disk0",
-        "com.deploymenttheory.weave.guest.disk.chunk.index": "0",
-        "com.deploymenttheory.weave.guest.disk.chunk.offset": "0",
-        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
-        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:aa11…"
+        "run.weaveplatform.guest.disk.name": "disk0",
+        "run.weaveplatform.guest.disk.chunk.index": "0",
+        "run.weaveplatform.guest.disk.chunk.offset": "0",
+        "run.weaveplatform.guest.disk.chunk.size": "536870912",
+        "run.weaveplatform.guest.disk.chunk.digest": "sha256:aa11…"
       }
     },
     {
@@ -85,8 +85,8 @@ layers (<https://github.com/opencontainers/image-spec/blob/v1.1.1/manifest.md>).
       "digest": "sha256:77ee…",
       "size": 33554432,
       "annotations": {
-        "com.deploymenttheory.weave.guest.state.name": "nvram",
-        "com.deploymenttheory.weave.guest.state.semantics": "carry"
+        "run.weaveplatform.guest.state.name": "nvram",
+        "run.weaveplatform.guest.state.semantics": "carry"
       }
     }
   ],
@@ -295,7 +295,7 @@ Annotations are string-to-string maps on descriptors, manifests and indexes
 name an artifact layer should be restored to. `org.opencontainers.image.source` on a manifest
 is what GHCR uses to link a package to a repository
 (<https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>).
-Custom keys for the weave contract live under `com.deploymenttheory.weave.guest.*`
+Custom keys for the weave contract live under `run.weaveplatform.guest.*`
 ([09-artifact-contract-v1.md](09-artifact-contract-v1.md)).
 
 ## Content addressing and digest pinning
@@ -308,7 +308,7 @@ artifact (a Merkle DAG). Tags are mutable pointers to a digest. Consequences:
   attestations bind to digests, never to tags.
 - A tag can be re-pointed at any time unless the registry enforces immutability, which GHCR
   does not ([04-registries-and-github.md](04-registries-and-github.md)). hostweave already
-  stores only `repo@sha256:…` references (`deploymenttheory/hostweave@main`
+  stores only `repo@sha256:…` references (`weaveplatform/hostweave@main`
   `pkg/types/image.go`), and the weave channel manifest will record digests
   ([05-supply-chain.md](05-supply-chain.md)).
 

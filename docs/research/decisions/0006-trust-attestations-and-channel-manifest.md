@@ -72,7 +72,7 @@ the attestation's certificate identity, and the build date.
 | air-gapped device | at import | channel manifest chain against the embedded root; bundle against a downloaded trusted root |
 
 **The channel manifest is mandatory in every profile.** Consumers carry a list of channel
-trust anchors: the deploymenttheory root embedded in core by default, plus any root an
+trust anchors: the weaveplatform root embedded in core by default, plus any root an
 organisation mints with `weavemanifest keygen` for its private profile. A channel is
 accepted when its signing key chains to any configured anchor.
 
@@ -167,5 +167,5 @@ Alternatives considered:
 - [0011](0011-deployment-profiles-and-reference-registry.md), [13-deployment-profiles.md](../13-deployment-profiles.md)
 - Sigstore: <https://blog.sigstore.dev/cosign-3-0-available/>, <https://github.com/sigstore/sigstore-go>, <https://raw.githubusercontent.com/sigstore/sigstore-go/main/docs/verification.md>, fallback tag behaviour <https://raw.githubusercontent.com/sigstore/sigstore-js/main/packages/oci/src/image.ts>
 - SLSA v1.2: <https://slsa.dev/spec/>
-- Channel manifest chain: `deploymenttheory/weaveplatform-manifest@main docs/trust-chain.md`, `README.md`; schema `deploymenttheory/weaveplatform-api@main schema/channel-manifest.schema.json`; verifier `deploymenttheory/weaveplatform-agent@main internal/manifestverify`
+- Channel manifest chain: `weaveplatform/weaveplatform-channels@main docs/trust-chain.md`, `README.md`; schema `weaveplatform/weaveplatform-agent-core@main schema/channel-manifest.schema.json`; verifier `weaveplatform/weaveplatform-agent-core@main internal/manifestverify`
 - Module promotion precedent: `deploymenttheory/weaveplatform-agent-modules@main docs/release-pipeline.md`

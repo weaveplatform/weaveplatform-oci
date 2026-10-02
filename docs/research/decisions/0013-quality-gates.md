@@ -135,7 +135,7 @@ Alternatives considered:
 
 ## References
 
-- hostweave testing decision: `deploymenttheory/hostweave@main docs/research/decisions/0018-testing-and-coverage.md`
+- hostweave testing decision: `weaveplatform/hostweave@main docs/research/decisions/0018-testing-and-coverage.md`
 - [10-shared-go-module.md](../10-shared-go-module.md), [11-migration.md](../11-migration.md), [13-deployment-profiles.md](../13-deployment-profiles.md)
 - godog: <https://github.com/cucumber/godog>
 - testcontainers-go v0.44.0: <https://github.com/testcontainers/testcontainers-go/tree/v0.44.0>

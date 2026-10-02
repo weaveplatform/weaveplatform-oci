@@ -11,7 +11,7 @@ import (
 	"oras.land/oras-go/v2/content/oci"
 	"oras.land/oras-go/v2/errdef"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/chunk"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
 )
 
 // OpenLayout opens or creates an OCI image layout directory.

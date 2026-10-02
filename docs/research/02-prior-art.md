@@ -307,7 +307,7 @@ Sources: [liquidmetal-dev/flintlock](https://github.com/liquidmetal-dev/flintloc
 
 Kernel and initrd are files inside ordinary container images (`kernel.image` with
 `filename: vmlinux`); the rootfs comes from a `container_source`. hostweave already borrowed its
-watch stream ([hostweave prior art](https://github.com/deploymenttheory/hostweave/blob/main/docs/research/prior-art.md)).
+watch stream ([hostweave prior art](https://github.com/weaveplatform/hostweave/blob/main/docs/research/prior-art.md)).
 
 **Adopted.** Nothing new for images.
 
@@ -370,7 +370,7 @@ family of typed layer media types with explicit compression suffixes
 
 Sources: [`docs/release-pipeline.md`](https://github.com/deploymenttheory/weaveplatform-agent-modules/blob/main/docs/release-pipeline.md),
 [`.github/workflows/module-release.yml`](https://github.com/deploymenttheory/weaveplatform-agent-modules/blob/main/.github/workflows/module-release.yml),
-[weaveplatform-manifest trust chain](https://github.com/deploymenttheory/weaveplatform-manifest/blob/main/docs/trust-chain.md).
+[weaveplatform-manifest trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md).
 Local checkouts: `weaveplatform-agent-modules@main docs/release-pipeline.md`,
 `.github/workflows/module-release.yml:106-128`.
 
@@ -404,7 +404,7 @@ Probed on 2026-10-02 unless stated.
 | kubevirt/containerdisks | `quay.io/containerdisks/<distro>` | `44`, `44-1.7`, `44-2604290212`, `latest` | Manifest list per arch |
 | Fedora bootc | `quay.io/fedora/fedora-bootc` | `46`, `46-aarch64` | Index per tag plus arch-suffixed tags |
 | Homebrew bottles | `ghcr.io/homebrew/core/<formula>` | `<version>` | Index with `os.version: "macOS 15.7"` and `ref.name` such as `1.25.0_2.arm64_sequoia` |
-| weaveplatform-agent-modules | `ghcr.io/deploymenttheory/weaveplatform-modules/<module>` | `X.Y.Z` | Sidecar manifest lists per-OS/arch binaries |
+| weaveplatform-agent-modules | `ghcr.io/weaveplatform/weaveplatform-modules/<module>` | `X.Y.Z` | Sidecar manifest lists per-OS/arch binaries |
 
 The weave repository and tag scheme that follows from this is in
 [09-artifact-contract-v1.md](09-artifact-contract-v1.md) and

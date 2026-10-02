@@ -161,6 +161,6 @@ state. Never shipped; regenerated per VM.
 
 **VZ.** Apple's Virtualization.framework.
 
-**weave-zot.** The container image `ghcr.io/deploymenttheory/weave-zot`: upstream zot pinned by digest with weave config roles (`private`, `mirror`) and a healthcheck. The reference private registry and site mirror. See [0012](decisions/0012-container-images.md).
+**weave-zot.** The container image `ghcr.io/weaveplatform/weave-zot`: upstream zot pinned by digest with weave config roles (`private`, `mirror`) and a healthcheck. The reference private registry and site mirror. See [0012](decisions/0012-container-images.md).
 
 **zstd.** The Zstandard compressor used per chunk in the contract.

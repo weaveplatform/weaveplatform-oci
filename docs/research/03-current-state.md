@@ -13,17 +13,17 @@ revision listed; line numbers refer to that revision.
 
 | Repository | Revision read | How |
 |---|---|---|
-| `deploymenttheory/hostweave` | `facca4b` (branch `fix/review-findings`, local checkout) | source and `docs/` |
-| `deploymenttheory/guestweave-cli-macos` (module `guestweave-macos`) | `3bf49f0` (`main`, local checkout) | source and `internal/docs/` |
-| `deploymenttheory/guestweave-cli-windows` (module `guestweave-windows`) | `93d230b85f8b` (`main`, via the GitHub contents API) | `internal/oci/oci.go`, `internal/oci/layer.go`, `internal/oci/cache/cache.go`, `internal/winmedia/retail.go`, `internal/vm/layout/layout.go`, `go.mod`, tree listing |
+| `weaveplatform/hostweave` | `facca4b` (branch `fix/review-findings`, local checkout) | source and `docs/` |
+| `weaveplatform/guestweave-cli-macos` (module `guestweave-macos`) | `3bf49f0` (`main`, local checkout) | source and `internal/docs/` |
+| `weaveplatform/guestweave-cli-windows` (module `guestweave-windows`) | `93d230b85f8b` (`main`, via the GitHub contents API) | `internal/oci/oci.go`, `internal/oci/layer.go`, `internal/oci/cache/cache.go`, `internal/winmedia/retail.go`, `internal/vm/layout/layout.go`, `go.mod`, tree listing |
 | `deploymenttheory/go-sdk-winmediafoundry` | v0.8.0 (Windows pin), v0.7.0 (macOS pin) | README and package list via GitHub |
 | `deploymenttheory/weaveplatform-agent-modules` | `6ff07a7` (local checkout) | `docs/`, `handoff/`, `.github/workflows/module-release.yml` |
-| `deploymenttheory/weaveplatform-manifest` | `3af1c16` (local checkout) | `README.md`, `docs/trust-chain.md` |
+| `weaveplatform/weaveplatform-channels` | `3af1c16` (local checkout) | `README.md`, `docs/trust-chain.md` |
 
 Two companion branches referenced by hostweave's image phase were **not** merged at
 the time of reading: macOS `94ab635` and Windows `eae767a` on
 `feat/hostweave-image-contract`
-(`deploymenttheory/hostweave@facca4b docs/implementation/image-lifecycle.md:112-124`).
+(`weaveplatform/hostweave@facca4b docs/implementation/image-lifecycle.md:112-124`).
 Statements about `weave capabilities` and per-process registry credentials describe
 those branches, not `main`.
 
@@ -386,21 +386,21 @@ flowchart LR
 
 ## References
 
-- `deploymenttheory/hostweave@facca4b`: `pkg/images/vm.go`, `pkg/images/registry.go`,
+- `weaveplatform/hostweave@facca4b`: `pkg/images/vm.go`, `pkg/images/registry.go`,
   `pkg/types/image.go`, `pkg/scheduler/filter.go`, `agent/runtime/{moby,guestweave,qemu}`,
   `internal/agentgw/gateway.go`, `api/openapi.yaml`, `api/proto/agent/v1/agent.proto`,
   `docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md`,
   `docs/research/decisions/0029-image-identities-and-builds.md`,
   `docs/research/guestweave-cli.md`, `docs/implementation/image-lifecycle.md`
-- `deploymenttheory/guestweave-cli-macos@3bf49f0`: `internal/oci/*`,
+- `weaveplatform/guestweave-cli-macos@3bf49f0`: `internal/oci/*`,
   `internal/vm/storage/*`, `internal/vm/layout/layout.go`, `internal/vm/vm.go`,
   `internal/command/commands_create.go`, `internal/command/commands_create_winguest.go`,
   `internal/winimage/*`, `internal/registry/*`, `internal/config/*`,
   `internal/docs/registries-and-image-formats.md`
-- `deploymenttheory/guestweave-cli-windows@93d230b85f8b`: `internal/oci/oci.go`,
+- `weaveplatform/guestweave-cli-windows@93d230b85f8b`: `internal/oci/oci.go`,
   `internal/oci/layer.go`, `internal/oci/cache/cache.go`, `internal/winmedia/retail.go`,
   `internal/vm/layout/layout.go`, `go.mod`
 - `deploymenttheory/go-sdk-winmediafoundry` v0.8.0: <https://github.com/deploymenttheory/go-sdk-winmediafoundry>
 - `deploymenttheory/weaveplatform-agent-modules@6ff07a7`:
   `.github/workflows/module-release.yml`, `docs/release-pipeline.md`, `handoff/linux-bring-up.md`
-- `deploymenttheory/weaveplatform-manifest@3af1c16`: `README.md`, `docs/trust-chain.md`
+- `weaveplatform/weaveplatform-channels@3af1c16`: `README.md`, `docs/trust-chain.md`

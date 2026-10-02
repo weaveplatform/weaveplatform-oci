@@ -12,8 +12,8 @@ exists yet. [Decision 0004](decisions/0004-shared-go-module.md) approves the sha
 
 | Item | Value | Why |
 |---|---|---|
-| Module path | `github.com/deploymenttheory/weaveplatform-oci` | the repository that owns the spec owns the reference implementation |
-| Go | 1.27 | hostweave's baseline (`deploymenttheory/hostweave@main`, decision 0020) |
+| Module path | `github.com/weaveplatform/weaveplatform-oci` | the repository that owns the spec owns the reference implementation |
+| Go | 1.27 | hostweave's baseline (`weaveplatform/hostweave@main`, decision 0020) |
 | CGO | off (`CGO_ENABLED=0`) | the agent-modules convention; cross-compiles from any host; guestweave-cli-macos keeps its purego bindings separate |
 | Registry client | `oras.land/oras-go/v2` v2.6.2 | artifact-first API, OCI 1.1 (`artifactType`, `subject`, referrers with tag fallback), file/memory/oci-layout stores, Range fetch; see the library comparison in [01-oci-primer.md](01-oci-primer.md) |
 | zstd | `github.com/klauspost/compress/zstd` | pure Go (no CGO), the de-facto Go zstd used by containerd and oras tooling, writes the frame content-size field the contract requires, and decodes concurrently (<https://github.com/klauspost/compress>) |
@@ -73,7 +73,7 @@ const (
     MediaTypeFirmwarePolicy = "application/vnd.weave.guest.state.firmware-policy.v1+json"
     ArtifactType            = MediaTypeConfig
 
-    AnnotationPrefix     = "com.deploymenttheory.weave.guest."
+    AnnotationPrefix     = "run.weaveplatform.guest."
     AnnotationChunkIndex = AnnotationPrefix + "disk.chunk.index"
     // … one constant per key in contract §5, §6, §8
     ChunkSize = 512 << 20
@@ -188,7 +188,7 @@ package client
 type Profile struct {
     Name         string
     Host         string   // ghcr.io
-    Organization string   // deploymenttheory/weave-images
+    Organization string   // weaveplatform/weave-images
     Insecure     bool
     Mirrors      []string // tried in order before Host for reads
     Default      bool
@@ -257,7 +257,7 @@ type Policy struct {
     RequireChannel     bool
     RequireAttestation bool
     Issuer             string // https://token.actions.githubusercontent.com
-    SANRegexp          string // ^https://github.com/deploymenttheory/weaveplatform-oci/.github/workflows/publish.yml@refs/.*$
+    SANRegexp          string // ^https://github.com/weaveplatform/weaveplatform-oci/.github/workflows/publish.yml@refs/.*$
     RequireKey         bool              // private profile: a cosign key signature must verify
     PublicKeys         []crypto.PublicKey // trusted signing keys; key hints select among them during rotation
 }
@@ -393,8 +393,8 @@ not shell out to it.
 | `build-macos.yml` | self-hosted Apple-silicon bare metal, `max-parallel: 1` | `version`, `variant`, `agent_version` | as above | bundle |
 | `publish.yml` | `ubuntu-latest` | `bundle` artifact or layout, `repository`, `tags` | `packages: write`, attestation permissions, `RELEASE_PLEASE_PAT` for the cross-repo dispatch | `weaveoci pack`, `push`, `actions/attest push-to-registry`, `weaveoci verify` self-check, `repository_dispatch image-published` to weaveplatform-manifest |
 
-Callers pass `uses: deploymenttheory/weaveplatform-oci/.github/workflows/publish.yml@v1`.
-`publish.yml` installs or runs the `ghcr.io/deploymenttheory/weaveoci` image and calls
+Callers pass `uses: weaveplatform/weaveplatform-oci/.github/workflows/publish.yml@v1`.
+`publish.yml` installs or runs the `ghcr.io/weaveplatform/weaveoci` image and calls
 `weaveoci publish`; it adds only the GitHub-specific steps (`actions/attest`, the cross-repo
 dispatch). A further workflow, `release-images.yml`, builds and publishes the `weaveoci` and
 `weave-zot` container images ([0012](decisions/0012-container-images.md)).
@@ -532,9 +532,9 @@ reproduces the original manifest digest.
 - klauspost/compress zstd: <https://github.com/klauspost/compress>
 - santhosh-tekuri/jsonschema: <https://github.com/santhosh-tekuri/jsonschema>
 - sigstore-go: <https://github.com/sigstore/sigstore-go>; verification guide: <https://github.com/sigstore/sigstore-go/blob/main/docs/verification.md>
-- go-containerregistry in-memory registry used by hostweave tests: `deploymenttheory/hostweave@main`, `pkg/images/registry_test.go`
-- hostweave contract-suite precedent: `deploymenttheory/hostweave@main`, `pkg/runtime/runtimetest`, `pkg/store/storetest`; coverage policy decision 0018; Go baseline decision 0020
-- Files replaced in guestweave-cli-macos: `deploymenttheory/guestweave-cli-macos@main`, `internal/oci/*`, `internal/vm/storage/{oci,lume,registry}.go`, `internal/registry/resolver.go`
-- Files replaced in guestweave-cli-windows: `deploymenttheory/guestweave-cli-windows@main`, `internal/oci/{oci,layer}.go`, `internal/oci/cache/cache.go`
-- Files changed in hostweave: `deploymenttheory/hostweave@main`, `pkg/images/vm.go`, `pkg/images/registry.go`, `pkg/types/image.go`, `agent/runtime/qemu/qemu.go`, `agent/runtime/guestweave/capabilities.go`, `pkg/scheduler/filter.go:36-98`, `api/openapi.yaml`
+- go-containerregistry in-memory registry used by hostweave tests: `weaveplatform/hostweave@main`, `pkg/images/registry_test.go`
+- hostweave contract-suite precedent: `weaveplatform/hostweave@main`, `pkg/runtime/runtimetest`, `pkg/store/storetest`; coverage policy decision 0018; Go baseline decision 0020
+- Files replaced in guestweave-cli-macos: `weaveplatform/guestweave-cli-macos@main`, `internal/oci/*`, `internal/vm/storage/{oci,lume,registry}.go`, `internal/registry/resolver.go`
+- Files replaced in guestweave-cli-windows: `weaveplatform/guestweave-cli-windows@main`, `internal/oci/{oci,layer}.go`, `internal/oci/cache/cache.go`
+- Files changed in hostweave: `weaveplatform/hostweave@main`, `pkg/images/vm.go`, `pkg/images/registry.go`, `pkg/types/image.go`, `agent/runtime/qemu/qemu.go`, `agent/runtime/guestweave/capabilities.go`, `pkg/scheduler/filter.go:36-98`, `api/openapi.yaml`
 - Related: [09-artifact-contract-v1.md](09-artifact-contract-v1.md), [08-target-architecture.md](08-target-architecture.md), [11-migration.md](11-migration.md), decisions [0001](decisions/0001-vm-artifact-contract.md), [0004](decisions/0004-shared-go-module.md), [0008](decisions/0008-device-cache-gc-and-mirrors.md), [0009](decisions/0009-guest-state-carry-vs-regenerate.md)

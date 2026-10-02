@@ -13,7 +13,7 @@ import (
 var schemaJSON []byte
 
 // SchemaID is the $id of the embedded config schema.
-const SchemaID = "https://github.com/deploymenttheory/weaveplatform-oci/pkg/spec/schema/vm-config-v1.schema.json"
+const SchemaID = "https://github.com/weaveplatform/weaveplatform-oci/pkg/spec/schema/vm-config-v1.schema.json"
 
 // Schema returns a copy of the embedded JSON Schema for the config document.
 func Schema() []byte {

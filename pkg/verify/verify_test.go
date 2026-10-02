@@ -21,12 +21,12 @@ import (
 	"oras.land/oras-go/v2/content/memory"
 	"oras.land/oras-go/v2/registry/remote/auth"
 
-	"github.com/deploymenttheory/weaveplatform-oci/internal/testregistry"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/channel"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/client"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/profile"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/verify"
+	"github.com/weaveplatform/weaveplatform-oci/internal/testregistry"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/verify"
 )
 
 func signer(t *testing.T) *sign.Signer {
@@ -144,7 +144,7 @@ func TestAttestationIdentity(t *testing.T) {
 	}
 	const (
 		issuer = "https://token.actions.githubusercontent.com"
-		san    = "https://github.com/deploymenttheory/weaveplatform-oci/.github/workflows/publish.yml@refs/heads/main"
+		san    = "https://github.com/weaveplatform/weaveplatform-oci/.github/workflows/publish.yml@refs/heads/main"
 	)
 	d := digest.FromString("subject")
 	e, err := vs.Attest(san, issuer, statement(d, verify.SLSAProvenanceV1))
@@ -154,7 +154,7 @@ func TestAttestationIdentity(t *testing.T) {
 	id := &verify.Identity{
 		Trusted:       vs,
 		Issuer:        issuer,
-		SubjectRegexp: `^https://github\.com/deploymenttheory/weaveplatform-oci/\.github/workflows/publish\.yml@refs/heads/main$`,
+		SubjectRegexp: `^https://github\.com/weaveplatform/weaveplatform-oci/\.github/workflows/publish\.yml@refs/heads/main$`,
 	}
 	r, err := id.VerifyEntity(e, d)
 	if err != nil || r.Identity != san || r.Provider != "github-attestation" {

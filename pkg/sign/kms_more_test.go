@@ -21,7 +21,7 @@ import (
 	"github.com/sigstore/sigstore/pkg/signature/kms"
 	"oras.land/oras-go/v2/content/memory"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/sign"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
 )
 
 // fakeKMS is a kms.SignerVerifier backed by an in-memory ECDSA key.

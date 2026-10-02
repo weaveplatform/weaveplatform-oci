@@ -6,7 +6,7 @@ import (
 
 	"github.com/opencontainers/go-digest"
 
-	"github.com/deploymenttheory/weaveplatform-oci/pkg/verify"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/verify"
 )
 
 // Regression: a nil trusted root used to panic inside sigstore-go.

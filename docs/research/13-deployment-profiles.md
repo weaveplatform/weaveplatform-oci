@@ -10,7 +10,7 @@ fixed three decisions on 2026-10-02:
 2. **The private profile signs with cosign key-based signing** (file or KMS key) **plus the
    minisign channel manifest.**
 3. **weaveplatform-oci publishes its own container images to GHCR:**
-   `ghcr.io/deploymenttheory/weaveoci` (the CLI) and `ghcr.io/deploymenttheory/weave-zot`
+   `ghcr.io/weaveplatform/weaveoci` (the CLI) and `ghcr.io/weaveplatform/weave-zot`
    (zot preconfigured for weave artifacts).
 
 The contracts these facts feed are in
@@ -43,14 +43,14 @@ trust mechanisms are in [05-supply-chain.md](05-supply-chain.md).
 
 | | GitHub | Private | Hybrid |
 |---|---|---|---|
-| Canonical registry | `ghcr.io/deploymenttheory` | an organisation's zot (`weave-zot`), Harbor or distribution v3 | GHCR |
+| Canonical registry | `ghcr.io/weaveplatform` | an organisation's zot (`weave-zot`), Harbor or distribution v3 | GHCR |
 | Site registry | none | none, or a second zot as a site mirror | zot per site, `sync` on demand from GHCR |
 | Publisher | GitHub Actions wrappers around `weaveoci publish` | `weaveoci publish` from any CI or a workstation | GitHub Actions |
 | Build-time signature | GitHub artifact attestation (Sigstore, keyless) | cosign-format bundle signed with a file or KMS key | GitHub artifact attestation |
-| Promotion trust | minisign channel manifest, deploymenttheory root | minisign channel manifest, organisation's own root or deploymenttheory root | minisign channel manifest |
+| Promotion trust | minisign channel manifest, weaveplatform root | minisign channel manifest, organisation's own root or weaveplatform root | minisign channel manifest |
 | Referrers | fallback tag `sha256-<hex>` (no API) | native referrers API on zot and Harbor; fallback tag on distribution v3 | fallback tag upstream; zot syncs referrers |
 | Consumer credentials | classic PAT (`read:packages`) or `GITHUB_TOKEN` | htpasswd, OpenID Connect or API keys on zot; robot accounts on Harbor | site zot credentials; zot holds the GHCR PAT |
-| Best for | open-source Linux images, the deploymenttheory release stream | air-gapped and sovereign sites; macOS and Windows images that must stay inside an organisation | offices with many devices pulling the same images |
+| Best for | open-source Linux images, the weaveplatform release stream | air-gapped and sovereign sites; macOS and Windows images that must stay inside an organisation | offices with many devices pulling the same images |
 
 ```mermaid
 flowchart LR
@@ -128,7 +128,7 @@ Facts behind the zot column, from the v2.1.21 source and docs:
 
 ## Reference deployment: the weave-zot image
 
-`ghcr.io/deploymenttheory/weave-zot` is upstream zot plus a weave configuration and a
+`ghcr.io/weaveplatform/weave-zot` is upstream zot plus a weave configuration and a
 health-check binary. It is built by this repository ([decision 0012](decisions/0012-container-images.md)).
 
 ```dockerfile
@@ -289,7 +289,7 @@ reads are off by default; a Linux-only public deployment can add `anonymousPolic
           "maxRetries": 3,
           "retryDelay": "30s",
           "syncTimeout": "6h",
-          "content": [ { "prefix": "deploymenttheory/weave-images/**" } ]
+          "content": [ { "prefix": "weaveplatform/weave-images/**" } ]
         }
       ]
     },
@@ -321,7 +321,7 @@ name: weave-registry
 
 services:
   zot:
-    image: ghcr.io/deploymenttheory/weave-zot:1
+    image: ghcr.io/weaveplatform/weave-zot:1
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -338,7 +338,7 @@ services:
 
   zot-mirror:
     profiles: ["mirror"]
-    image: ghcr.io/deploymenttheory/weave-zot:1
+    image: ghcr.io/weaveplatform/weave-zot:1
     command: ["serve", "/etc/zot/mirror.json"]
     restart: unless-stopped
     ports:
@@ -466,7 +466,7 @@ rotation through the bundle's key hint
 ## Channel trust in private deployments
 
 Consumers accept a configured list of **channel trust anchors**: minisign root public keys,
-each with a name. The default list contains only deploymenttheory's root, which core
+each with a name. The default list contains only weaveplatform's root, which core
 already embeds. A private organisation that builds its own images runs its own
 `weavemanifest keygen` root, endorses its own signing key, promotes into its own channel
 repository and adds its root to the anchor list on its devices. An image is dispatchable
@@ -492,8 +492,8 @@ Devices store registry credentials through the Docker credential-helper protocol
 
 | Image | Built with | Base | Platforms | Tags |
 |---|---|---|---|---|
-| `ghcr.io/deploymenttheory/weaveoci` | ko v0.19.1 ([ko](https://github.com/ko-build/ko/releases/tag/v0.19.1)) | `gcr.io/distroless/static-debian12:nonroot` | linux/amd64, linux/arm64 | `vX.Y.Z`, `vX.Y`, `vX`, `latest` |
-| `ghcr.io/deploymenttheory/weave-zot` | docker/build-push-action v7.4.0 ([action](https://github.com/docker/build-push-action/blob/v7.4.0/action.yml)) | `ghcr.io/project-zot/zot:v2.1.21@sha256:…` | linux/amd64, linux/arm64 | `<weave version>`, `<weave version>-zot2.1.21`, `latest`; `-nonroot` variants |
+| `ghcr.io/weaveplatform/weaveoci` | ko v0.19.1 ([ko](https://github.com/ko-build/ko/releases/tag/v0.19.1)) | `gcr.io/distroless/static-debian12:nonroot` | linux/amd64, linux/arm64 | `vX.Y.Z`, `vX.Y`, `vX`, `latest` |
+| `ghcr.io/weaveplatform/weave-zot` | docker/build-push-action v7.4.0 ([action](https://github.com/docker/build-push-action/blob/v7.4.0/action.yml)) | `ghcr.io/project-zot/zot:v2.1.21@sha256:…` | linux/amd64, linux/arm64 | `<weave version>`, `<weave version>-zot2.1.21`, `latest`; `-nonroot` variants |
 
 - `weaveoci` is CGO-free, so ko builds it without a Dockerfile and generates an SPDX SBOM
   by default ([ko SBOMs](https://github.com/ko-build/ko/blob/v0.19.1/docs/features/sboms.md)).
@@ -542,7 +542,7 @@ private registry) are unchanged by hosting choice and remain open in
 - Does GHCR accept the cosign key-based bundle referrer for a custom `artifactType` through
   the fallback tag, exactly as for an attestation? (a spike, shared with the attestation
   question in [12](12-open-questions.md)).
-- How does an organisation's own channel root coexist with deploymenttheory's in one
+- How does an organisation's own channel root coexist with weaveplatform's in one
   channel document, and who may promote into which channel?
 
 ## References

@@ -70,7 +70,7 @@ consumer.
 
 ## Conventions
 
-- Every external claim cites a URL. Claims about weave code cite `deploymenttheory/<repo>@<branch>` and `path:line`.
+- Every external claim cites a URL. Claims about weave code cite `<org>/<repo>@<branch>` and `path:line`. Code read before the move to the `weaveplatform` organisation keeps its original citation where the repository no longer exists; see the location table below.
 - Items that could not be confirmed against a primary source are marked *(unverified)*.
 - Sizes use GiB and MiB. "GB" appears only when a vendor limit is quoted verbatim.
 - Diagrams are fenced `mermaid` blocks.
@@ -88,15 +88,28 @@ consumer.
 6. Linux images use a bootc OCI image as the source of truth where practical, with upstream cloud images as the fallback; hostweave's QEMU runtime becomes an OCI consumer.
 7. Three deployment profiles share one codebase: github, private and hybrid. zot is the reference private registry; Harbor and distribution v3 are supported targets.
 8. The private profile signs with cosign key-based signing (file or KMS key) plus the minisign channel manifest.
-9. `weaveplatform-oci` publishes its own `ghcr.io/deploymenttheory/weaveoci` and `ghcr.io/deploymenttheory/weave-zot` container images to GHCR.
+9. `weaveplatform-oci` publishes its own `ghcr.io/weaveplatform/weaveoci` and `ghcr.io/weaveplatform/weave-zot` container images to GHCR.
 
 The implementation is Go, with helper scripts in any language. Every implementation phase must pass
 godog acceptance tests and a merged coverage gate of at least 95 % in total
 ([0013](decisions/0013-quality-gates.md)).
 
+## Repository locations
+
+On 2026-10-02 the weave repositories moved from the `deploymenttheory` to the `weaveplatform` GitHub organisation, and this repository with them. Citations in this set use the current location where one exists.
+
+| Cited as | Now |
+|---|---|
+| `deploymenttheory/hostweave`, `guestweave-cli-macos`, `guestweave-cli-windows`, `weaveplatform-oci` | same names under `weaveplatform/` |
+| `deploymenttheory/weaveplatform-agent` | `weaveplatform/weaveplatform-agent-core` |
+| `deploymenttheory/weaveplatform-api`, `weaveplatform-sdk` | merged into `weaveplatform/weaveplatform-agent-core` (`sdk/` module, `schema/`) |
+| `deploymenttheory/weaveplatform-manifest` | `weaveplatform/weaveplatform-channels` |
+| `deploymenttheory/weaveplatform-agent-modules` | no longer published; the in-guest modules are `weaveplatform/guestweave-agent`. Citations describe the code as read at the research baseline |
+| `deploymenttheory/go-sdk-winmediafoundry` | unchanged; stays in `deploymenttheory` |
+
 ## Relationship to other repositories
 
-- hostweave: [decision 0029, image identities and builds](https://github.com/deploymenttheory/hostweave/blob/main/docs/research/decisions/0029-image-identities-and-builds.md) and the [image lifecycle phase record](https://github.com/deploymenttheory/hostweave/blob/main/docs/implementation/image-lifecycle.md) describe the image catalogue this work plugs into.
-- weaveplatform-manifest: the [trust chain](https://github.com/deploymenttheory/weaveplatform-manifest/blob/main/docs/trust-chain.md) that promotion extends to images.
-- weaveplatform-agent-modules: the [release pipeline](https://github.com/deploymenttheory/weaveplatform-agent-modules/blob/main/docs/release-pipeline.md) whose ORAS push and dispatch the image pipeline mirrors.
+- hostweave: [decision 0029, image identities and builds](https://github.com/weaveplatform/hostweave/blob/main/docs/research/decisions/0029-image-identities-and-builds.md) and the [image lifecycle phase record](https://github.com/weaveplatform/hostweave/blob/main/docs/implementation/image-lifecycle.md) describe the image catalogue this work plugs into.
+- weaveplatform-channels (formerly weaveplatform-manifest): the [trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md) that promotion extends to images.
+- weaveplatform-agent-modules (no longer published): its release pipeline, an ORAS push plus a dispatch to the channel repository, is the pattern the image pipeline mirrors ([02-prior-art.md](02-prior-art.md)).
 - guestweave-cli-macos: `internal/docs/registries-and-image-formats.md` documents the registry profiles and codecs being replaced.
