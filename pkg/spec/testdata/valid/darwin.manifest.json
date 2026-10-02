@@ -1,0 +1,1714 @@
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "artifactType": "application/vnd.weave.guest.config.v1+json",
+  "config": {
+    "mediaType": "application/vnd.weave.guest.config.v1+json",
+    "digest": "sha256:0f27aaf869c5676942db21a6ff42713b3def051bea599bf5d8a936f22e57b883",
+    "size": 1031
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:409e181a050067439913c82b2b6394ba18ba37e1543c30595cbbbaaeca76f817",
+      "size": 1000,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0f939656cf2d17ee6dfecb9e12c8cdef7776d9f7a44841ebd652035f44f2f230",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "0",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "0",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000000"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:89063f9691f28dbca9c14ec6aadf3c949fe1a20e5ec5ea2fab95e47d3a85e1b8",
+      "size": 1001,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:c8e71c5f0f7f1ded9b6447b179a77c849e9e660f9ceb14c5aa8d0c0d6fcb3ac6",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "1",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "536870912",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000001"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8369d234e9ed287b3481aa6be94a8ddd4c56b25451c6d63e0bff92d270371b19",
+      "size": 1002,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0364e22acf9cc2acb66ff290a5eb12b234e91ca55feaed3269c0b1dfe8bfe5aa",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "2",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "1073741824",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000002"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:df4f06c7386f198278f79b9b2f33c75ab69a8cdcda02dd2e9d279174ace4a713",
+      "size": 1003,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d406fd70119320d01dda83068a4794d59d70ce6fa8b6b0ac382ddfe01e7c36ac",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "3",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "1610612736",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000003"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:e03ac45be68eeceb850420d4ec50fddbfa1cd3c19d223437e86e500b314ed466",
+      "size": 1004,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:7b1a8ef82b190ea92450c6dbd3780b67cd8c9de0d928467b9b87dbd227f6a7a9",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "4",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "2147483648",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000004"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:0837b6037907e014f954da200d2c56ac0f382f0d6fcd194d4483c05af5bcc11f",
+      "size": 1005,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:c5b7d2e9a3d248c66fc4bf868d2645a5895f4cb498369a6816462d882825cb0c",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "5",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "2684354560",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000005"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:cfe1c9260b9bd03409e5362271d8afd96e9d40cca75cd5bff98adef44fb1d540",
+      "size": 1006,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:32b28782ea4e7492ac390c22c2685caf70100d57487f015a4e0ec3d90f5ec529",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "6",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "3221225472",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000006"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:2589cd5f59e448eb5b7b24d58d4971af2f5ef3445dbf93161dbfe929dc6b507f",
+      "size": 1007,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:3f60348de89fdf9d79db37f1ca99a25ae3cc15c478dcf7778f5dac0c5745dbe9",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "7",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "3758096384",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000007"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:e4c921f5259846ee0ac8bf8b1c4c9944ecc1ca1f60f2e309ad8c20e54bce23fc",
+      "size": 1008,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6596da044e6ad9339ce502e07e665c077bc235292cfd1c983946ab596d51984c",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "8",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "4294967296",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000008"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:0f4e44602141175c0ab8a2d72fabbd469bc29bb2cf7b04ec9484fa51a48f3da8",
+      "size": 1009,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:99bc9949ccc795266edc885ee90a113c21d8d2d8e394947e0e0a1e85b46b0b0b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "9",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "4831838208",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000009"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:3e9a07c61c8c1c024e5942c58b0900e54f723fd2d26d47b52f3135b813f00d7e",
+      "size": 1010,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:e99bf2e93fee68d3aed206a45301cf5ed0258b13a4bee2c2026f668c60e9526d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "10",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "5368709120",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000010"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:f14af987577aaa3649686c505d1911d7d27d1f3cd9d18edc1687f309eb20a834",
+      "size": 1011,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:11d7e7aedb1292e61e348dd13469e8467d7dc4493f8b073bd26a637171adf835",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "11",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "5905580032",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000011"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:996dca09962f5f67c874cb867271601d1631ef2f2440096444828dea1da8c24b",
+      "size": 1012,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ad5cdfb8556a88730924f507022c5b53364dad475beb708cbd72e0fb435cf648",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "12",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "6442450944",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000012"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:f22bf4501d0221898680e6d4c02427eaaff08ee7a93a3434d4862a52c7d41ead",
+      "size": 1013,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:a689a4807e85b6e03b4a1385b566bbfe24712668e955941e337d63d576825bac",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "13",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "6979321856",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000013"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9ec5eef6f2cd7bbc13e052a3c41ba6aa5a2b14d6d4d4433520cdd8dd2d922255",
+      "size": 1014,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d261730246e0f7ae28643c6b2270b8c85bbe2ee8eb0374683d53f801b59ee1bc",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "14",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "7516192768",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000014"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a4d7f79fbb2f6ae800043a9daf67be8a99401b15d1499b567c119e817ff8dc57",
+      "size": 1015,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:16b1723dc395b099da88492ffe50708ad47b0f9c9c947faf4d891c61d9978900",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "15",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "8053063680",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000015"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:4c7e0b6ea6e70713d19cfc202e295054cfb17fca1f0ff7a8b87c8980235a0318",
+      "size": 1016,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:db2851ffa3f5ed6b5e9b0ba7edf24b714a938fcd79c9eb41dc6d8142d4a2b60f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "16",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "8589934592",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000016"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:6f13ab814b818f9ed8ac19fc9edc0192a6555c12453c0524eb9dce81dee9193e",
+      "size": 1017,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:83251044dd66ed634300c017086ec59fca3f4f584c9d2bebacb08c0cebaf56ee",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "17",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "9126805504",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000017"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:942add6ea0efb9401f101359343baca7a18fb2df0748591fa61f700a274c6e42",
+      "size": 1018,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:5d19204f65f1fc98db757a0902328987f820a54039840e71fe573bdf597c299c",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "18",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "9663676416",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000018"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a88eb75d07eb8912ea6dd8a29dc2c8b622fd2e598d941730de46ff28f3be6db0",
+      "size": 1019,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6e20da1420c0a666587a8c52455e4361710fabe671a2dc1440f4c24f4ae69448",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "19",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "10200547328",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000019"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:820f7c9e00c37457cdab5809e5ef5389b16dbd0943a47a60a43b1ca3e36d2c9e",
+      "size": 1020,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:65b250e9422d728685af7354745e685b89f565c03e18a4bafca18ac4e41855bc",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "20",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "10737418240",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000020"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:173ac1f2a3e4f8b7a6aa814550b3495f6da3661c3fcfcb4a42db2f77e91481f5",
+      "size": 1021,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9333cdcd0166d3f1953c86d1f1816c9cd8041e8088742dc495b3336d26729b51",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "21",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "11274289152",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000021"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:cf4b212f478964895c5dbb252a569f4b70ce95478734ac609d3fc57026f53ddf",
+      "size": 1022,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:79266c508beec680ef6a8c7e654793320eb6087a71ad3dd60bb0707eaf51fb51",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "22",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "11811160064",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000022"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:7a032a1695a84f584b3965e6502d78b822f41858c13cf291b49419a21291cf32",
+      "size": 1023,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:1b06d88e598f7f94721367b1542bdaf478f22df1626b781542fea891904e7b15",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "23",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "12348030976",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000023"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:745b83649277dc403a5923773239cedae36a08e2df188af768c28ae761661005",
+      "size": 1024,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b260716d181c47dcc33fcb45d34a41cd62e6fd95a358aef5a9911457191de0b5",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "24",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "12884901888",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000024"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:73503ca27d2043a4346b647ab7515a6504762b3e73a7bcd8821a2e983633ba8b",
+      "size": 1025,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:3666ad852f3342f55990f7d486ab0ab323b5c90a92ecb558ec2009c9bca6969b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "25",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "13421772800",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000025"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:556d288008f15613b47cfacd7d972f3d2505b015984b1c55cfbecfe1a4c7de96",
+      "size": 1026,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:8b3a82ba27d262c1a673fb3930e0e4cc72a85fc17119d7cd59000afae0e67a55",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "26",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "13958643712",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000026"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:2699540c5ff94360e8a6069991e9c8bff3a39e190923bd2597f4a64fd57e1fc8",
+      "size": 1027,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:40bc3d94d162e9e5963e0d8db9e910e37b6658282341d03db39fec6929857609",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "27",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "14495514624",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000027"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:ae8a36286b6146e413d82cd3f520cd769e9985825b21abb32b78a74a7daae992",
+      "size": 1028,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:8df5e65a2284bd3ba3e313276c5a8c4ec3eaa0a08c9a06f219ddb55293fb7c71",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "28",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "15032385536",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000028"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a4e56fb5a3f1d48ab64dcfe5836f352682fd02a8bffcce6abe2c8f6ea7204118",
+      "size": 1029,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:60d73ffad207409962c59219f6532015cc76db096d03261978c67fff8553352d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "29",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "15569256448",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000029"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:1d90dbed9c22c745e3a8df0adf3de5e03c21caf5260dcc54b837b2f691801c73",
+      "size": 1030,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:a5178608620ddc87dfce03ef450650fdcea5e2e932bedd23d7eeb6138ef45eee",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "30",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "16106127360",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000030"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9a8d4af77eb03c5f478222ffd476479ce975b9615d99dd5ba84c0d96203148b3",
+      "size": 1031,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6aac8484c0387653b2a0ff350bedf0599a007a49b583b00e2440fcb7009f0659",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "31",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "16642998272",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000031"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:5e8abf2de65cfb60ef5a6565fc832d69f7bd7cbacbb0660def283790d0b32b14",
+      "size": 1032,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:48bd3ae9d8238716b6372daac8b8d412f866656991e173993a1a25e2245bbf5b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "32",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "17179869184",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000032"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:d20383944e48137da94dc0b5ee36451bf56e6cf2c6812365f26e500fdb33dd17",
+      "size": 1033,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:bc08589d8811d37035aa4d1f1be5cacc0dabbbfc678c4097d2b51548f10beff8",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "33",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "17716740096",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000033"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:b77fc1f6d67622995c272d576ee568f4c26df58303f06da092e5be92ea0ae5c8",
+      "size": 1034,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:3cae2903b09302cfc4173604ceef74788647d1460a4e20ccbe5e096f2f0d5c87",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "34",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "18253611008",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000034"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:918b96ae0606cd10780b8b312f26954cb6afefbf3e39151448df4fb4ff455951",
+      "size": 1035,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b40e869dc322049f7f912f5b603dbc5b511f3c63ab05fe524c9dd250a7bc1fb4",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "35",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "18790481920",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000035"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:80c7d49aca683c4b3eb463bf7e79680bbfb8c0b6042215a032e8ec24041a3319",
+      "size": 1036,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:331a7e94bb25fde34d47e2aac516338232173524e8b052d3a6e97bea3b40396d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "36",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "19327352832",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000036"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:53e206a39153d5591ba9a5e95edc57a7dc81fa4591d6c0f37c5abb20d9277fb6",
+      "size": 1037,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:4038ff7fe962cfb4475a0bf5e0141ff25ce52056e974f7dd138cb1b85ebb69c3",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "37",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "19864223744",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000037"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:033c731cc755fb07b99d0a27f8dedd4c4da8b362b07f847e1b94df3b78c93ede",
+      "size": 1038,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:f6db065132656cd8a16e92a37f6cc206eb9e71ddddfc5cf523af201602916712",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "38",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "20401094656",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000038"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:08c7b2cc173745622395e9e48700e4969ccf21feb672ce5949a9629272ffc85b",
+      "size": 1039,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:f9bf74a8401261b886e53a8d5c66a197c6e13b331e614406441901ee2364af44",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "39",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "20937965568",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000039"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:e1663b93b53ed420dc036a7d8edb3aa22c80784e38c05625d62790e3264fb359",
+      "size": 1040,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d2747abf1e002bac2c6650e98398a985e8a114c510b66bc5d10124fde8f5c6b3",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "40",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "21474836480",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000040"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9a82d2fb130f36b810522585f4e13e902d211e346643a2cc509a8dc33e0ae49f",
+      "size": 1041,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:dc6d58bbf19d642b560cf13d52f0f2a0f9596f63ab55042968e318c9ca7a1917",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "41",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "22011707392",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000041"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:f168efcab26bad6c8042d0c4d2c7f23569feadca8838485c09486d914ed3fa7e",
+      "size": 1042,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ff9ce65857c1436fad1dc6df9a837b8b8814426de0840a8d057712998e8fc8b9",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "42",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "22548578304",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000042"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:16384089d20ee37b9c9985b17aac46c8d8ff5c1d8f80a9e73db6b12c65d43bbf",
+      "size": 1043,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:5a2ec59aeab4f174742c462efe10d73969e3f65fb91427bc4ec67fcaa3d38777",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "43",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "23085449216",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000043"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:c753ac5bf744d901294c29bd8230dbb919d1a74bc58302a779fdeae64cf8915e",
+      "size": 1044,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b51dcfceb7acb0eb214203ae570e194eb516327e80c913df380d45df4491d8f1",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "44",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "23622320128",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000044"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:ae2e2df35d283529c64d015c1ecffd5e4d7bd4f6b3b5a9c44642a7fecbf2e8b4",
+      "size": 1045,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0da9f8706dfe0d17b6f61f8cb10004ee5f37c4d03af760cb690874244426a5e0",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "45",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "24159191040",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000045"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a7319405ba349ea8ed7b340fb99c5a62eebfdda7055ea47ae1a9e6514ba34a1c",
+      "size": 1046,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6359bf349acc9fb462b3ba2956396c46a9e6c7bcc49553d0683c2d3454fe5900",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "46",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "24696061952",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000046"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:5a8381927c274d782529bc11ac9db0006afd097bf8d27810f862d9287ffc9f88",
+      "size": 1047,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:e1ba2b2a26a5df64bc16522b8c2d1ba18b032f7cf52d8f555fb76453aae77d60",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "47",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "25232932864",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000047"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:aec20b0b756534e74e97b8210be528ba18220ac802c395b259c27a3a55949a9a",
+      "size": 1048,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0fafe6a3ab20afab1e7e5c471314c1dc8f13c49a3de4ddd2b124ddd62eb1bfd7",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "48",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "25769803776",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000048"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:52037102edd8f4f09cae3b0cf4c3cd8a2a67846c33112b7514b2969ca3504a91",
+      "size": 1049,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:8fcad3b8e51e1f4ac6f3bd0d92d70b6136cbe0188181be811874821944b74c45",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "49",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "26306674688",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000049"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:1ea7c8198ced72d622f72c89031ee3bd186a88cfa472fe934181fb446e83ab36",
+      "size": 1050,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:cf3c96601cd60c63366a38ef9d5944cc73e124771e2f458aaca05fb62c7cb962",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "50",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "26843545600",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000050"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:adb9ffe36734eca66e1c17f2a7db2a93aa069396da7bd81d20bc662d2937aeea",
+      "size": 1051,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0698ca04af6361c53b51a50d702564d9103bae04b8f69485608c621fef69b926",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "51",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "27380416512",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000051"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:cb088759710618e0632d59446d61f02ee8156945bf6bdb4e74efe46b96ab6aad",
+      "size": 1052,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:4769f4ffd8ab9ac822eb121ba23bc4a1b5780f9d165d75e76606943609f3a5ca",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "52",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "27917287424",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000052"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a8fe4314af21590d2a11c5754d396b3f5cadcaa01b32e62572aa78cc37ac435c",
+      "size": 1053,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:bc47410473fde5c0d832418c5cf7e77d735d2936af7e8cc6c44e632f6a46988b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "53",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "28454158336",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000053"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8e243f526c07bbd7cde97a2adb8c89f84b8c887ad9195e58993ea3ce05444e9b",
+      "size": 1054,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:4e48818c9f53bdb1a1919ea5384e305992098a579fc655038d0efdcb7675f19e",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "54",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "28991029248",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000054"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9ea232c5716d18df0e20ac427e92098e1c3fe98246619a181854c3ca7461b289",
+      "size": 1055,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:eb8c00641c5b24ffe59816a06398d11e9b8e233d5909e9368d2feaac34307299",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "55",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "29527900160",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000055"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:b59695015a1049ef4ed004f7d74c334126433cc9c9551e38f4ca68ff92435f3c",
+      "size": 1056,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:55679a50edd3aed077b34ea93a9e4284227b97c436393092fbb9dc059bb8df85",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "56",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "30064771072",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000056"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8f3d092b6e4b46ad846290ab6d28a181f83e99801ab2a5876ffd48a9ccb7bc52",
+      "size": 1057,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:3e8a563f0ca71a34d3eeb9c7fdb6fef69205b01870ac574375b70cb52d507c19",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "57",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "30601641984",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000057"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:2bb70cf5d1b6b8cf9d07e1ebce2e3b48778234d5791e64bb2b5cf94c20c96b1c",
+      "size": 1058,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:a10167497b96fbc107a20efdc3133325ae9d1a11f11ec53a6db776ce6aba7170",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "58",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "31138512896",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000058"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:de9a8116e28a7f90af1ed991e1d0eb0fe86c78e32b9b9bea95d3633dc962fc17",
+      "size": 1059,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ab151529ded02f1ddff65c15fb65fc176ca1c73464a6501dda1bb99c20e5170d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "59",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "31675383808",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000059"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:b1446de222afb93fcb017fb924185e688a1287a60602a2c3fc49f83776740d87",
+      "size": 1060,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:e932578a98ee540055a011797bdb9b552df8ef2092596814247b4616d0a01717",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "60",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "32212254720",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000060"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:bc0f309f801b552dca5657c44238f5a41d401350dd01cd1cd82d9178e6841b8f",
+      "size": 1061,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:76c9c31e0ce4c364d56e8ab0d33a700cdbc3191b38fdd85548cf79ad8e8b7b25",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "61",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "32749125632",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000061"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:3568d1fe7f0874b71933fc5c9a3b142185a5fd930823477810f3b541c6a21700",
+      "size": 1062,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:bdb081248f4c4c19bd5eefb7bfa34899c5f72d6882c1673440f3ecfb55945746",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "62",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "33285996544",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000062"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8c8aa0a3ecafb882c780d7428fe20c6afd84c6c7ec03ba78a6eb66bf16d6545f",
+      "size": 1063,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d788efa21cc459c042b8efb02faf8e6fcd29931fafb306a05c89b3a6085daa61",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "63",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "33822867456",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000063"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:c40edfae37e3166c843014bb0d8e7e9fc12e5982ecae25242fbc75a00623a793",
+      "size": 1064,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:82eaa5251191ff7f5e0ad8bd94697859403c67ceae9026d3f50499823d52ae1d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "64",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "34359738368",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000064"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a4b1b0106c15e468a6810f2a5faa51cf8f49dfbff06603b7468c3e8c5f35735e",
+      "size": 1065,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:968ab5a7eb1f76c5bc0a666c1e58611ea2ebf551914ef74d8a6896f90f479264",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "65",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "34896609280",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000065"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:4c4f8c2734b5a63c70435394d66010d7a5e7bfe2133c2d675bb9ba39485f07b8",
+      "size": 1066,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:768b4ee03f7355f5bce47aaf8bffab275dea74385f3da4b635144fa4f9d72e2f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "66",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "35433480192",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000066"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:7ccc2717bf7446621ab16f653b874d399bc3ad59287960c5f86022712200b157",
+      "size": 1067,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:8a7e2cb8fafe5809a91e4a498bff51e7148c3617aa2739d9d60dd0da82279337",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "67",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "35970351104",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000067"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:041e74345b267133b0d5d5e3341d8f57f7ee80fc491a6ed93e508f66316114ae",
+      "size": 1068,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:42467d9b3a3c93e6b04bac5f5258aaea08c33ebc9d18eb5aaae7f3dcbda33793",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "68",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "36507222016",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000068"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:126ec119e36229e6a721a4c924389dd4b3bdb0d8953bf649039d5781b92473bf",
+      "size": 1069,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:c13bebefa394e5b0bbd3a21035f1114e530ab891ace9ccba8bf8d9632f94f9ee",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "69",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "37044092928",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000069"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:687fdbb4f800df243f1c7d154f68ca66e2d8ad8ac12862557a3fb7ddebcdb99e",
+      "size": 1070,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6df7c64472181866ecf5ecca7ab969ea5e738618524421a71f79c2637619a6f2",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "70",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "37580963840",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000070"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:86cb4ec6108c67bdb94a67d8bdf485bea78e33f14c5bf384eafbdc0e58e12c15",
+      "size": 1071,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:00daaf358521ee3163a31aec0984b87a781abe73628ac5d62d366d3348b85e5f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "71",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "38117834752",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000071"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:69c48eb38943dd2aab9d31965d2fc09d24a812f34ab3386a7d5fca0d501499a0",
+      "size": 1072,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:038f4906b70b438e8f105b844a83c056bd60c71f839942835dfbae803fa4889d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "72",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "38654705664",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000072"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:64951b1b96858fc0d266814e35d18cab83d27141be908534a25c544b0104c3d0",
+      "size": 1073,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:428b1873d15ec3c8d521683d56acfa007449c954a711038f4530c9063365a1fd",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "73",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "39191576576",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000073"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:b9f68b4bdf2e81180e1efc19c77e1d9a6ea89949617ef00ad2958f97fbaba447",
+      "size": 1074,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d2bc6dbf2d16ccebed7dffe97632d39a7ddafbb905b8803cceb72c8aa884c3d2",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "74",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "39728447488",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000074"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:da7ab15d392ede849c578d19081dfd28cb3df49118f6e52cb48b62a4a372afbe",
+      "size": 1075,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:73b14dd4b255964e33082911c3310d62c8e4febe25eb3698dbf5587733989a2c",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "75",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "40265318400",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000075"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:fbcfcf84b49ac85c49dc43759ade3de14fa8238efcd4b2c87588f633cb204cde",
+      "size": 1076,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:2ca340e73c9daf797d65d0825648a3213665cf1ebb72104d8ea5bb56435e126f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "76",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "40802189312",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000076"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9d42221e8ef97bdfeb224b320417ab1170d7f83068191b534217b283b0421c11",
+      "size": 1077,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:f0de869160e6af4edbe84f7de5011420088a850177b0a4feebf7814bb09144a7",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "77",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "41339060224",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000077"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8bdb3eb0f490901626d9dc29f88c5e04637a8d406c849cc8298fe3376cbda116",
+      "size": 1078,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:30cea87ff0c58f4143da85649531e3c99d67007888a4aa1353eaceb804b6d22d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "78",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "41875931136",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000078"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9897d0bf2b35b2757e9d66e2b9b61b52989525874b2b705ed83d439cb1cc737d",
+      "size": 1079,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0e268714d3a4922946aa53cc0d430a48a16022e2e53c58ac030d061e4de89603",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "79",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "42412802048",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000079"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:55cdc5b4bb0f7706d94e9cb936e9a86f245a99e090ae9d6dd4d4f4f038209dbb",
+      "size": 1080,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:07471908c8c179f572cc2a1fa5210d803d8015058798ef860e67bab65c32a0d5",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "80",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "42949672960",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000080"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:fddb190f57176ca0fcd565b63c9da0dde8eabffb4bf80633b8df1210a1c1b5f3",
+      "size": 1081,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:67a1f9390d23f934ffe1b4d393fabc6f6a56d6ae5c64e4eaffe419c94b2d6f22",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "81",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "43486543872",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000081"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:27aa8316b931f14b3f52ca7edbd7c8fdb2ac2f0b1c0f8263ca988dfc3c723a46",
+      "size": 1082,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9e729a6ce6a46511bcf0917d4661d8f2a8853034d0c9912c01ac8d724251f63f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "82",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "44023414784",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000082"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:349825871441bc60573fe95084e06905920c7c41e9a4abd6f53af1f69f17e710",
+      "size": 1083,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:7592f83f9ffde3217b56edef5911939ccf13643e6ad2c9d1a13eb91a148acaff",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "83",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "44560285696",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000083"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:cf73e23482cd9dd72bc4b702dacbc7f59416e87d5c3ed75882762a58339f7e10",
+      "size": 1084,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b558f66e1f4cf17cec3c9ee7769e6a9f15c876938ab48b59d6e94d053afff5b1",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "84",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "45097156608",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000084"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:003113ce5a68a208ff850050bae1553710464afe95263b610499a32453a90de9",
+      "size": 1085,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:05fcb74feb00c2ea3f1a4600d3ef6ab8bacb90bccde88917a806de4ff125a86c",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "85",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "45634027520",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000085"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:f63a03b12330131b7a045f43b99cf613c286db7664b2b678d3bd52b8a939deaf",
+      "size": 1086,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ebbac447e3019d5ed278a437b1f5c92def95dc9dfe71ec8f69c440eb0f061908",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "86",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "46170898432",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000086"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9266b20917a8e67487cbe424ef956c439f38f960d4bb230c8e86bd743e7c583a",
+      "size": 1087,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:a162f56d39ea99731fe9a331adb7d5d41fab29ae759bb92c6e4824c342286d2a",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "87",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "46707769344",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000087"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8941c1172d697fdd7cf6ea627a83391a4da2e877a0824ddbb220759c831953ab",
+      "size": 1088,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:f445026444e5cd0440a14f928ee226e243dd2ad464d7db14d1bd57ef937cac03",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "88",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "47244640256",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000088"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:23ed0e9fb6fcb75b6fc43dd7069c852392535fda3dfcea490a929d0e7c85f14e",
+      "size": 1089,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b035f4c86e5a08e08649bfa58e533e5f3bb2ebcddedea5bfb50f57318530cda7",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "89",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "47781511168",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000089"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:0b14f13d0a640db58b8e1c745233b1e234a719437e311a749479290d771f95bb",
+      "size": 1090,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ced835dafdf6f9922a4c3460e4789adf437a67892cdf7bfb529ecd72ebd07d61",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "90",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "48318382080",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000090"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9dc98d2e6b973701fb3787694b781382afefc68bef1e2f1737f575946a3813e0",
+      "size": 1091,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:39b0ff5ca116e9cae547089233d6da920b37a747cccd8e18935721e0546ca66f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "91",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "48855252992",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000091"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:541acbf81ae580198dcc7dd4f526181ba64e3e7c1391f03f4e4b964e62d0f8c8",
+      "size": 1092,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:2309f2d0ae9c0756885e825e018e1a2f9253b16720d758167abb14617c7d9953",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "92",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "49392123904",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000092"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:bd21d1c85b49a94674f81be70958bddc315a24e89c00c704c62965da3d7fc5bb",
+      "size": 1093,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:af12400e1248e615f03fb498d1b393648ceaf3e85b510095bdef1983f0ddb27f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "93",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "49928994816",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000093"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:5afd9f106ed1563ddcceb7af47bbb8bd8d0ac562dc9b5f271824d7624017d10f",
+      "size": 1094,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0e80a295e893054ed948a2e43f4b615f181065c684768aed2d9bd03b0800c132",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "94",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "50465865728",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000094"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:52814d1650f67674e62d587a344e74e6edf2afa8087651f131770b85e1ff597b",
+      "size": 1095,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:98b6c06678f8ebaf68e0bbe09f46c59d5baf07293898edb2156db3e7338ad0ef",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "95",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "51002736640",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000095"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:812e89bb2baac66dfd7da96c217141f6d58e78fd3990a5c1ac607fd8d6a08a62",
+      "size": 1096,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:e04befc00c63c67cb05c9c79c787525dcb2da268ab7378c3caa68bfec5d0ea28",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "96",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "51539607552",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000096"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:90bb89d00c92f2f3ff89148cfc96e18cc67968349f3e8a5546f4215013e5b6fa",
+      "size": 1097,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:c002029ee1dd3a73aa6d36ba146839d5617cf6268421917c6ec0737cb0ca4026",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "97",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "52076478464",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000097"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:58a03020dce73cb253fa5eb10b776522a68bfcc85e40e2f1592cd76862a8b39c",
+      "size": 1098,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:134762851a1df4254cac0a008de1725de3238abb17cd343488330c22333cee66",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "98",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "52613349376",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000098"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:3f919d6249a6b421fbd65028d0c9decdb09060692974a24a440f7da68a1c292a",
+      "size": 1099,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:876b79bedc86f6249ca82c2468ddcdcaf9285b87c64257e52d08c62fecc95d91",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "99",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "53150220288",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000099"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:e0d73e36260960d5eb2835f424f39d52c1b2117c549c1d97772a653f9f082dac",
+      "size": 1100,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:d73176581a0b653ac552e30a9f3db7798ea25aeabf990c5d0fb1d417149c485d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "100",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "53687091200",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000100"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:44bf9bb5f3b324c468ebba3c1e128dfa0735b89eb2fcaedaf4cba4b59a590ca9",
+      "size": 1101,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:ff8e45c34ea7c2b9df09568363a0961d8bdddc4619497fc0e4d9efb5ebd0fe82",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "101",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "54223962112",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000101"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8df2df7ab732dc645fa56c8810af36b0a6d6f55fb373151622fd1106ec282ca8",
+      "size": 1102,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:219c19eefa801c14831fd40d7113e878b2213c5ca509b65ccf79de6d48b7fe71",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "102",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "54760833024",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000102"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:ce1bbe84b5656455a8cd79f8dfecc35a3fa082db8a901877980b461291c3c545",
+      "size": 1103,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:060f44ae652b5678246de4ba1e99739df282eb3629ce35e579364ad7a22de7c5",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "103",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "55297703936",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000103"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:f22da775bc97b994f7266a18c7ac46d6d079a87f99462fc17ea1d4a86faf184b",
+      "size": 1104,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:405ccd562008a83b729f32a1c91f39d95314763d2f398e4eac9179b00dc43269",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "104",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "55834574848",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000104"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:56784dff1b04a0b63c867047201e44d3148d136405ec94238cb8e8a59bc4876f",
+      "size": 1105,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:69475f31eee1d1d671c81106d91491494b669f68323a03c3fd9717f61f355c81",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "105",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "56371445760",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000105"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:5f3dc6e2419135b7421303b0fc9f1dcec00314bb7a80e4b296be8909e39b62cf",
+      "size": 1106,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:a7bfa29772b59f87ba3213d2d127e351ed212317dea36df64368537e5d209a8e",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "106",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "56908316672",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000106"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:8b29312dd7366da53a8c3744385837e30e0e9c698f6fd976cb8ddfa80eb2be8c",
+      "size": 1107,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:c92f0216403dea3677612de24c269fa5f42e3d8484da7784d590d2e053a56105",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "107",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "57445187584",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000107"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:4e037b4afeddccb3c654fb6c6b14a1c084e493a6506741a620c8b3eb54f04db9",
+      "size": 1108,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:76470ad34975a1e3cde35ee902b10cfd325af2606809e93fba053690e4ae3a1e",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "108",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "57982058496",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000108"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:cc7bde4810eb14eb6dd5d15f6641de8698847843fdc77653412f488a0bba0f5c",
+      "size": 1109,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:abbed2b7ffa38e34d5ffced8425454b6122e5acdf70914e3e5d1f66612b9f9b2",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "109",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "58518929408",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000109"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:1eb5fc21b5e899c49417c380a8ff36d2b7636461a329fb3eeb0446c25d56866d",
+      "size": 1110,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:497da628b0182646a263e73b36455f8bea448b56caa30b70df2f383a7376911f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "110",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "59055800320",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000110"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:2187cbe82d18fbad652e1056cc76a06d1674570635d252228966f91afdc5191b",
+      "size": 1111,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:fa6d5c09153a8e6852b1a600b57342964100d9e4f944d36c6eadce903e948582",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "111",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "59592671232",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000111"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:c35c3f78969bc4b14b97e33cf52da9c7bd32123073022c8ecf7de5f8a835ef19",
+      "size": 1112,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:1603fc7115e04ff02f6279ed655857e2c734ad62fca0c5fbaaccf3eb91cdab8d",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "112",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "60129542144",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000112"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:aab1bde015d38f4d3a0c78b37f70de8f02bd2603eefe4d87d82287938f16da18",
+      "size": 1113,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:b594a220120713a48e190fa1e169ef9effaac907697517184255e6c41400e083",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "113",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "60666413056",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000113"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:0dc3bf5c1f5338276305a6784a0de226e2aceb52c026a50a7ab1d11db332fb22",
+      "size": 1114,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:805a264c0e148c0c15953b0b982b5982a805093c28fb3ab39ab8cf8748106c72",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "114",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "61203283968",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000114"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:95445ed436eae42ed992c2673100ae87f29ac6bbbeae73146d092da956505f5b",
+      "size": 1115,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:42af4d6d22b6d010d071d9c0c6e0ee10c3255278a6eb303abd6a0c8262027da1",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "115",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "61740154880",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000115"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:d7c4d407e8e94808afc0fcac0c63f896546c9eca95c6805a3cde06ac1abe3166",
+      "size": 1116,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9db5954cef084cd90147ef497572c05fe09f175b0a97da5cdbcda634e72f19a4",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "116",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "62277025792",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000116"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a2084f2a339d8bcd7ef7028d1dde0b20048736858e43221b83784682a0acb68e",
+      "size": 1117,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:461ec0914e3db71a7e29efe95ee289be3d9769724deb7be7477ae5d13cd2d8d8",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "117",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "62813896704",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000117"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:3f57a3f5267530ee162ddd0f8c034ebeea0a67e89d816ec0622eb40ec14155a6",
+      "size": 1118,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:6ba9ac68db577dc1f129fda1e5504123dd989724015761da2616322b8f87187f",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "118",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "63350767616",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000118"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:918ebcf4c7872a5784d7f1c3201277abc8b7964a826fc8eaeb8c121803c3ea11",
+      "size": 1119,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:f549f8ed17a544889270c4f1525b921fd4956761284abf1918b24661b65ecfd2",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "119",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "63887638528",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000119"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:5616366c8c863393bc8ba33bcc0ac91e5c08fb134d346e39f35a744095dcddbc",
+      "size": 1120,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:410b70690d30e0d81e35f53000992fef0650d8012ffe6f3c6c967c15ced8936b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "120",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "64424509440",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000120"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:2a2112fd67a69036758bbd34dd7183a30deb2b2c278473b75f2108d6d05d8af1",
+      "size": 1121,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:2e85cf90bad2fc97afb174a8e6e89e80d51a09f6cc18209d6159edfca9dee7c4",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "121",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "64961380352",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000121"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:c29b82ae7478031e493c1c558e737b9208a73ba87e5c3b0561412a0bc7f09afc",
+      "size": 1122,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:0d41338ae05116b7ba368b69f6101aa9b089f365cdcae5beb75bbd969455ac3b",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "122",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "65498251264",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000122"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:0b440efbfedde4c64b9e467460a4b3fc54d3436406a5fac039ed5d852b78beb9",
+      "size": 1123,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:bc3af4fbcbd982de775cac384db608e53101ade1b5ea6e95facc02e3a721206e",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "123",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "66035122176",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000123"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:9b4e572fe2acc0f6e2e92166adfe5effe9a2b2b6af0aa3236ac8f27179c15de5",
+      "size": 1124,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:5ff130eb4d5a9efe3ebe97c8a8b15a0b01b067b260be7f4897a0886b98f63b41",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "124",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "66571993088",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000124"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:bc5ab29610eed538b180edfbdf41019a8f3d47c96a5f366fc737ecb461ecbc75",
+      "size": 16398,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "125",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "67108864000",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.chunk.zero": "true",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000125"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:bc5ab29610eed538b180edfbdf41019a8f3d47c96a5f366fc737ecb461ecbc75",
+      "size": 16398,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "126",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "67645734912",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.chunk.zero": "true",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000126"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:bc5ab29610eed538b180edfbdf41019a8f3d47c96a5f366fc737ecb461ecbc75",
+      "size": 16398,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "127",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "68182605824",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "536870912",
+        "com.deploymenttheory.weave.guest.disk.chunk.zero": "true",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000127"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.disk.v1.raw+zstd",
+      "digest": "sha256:a5fcecd77a63cdbb509dbd6f8573b916a8f1e6d5d943f91983c97893f762b77b",
+      "size": 1128,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.disk.chunk.digest": "sha256:7976478dc599b532b9e9c59820fa13df3032fbd4a16b4893b0607aa88ed79db9",
+        "com.deploymenttheory.weave.guest.disk.chunk.index": "128",
+        "com.deploymenttheory.weave.guest.disk.chunk.offset": "68719476736",
+        "com.deploymenttheory.weave.guest.disk.chunk.size": "104857600",
+        "com.deploymenttheory.weave.guest.disk.name": "disk0",
+        "org.opencontainers.image.title": "disk0.chunk.000128"
+      }
+    },
+    {
+      "mediaType": "application/vnd.weave.guest.state.auxstorage.v1",
+      "digest": "sha256:fe1c69bc6e953a8fab47157100a287ce0c1af262ec63d04345bcca594a3e2f53",
+      "size": 4096,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.state.name": "auxstorage",
+        "com.deploymenttheory.weave.guest.state.semantics": "carry",
+        "org.opencontainers.image.title": "auxstorage.bin"
+      }
+    }
+  ],
+  "annotations": {
+    "com.deploymenttheory.weave.guest.arch": "arm64",
+    "com.deploymenttheory.weave.guest.disk.totalSize": "68824334336",
+    "com.deploymenttheory.weave.guest.os": "darwin",
+    "com.deploymenttheory.weave.guest.osBuild": "25A354",
+    "com.deploymenttheory.weave.guest.osVersion": "26.0",
+    "org.opencontainers.image.created": "2026-10-02T08:00:00Z",
+    "org.opencontainers.image.revision": "0123abc",
+    "org.opencontainers.image.source": "https://github.com/deploymenttheory/weaveplatform-oci",
+    "org.opencontainers.image.title": "macos-26-vanilla",
+    "org.opencontainers.image.version": "26.0-25A354-r1"
+  }
+}

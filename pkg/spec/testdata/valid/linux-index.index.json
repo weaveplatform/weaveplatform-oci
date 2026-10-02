@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "artifactType": "application/vnd.weave.guest.config.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:d2446ec5b65e44c175498b56827feb21568ccc5528da4ee49c4d8330c1349fa2",
+      "size": 77599,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.arch": "arm64",
+        "com.deploymenttheory.weave.guest.distro": "ubuntu",
+        "com.deploymenttheory.weave.guest.os": "linux",
+        "com.deploymenttheory.weave.guest.osBuild": "20260915",
+        "com.deploymenttheory.weave.guest.osVersion": "24.04"
+      },
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      },
+      "artifactType": "application/vnd.weave.guest.config.v1+json"
+    },
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:37d323153931ff4efa52f5553f6e089a296d18b49d71d0bfd74db46a5098de0c",
+      "size": 77599,
+      "annotations": {
+        "com.deploymenttheory.weave.guest.arch": "amd64",
+        "com.deploymenttheory.weave.guest.distro": "ubuntu",
+        "com.deploymenttheory.weave.guest.os": "linux",
+        "com.deploymenttheory.weave.guest.osBuild": "20260915",
+        "com.deploymenttheory.weave.guest.osVersion": "24.04"
+      },
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "artifactType": "application/vnd.weave.guest.config.v1+json"
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.image.version": "26.0-25A354-r1"
+  }
+}

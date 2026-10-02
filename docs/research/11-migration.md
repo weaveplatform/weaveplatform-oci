@@ -25,27 +25,49 @@ date. Each phase names the repository it changes and what "done" means.
 7. **Companion pins move together.** hostweave pins guestweave commits and verifies binaries
    ([hostweave ADR 0010](https://github.com/deploymenttheory/hostweave/blob/main/docs/research/decisions/0010-vm-runtimes-guestweave-and-qemu.md)).
    A phase that changes `weave capabilities` output also bumps the pin and the contract tests.
+8. **Quality gates on every phase.** A phase is done only when its godog acceptance features pass
+   against real registries and the merged coverage gate is green: at least 95 % in total and at
+   least 90 % per package, with `golangci-lint` and `govulncheck` clean
+   ([0013](decisions/0013-quality-gates.md)). The implementation is Go; helper scripts may use
+   other languages.
+9. **Every profile is tested.** From phase 2b onwards each acceptance suite runs against
+   `weave-zot` (referrers API) and `registry:3.1.2` (fallback tag). GHCR is covered by an opt-in
+   smoke job, so the private and hybrid profiles never lag the github profile
+   ([0011](decisions/0011-deployment-profiles-and-reference-registry.md)).
 
 ## Phases
 
 | Phase | Repository | Delivers | Depends on | Done when |
 |---|---|---|---|---|
 | 0 | weaveplatform-oci | This research set; decision records 0001–0010 as Proposed | — | Records reviewed; open questions assigned owners ([12](12-open-questions.md)) |
-| 1 | weaveplatform-oci | `spec`, `chunk`, `pack`; fixtures under `spec/testdata`; `weaveoci pack` and `inspect`; conformance tests | 0 | A bundle packs to an index whose manifests pass `spec.Inspect`; zero-chunk and resume fixtures pass; media-type strings match [09](09-artifact-contract-v1.md) byte for byte |
-| 2 | weaveplatform-oci; weaveplatform-api; weaveplatform-manifest; weaveplatform-agent | `client` (oras-go v2, profiles, mirrors, Range resume, HEAD skip, referrers with tag fallback), `cache` (CAS, pins, LRU, quota, `oci-layout`), `verify` (sigstore-go bundle verification; channel verification via an extracted `manifestverify` package); `weaveoci push/pull/verify/export-layout/import-layout`; channel-manifest schema gains an `images[]` section | 1 | Round trip against an in-process registry (oras-go memory store) and against GHCR; `verify` accepts a bundle under the `sha256-<hex>` fallback tag; `channels/stable.json` with an `images[]` entry validates against the updated schema |
-| 3 | weaveplatform-oci; weaveplatform-manifest | `build-linux.yml` and `publish.yml`: bootc image or verified cloud image → raw → pack → push → `actions/attest push-to-registry` → self-verify → `repository_dispatch image-published` → promotion PR | 2 | A public `ubuntu-24.04` (or `fedora-bootc-46`) image is promoted into `channels/stable.json`; `weaveoci pull --verify=channel` succeeds on a clean machine |
+| 1 | weaveplatform-oci | `spec`, `chunk`, `pack`, `conformance`; fixtures under `pkg/spec/testdata`; `weaveoci pack`, `inspect`, `unpack`, `healthcheck`. **Pulled forward from 2b at the owner's request so the correctness loop runs from the start:** the `weave-zot` image (`deploy/zot`: Dockerfile, `private` and `mirror` config roles, `compose.yaml`) and Docker-backed acceptance against `weave-zot` and `registry:3.1.2`. Quality-gate workflow `.github/workflows/quality-gate.yml` (unit matrix on `ubuntu-latest`, `macos-latest`, `windows-latest`; acceptance; blocking lint; govulncheck; cross-compile; merged coverage gate). Acceptance: `phase1_pack_inspect.feature`, `phase1_registry_roundtrip.feature` | 0 | **Implemented 2026-10-02.** Acceptance (16 scenarios) passes locally and the merged gate is green at 96.1%. A bundle packs to an index whose manifests pass `spec.Inspect`; repacking an unpacked bundle reproduces the digest; resume and sparse output verified; artifacts round-trip through weave-zot and registry:3 with digests unchanged; weave-zot refuses tag moves for the publisher and serves the referrers API |
+| 2 | weaveplatform-oci; weaveplatform-api; weaveplatform-manifest; weaveplatform-agent | `client` (oras-go v2, profiles, mirrors, Range resume, HEAD skip, all blobs before manifests, referrers with tag fallback), `cache` (CAS, pins, LRU, quota, `oci-layout`), `verify` (sigstore-go bundle verification for attestations and cosign keys; channel verification via an extracted `manifestverify` package), `profile` (github, private, hybrid), `sign` (cosign key-based, file or KMS key, no transparency log), `publish` (the pipeline as a library); `weaveoci push/pull/verify/sign/publish/profile/export-layout/import-layout`; channel-manifest schema gains an `images[]` section. Acceptance: `phase2_push_pull.feature`, `phase2_sign_verify.feature`, `phase2_layout_airgap.feature` | 1 | Acceptance passes and the coverage gate is green. Round trip against an in-process registry (oras-go memory store) and against GHCR; `verify` accepts a bundle under the `sha256-<hex>` fallback tag; `channels/stable.json` with an `images[]` entry validates against the updated schema **Implemented in this repository 2026-10-02:** `client`, `cache`, `profile`, `sign`, `verify`, `publish`, `channel` and the CLI verbs; acceptance features `phase2_push_pull_sign`, `phase2_channel` and `phase2_layout_airgap` pass against weave-zot and registry:3, including `cosign verify` interop. **Deferred to the repositories that own them:** the channel-manifest schema change and promote workflow (now `weaveplatform/weaveplatform-agent-core` and `weaveplatform/weaveplatform-channels`, Q26) and a real root key. |
+| 2b | weaveplatform-oci | (the image, configs, compose and container acceptance landed in phase 1) Remaining: `deploy/zot/`: the `weave-zot` image (`FROM ghcr.io/project-zot/zot:v2.1.21` pinned by digest, config roles `private` and `mirror`, `weaveoci healthcheck` as `HEALTHCHECK`), `compose.yaml`; `release-images.yml` publishing multi-arch `ghcr.io/deploymenttheory/weaveoci` and `ghcr.io/deploymenttheory/weave-zot`, signed and attested ([0012](decisions/0012-container-images.md)); acceptance suites from phases 1–2 rerun against `weave-zot` and `registry:3.1.2` containers. Acceptance: `phase2b_weave_zot.feature` (startup, readiness, auth, create-without-update tag immutability, referrers API, mirror sync with digests preserved) | 2 | Acceptance passes and the coverage gate is green; both images are published, signed and pullable; `docker compose up` in `deploy/zot/` yields a registry that `weaveoci publish --profile private` can publish to and `weaveoci pull --verify=signature` can read from |
+| 3 | weaveplatform-oci; weaveplatform-manifest | `build-linux.yml` and `publish.yml`: bootc image or verified cloud image → raw → pack → push → `actions/attest push-to-registry` → self-verify → `repository_dispatch image-published` → promotion PR | 2b | Acceptance (`phase3_linux_publish.feature`) passes and the coverage gate is green. github profile: a public `ubuntu-24.04` (or `fedora-bootc-46`) image is promoted into `channels/stable.json` and `weaveoci pull --verify=channel` succeeds on a clean machine. private profile: the same build published by `weaveoci publish` from a non-GitHub runner to `weave-zot`, cosign key-signed, and pulled with `--verify=both` against a test channel root |
 | 4 | guestweave-macos | Adopt the module for `pull`, `clone <ref>`, `push`, `images`, `login`; delete Tart and Lume codecs and the hand-ported client; `weave capabilities` reports `image_formats: ["weave-guest-v1"]`; push carries `hardwareModel` and auxiliary storage, strips ECID and MAC; Windows ARM64 VMs become pushable | 2 | Existing macOS acceptance suite passes with the module; a macOS image pushed from a Mac pulls and boots on another Mac; `grep -r cirruslabs internal/` is empty |
 | 5 | guestweave-windows | Adopt the module; raw chunks → cached parent VHD/VHDX via `disk/vhd` → differencing child; drop VHDX-v2 reader and writer; `weave capabilities` reports `weave-guest-v1`; `guest.vmgs` regenerated per clone | 2, outcome of the VHD-vs-VHDX spike ([12](12-open-questions.md)) | A Windows image published from the Windows pipeline (phase 7) or from a host pulls and boots; prune refuses to delete a parent with children |
 | 6 | hostweave | Server: `spec.Inspect` replaces the `inspectVM` classifier; `ImageVersion` gains `ArtifactType`, `OSVersion`, `TotalSize`, `Attestation`, `ChannelDigestPinned`; `RegistryConnection` gains mirrors; OpenAPI updated. Agent: QEMU pulls through `cache` and overlays with qcow2; `HOSTWEAVE_QEMU_IMAGES` removed; `attr.driver.qemu.formats` fingerprinted; scheduler filter consults every VM driver's formats; guestweave pin bumped to the phase 4/5 revisions | 4, 5 | `pkg/images` tests use the contract fixtures; a VM job lands on a Linux QEMU host from a channel-pinned image; macOS and Windows contract tests pass against the pinned CLIs |
 | 7 | weaveplatform-oci | `build-macos.yml` (self-hosted Apple silicon, IPSW via restore-image lookup, unattended setup, agent baked) and `build-windows.yml` (go-sdk-winmediafoundry ISO, autounattend, QEMU/KVM on ubuntu runners or self-hosted); org-private repositories | 3, 4, 5 | A `macos-26-vanilla` and a `windows-11-base` image are promoted and pulled through hostweave and both guestweave CLIs |
-| 8 | all | Mirror profile validated against zot with `preserveDigest`; `oci-layout` export on one machine, import and verify on an air-gapped one; `delete-package-versions` retention tested against chunked and attested images | 3–7 | The drill runbook in [04](04-registries-and-github.md) passes end to end without touching GHCR from the air-gapped side |
+| 8 | all | Hybrid profile validated with a site `weave-zot` in the `mirror` role (`preserveDigest`, `http.compat: ["docker2s2"]`); `oci-layout` export on one machine, import and verify on an air-gapped one; `delete-package-versions` retention tested against chunked and attested images | 3–7 | Acceptance (`phase8_mirror_airgap.feature`) passes; the drill runbook in [04](04-registries-and-github.md) and [13](13-deployment-profiles.md) passes end to end without touching GHCR from the air-gapped side |
+
+Phases 4–7 each add their own acceptance features in the repository they change
+(`phase4_guestweave_macos.feature`, `phase5_guestweave_windows.feature`,
+`phase6_hostweave_oci.feature`, `phase7_macos_windows_publish.feature`) and must meet the same
+coverage gate as weaveplatform-oci. Phase 2b was inserted after the original numbering was
+published; later phase numbers are unchanged.
 
 ## Per-repository change lists
 
 ### weaveplatform-oci
 
 - Replace the template `workload/` directory with the Go module: `spec`, `chunk`, `pack`, `client`,
-  `cache`, `verify`, `disk/vhd`, `cmd/weaveoci` ([10](10-shared-go-module.md)).
+  `cache`, `verify`, `profile`, `sign`, `publish`, `disk/vhd`, `cmd/weaveoci`
+  ([10](10-shared-go-module.md)).
+- Add `deploy/zot/` (the `weave-zot` image and Compose file), `test/acceptance/` (godog) and
+  `scripts/` (coverage gate) ([13](13-deployment-profiles.md)).
+- Add the quality-gate workflow and `release-images.yml`, which publishes `weaveoci` and
+  `weave-zot` to GHCR ([0012](decisions/0012-container-images.md),
+  [0013](decisions/0013-quality-gates.md)).
 - Add reusable workflows `build-linux.yml`, `build-macos.yml`, `build-windows.yml`, `publish.yml`
   ([07](07-build-pipelines.md)).
 - Add release-please configuration for the module tag (`v0.x`), mirroring
@@ -134,7 +156,7 @@ they were public, and deleted after the channel manifest no longer references th
   snapshot, export and import VMs.
 - Registry profiles and mirrors. Fully qualified references keep working with no profile.
 - Verification mode. `--verify=channel` is the default when a channel is configured;
-  `--verify=attestation` and `--verify=none` are explicit choices. `none` prints a warning.
+  `--verify=signature` and `--verify=none` are explicit choices. `none` prints a warning.
 - The channel manifest itself. A CLI with no channel configured pulls by digest or tag and
   verifies blob digests only.
 - hostweave. guestweave is a standalone tool; hostweave drives it through the CLI boundary and
@@ -145,6 +167,7 @@ they were public, and deleted after the channel manifest no longer references th
 | Phase | Rollback |
 |---|---|
 | 1–2 | Module versions are tagged; consumers pin a version. Nothing in production depends on them yet |
+| 2b | Container images are tagged by version and pinned by digest in `compose.yaml`; roll back by pinning the previous digest. Registry data lives in a volume and survives an image downgrade |
 | 3 | Un-promote by reverting the channel PR; the published image stays in GHCR but is not trusted |
 | 4 | guestweave-macos release before the module adoption is tagged; hostweave keeps its earlier pin. Images pushed under the contract remain readable by later versions |
 | 5 | Same as 4 for guestweave-windows; cached VHDX-v2 parents remain usable by the previous release |

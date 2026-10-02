@@ -45,7 +45,7 @@ guestweave keep every from-source mode.
   archive. None of these touch a registry and none require a profile, credentials or a
   channel manifest.
 - From OCI: `pull`, `clone <ref>`, `push`, `images`, `fqn`, `login`, through the shared
-  module. Verification is `--verify=channel|attestation|none`, defaulting to `channel`
+  module. Verification is `--verify=channel|signature|both|none`, defaulting to `channel`
   when a channel manifest is configured and to `none` otherwise, with a warning.
 - A VM created from source can be pushed, and the result is a conformant artifact.
   A VM pulled from OCI is an ordinary VM afterwards; `run`, `set`, `snapshot`, `delete`

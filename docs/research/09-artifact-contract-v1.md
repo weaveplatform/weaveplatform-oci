@@ -157,10 +157,10 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
     "org.opencontainers.image.description": "macOS 26.0 (25A354) vanilla, weave agent 0.2.0 baked",
     "org.opencontainers.image.vendor": "deploymenttheory",
     "org.opencontainers.image.licenses": "LicenseRef-Apple-macOS-SLA",
-    "com.deploymenttheory.weave.guest.guest.os": "darwin",
-    "com.deploymenttheory.weave.guest.guest.arch": "arm64",
-    "com.deploymenttheory.weave.guest.guest.osVersion": "26.0",
-    "com.deploymenttheory.weave.guest.guest.osBuild": "25A354",
+    "com.deploymenttheory.weave.guest.os": "darwin",
+    "com.deploymenttheory.weave.guest.arch": "arm64",
+    "com.deploymenttheory.weave.guest.osVersion": "26.0",
+    "com.deploymenttheory.weave.guest.osBuild": "25A354",
     "com.deploymenttheory.weave.guest.disk.totalSize": "68719476736",
     "com.deploymenttheory.weave.guest.hypervisors": "vz"
   }
@@ -282,10 +282,10 @@ UEFI variable store and a firmware policy that tells the HCS consumer to create 
     "org.opencontainers.image.description": "Windows 11 Pro 25H2 base, weave agent 0.2.0 baked",
     "org.opencontainers.image.vendor": "deploymenttheory",
     "org.opencontainers.image.licenses": "LicenseRef-Microsoft-Windows-11",
-    "com.deploymenttheory.weave.guest.guest.os": "windows",
-    "com.deploymenttheory.weave.guest.guest.arch": "amd64",
-    "com.deploymenttheory.weave.guest.guest.osVersion": "10.0.26200.6584",
-    "com.deploymenttheory.weave.guest.guest.osBuild": "26200.6584",
+    "com.deploymenttheory.weave.guest.os": "windows",
+    "com.deploymenttheory.weave.guest.arch": "amd64",
+    "com.deploymenttheory.weave.guest.osVersion": "10.0.26200.6584",
+    "com.deploymenttheory.weave.guest.osBuild": "26200.6584",
     "com.deploymenttheory.weave.guest.disk.totalSize": "68719476736",
     "com.deploymenttheory.weave.guest.hypervisors": "hcs,kvm,hvf"
   }
@@ -347,11 +347,11 @@ state blobs (a QEMU or VZ consumer creates fresh UEFI variables).
     "org.opencontainers.image.description": "Ubuntu 24.04 cloud image 20260915, weave agent 0.2.0 baked",
     "org.opencontainers.image.vendor": "deploymenttheory",
     "org.opencontainers.image.licenses": "Ubuntu-IPRights",
-    "com.deploymenttheory.weave.guest.guest.os": "linux",
-    "com.deploymenttheory.weave.guest.guest.arch": "arm64",
-    "com.deploymenttheory.weave.guest.guest.distro": "ubuntu",
-    "com.deploymenttheory.weave.guest.guest.osVersion": "24.04",
-    "com.deploymenttheory.weave.guest.guest.osBuild": "20260915",
+    "com.deploymenttheory.weave.guest.os": "linux",
+    "com.deploymenttheory.weave.guest.arch": "arm64",
+    "com.deploymenttheory.weave.guest.distro": "ubuntu",
+    "com.deploymenttheory.weave.guest.osVersion": "24.04",
+    "com.deploymenttheory.weave.guest.osBuild": "20260915",
     "com.deploymenttheory.weave.guest.disk.totalSize": "21474836480",
     "com.deploymenttheory.weave.guest.hypervisors": "kvm,vz,hvf,hcs"
   }
@@ -383,7 +383,7 @@ Config excerpt:
 One index per repository tag
 ([image-index.md](https://github.com/opencontainers/image-spec/blob/v1.1.1/image-index.md)).
 Each child is one VM manifest; children carry the `platform` object and the same
-`com.deploymenttheory.weave.guest.guest.*` annotations as their manifest so that listings
+`com.deploymenttheory.weave.guest.*` annotations as their manifest so that listings
 never need to fetch children.
 
 ```json
@@ -399,11 +399,11 @@ never need to fetch children.
       "size": 61920,
       "platform": { "os": "linux", "architecture": "amd64" },
       "annotations": {
-        "com.deploymenttheory.weave.guest.guest.os": "linux",
-        "com.deploymenttheory.weave.guest.guest.arch": "amd64",
-        "com.deploymenttheory.weave.guest.guest.distro": "ubuntu",
-        "com.deploymenttheory.weave.guest.guest.osVersion": "24.04",
-        "com.deploymenttheory.weave.guest.guest.osBuild": "20260915"
+        "com.deploymenttheory.weave.guest.os": "linux",
+        "com.deploymenttheory.weave.guest.arch": "amd64",
+        "com.deploymenttheory.weave.guest.distro": "ubuntu",
+        "com.deploymenttheory.weave.guest.osVersion": "24.04",
+        "com.deploymenttheory.weave.guest.osBuild": "20260915"
       }
     },
     {
@@ -491,7 +491,7 @@ single largest deliberate difference from the formats surveyed in
 
 ### 4.3 JSON Schema
 
-Embedded in the `spec` package and published as `spec/schema/vm-config-v1.schema.json`.
+Embedded in the `spec` package and published as `pkg/spec/schema/vm-config-v1.schema.json`.
 
 ```json
 {
@@ -665,14 +665,29 @@ converted from it). This is why one artifact serves every hypervisor.
    descriptor specification requires
    ([descriptor.md](https://github.com/opencontainers/image-spec/blob/v1.1.1/descriptor.md)).
 5. A chunk whose uncompressed bytes are all zero MUST be published as the **canonical
-   zero chunk**: the zstd encoding of 512 MiB of zeros produced by the reference
-   encoder in the `spec` package, with `com.deploymenttheory.weave.guest.disk.chunk.zero`
-   set to `"true"`. The compressed and uncompressed digests of the canonical zero chunk
-   are constants that will be computed by the reference implementation and published
-   in `spec` and in `spec/testdata`; they are not stated here so that no hand-typed
-   value can diverge from the encoder. A short final chunk that is all zero uses the
-   canonical zero chunk of its own length (one constant per possible length is not
-   needed: the consumer computes the uncompressed digest of `n` zero bytes on demand).
+   zero chunk** for its length, with `com.deploymenttheory.weave.guest.disk.chunk.zero`
+   set to `"true"`. The canonical zero chunk of `n` bytes is defined byte for byte, so
+   its digest never depends on an encoder version:
+
+   | Bytes | Value |
+   |---|---|
+   | magic | `28 b5 2f fd` |
+   | frame header descriptor | `c0` (8-byte content size; no single segment, checksum or dictionary) |
+   | window descriptor | `38` (window log 17, 128 KiB) |
+   | frame content size | `n`, 8 bytes little endian |
+   | blocks | `ceil(n / 131072)` RLE blocks of byte `00`: a 3-byte little-endian header `size << 3 \| 1 << 1 \| last` followed by `00`; every block holds 131072 bytes except the last |
+
+   For a full 512 MiB chunk the frame is 16,398 bytes and its digests are published
+   as constants in the reference implementation (`spec.ZeroChunkCompressedDigest`,
+   `spec.ZeroChunkUncompressedDigest`):
+
+   ```
+   compressed   sha256:bc5ab29610eed538b180edfbdf41019a8f3d47c96a5f366fc737ecb461ecbc75
+   uncompressed sha256:9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767
+   ```
+
+   A short final chunk that is all zero uses the canonical zero chunk of its own
+   length; consumers compute its digests on demand.
 6. Consumers MAY skip fetching a `zero=true` chunk and instead punch a hole (or leave
    the sparse file untouched) over its range. Consumers MUST still verify the
    descriptor digest if they do fetch it.
@@ -775,11 +790,11 @@ The guestweave CLIs already regenerate the MAC on clone (`--regenerate-random-ma
 | `org.opencontainers.image.description` | ≤512 characters (GHCR limit) | SHOULD |
 | `org.opencontainers.image.vendor` | `deploymenttheory` | SHOULD |
 | `org.opencontainers.image.licenses` | SPDX expression or `LicenseRef-…` for proprietary OS images; ≤256 characters | SHOULD |
-| `com.deploymenttheory.weave.guest.guest.os` | equals `guest.os` | MUST |
-| `com.deploymenttheory.weave.guest.guest.arch` | equals `guest.arch` | MUST |
-| `com.deploymenttheory.weave.guest.guest.osVersion` | equals `guest.osVersion` | MUST |
-| `com.deploymenttheory.weave.guest.guest.osBuild` | equals `guest.osBuild` | MUST |
-| `com.deploymenttheory.weave.guest.guest.distro` | equals `guest.distro` | MUST for linux |
+| `com.deploymenttheory.weave.guest.os` | equals `guest.os` | MUST |
+| `com.deploymenttheory.weave.guest.arch` | equals `guest.arch` | MUST |
+| `com.deploymenttheory.weave.guest.osVersion` | equals `guest.osVersion` | MUST |
+| `com.deploymenttheory.weave.guest.osBuild` | equals `guest.osBuild` | MUST |
+| `com.deploymenttheory.weave.guest.distro` | equals `guest.distro` | MUST for linux |
 | `com.deploymenttheory.weave.guest.disk.totalSize` | sum of `disks[].logicalSize` | MUST |
 | `com.deploymenttheory.weave.guest.hypervisors` | comma-separated advisory list from `vz,hvf,hcs,kvm,tcg` | SHOULD |
 
@@ -791,7 +806,7 @@ MUST reject a manifest whose annotations disagree with its config.
 ### 8.2 Index annotations
 
 `org.opencontainers.image.{created,version,source,description}` as on the manifest.
-Child descriptors carry the `com.deploymenttheory.weave.guest.guest.*` set.
+Child descriptors carry the `com.deploymenttheory.weave.guest.*` set.
 
 ### 8.3 Layer annotations
 
@@ -939,7 +954,10 @@ reports every failure rather than stopping at the first:
 13. For each `state[]` entry: exactly one layer with that `state.name`, whose media type
     and `semantics` annotation match; no state layer lacks a config entry; a `required`
     entry's layer is present.
-14. No chunk digest or state blob appears twice with different annotations.
+14. A blob may appear more than once (repeated zero chunks, identical data chunks
+    at different offsets), but every occurrence MUST carry the same media type and
+    the same content annotations (`chunk.size`, `chunk.digest`, `chunk.zero`); only
+    position annotations may differ.
 
 **Content (optional, `--deep`)**
 
@@ -992,7 +1010,7 @@ a 50 GB disk ([prior art](02-prior-art.md)).
   version they support.
 - The reference implementation in `spec` exports the version constants, the JSON
   Schema and the canonical zero-chunk digests, and ships fixtures under
-  `spec/testdata` for every example in this document. A change to this document that
+  `pkg/spec/testdata` for every example in this document. A change to this document that
   changes any byte of an example MUST change the fixture in the same commit.
 - This document's status moves from Draft to Accepted when
   [decision 0001](decisions/0001-vm-artifact-contract.md) is accepted and the

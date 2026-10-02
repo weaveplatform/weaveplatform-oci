@@ -17,7 +17,8 @@ owns the artifact specification, a shared Go module and the publication workflow
 
 Module path `github.com/deploymenttheory/weaveplatform-oci`, Go 1.27, `CGO_ENABLED=0`,
 `oras.land/oras-go/v2` pinned at v2.6.2 as the registry library, `github.com/klauspost/compress/zstd`
-for compression, `github.com/sigstore/sigstore-go` for bundle verification. The template
+for compression, `github.com/sigstore/sigstore-go` for bundle verification and
+`github.com/sigstore/sigstore/pkg/signature` for key-based signing. The template
 `workload/` directory is replaced by the packages below.
 
 | Package | Responsibility |
@@ -29,8 +30,13 @@ for compression, `github.com/sigstore/sigstore-go` for bundle verification. The 
 | `cache` | content-addressed store `blobs/sha256/`, `refs/` index, in-use pins, LRU GC, quota, `DiskSpaceGuard` interface, `oci-layout` import and export |
 | `verify` | Sigstore bundle verification against a trusted root; channel-manifest verification through an extracted `weaveplatform-manifest` verifier package; a policy combinator |
 | `disk/vhd` | raw to fixed VHD (footer) and, pending a spike, dynamic VHDX; used only by the Windows consumer |
-| `cmd/weaveoci` | `pack`, `push`, `pull`, `inspect`, `verify`, `export-layout`, `import-layout`, `republish`, `gc` |
-| `.github/workflows/` | reusable `build-macos.yml`, `build-windows.yml`, `build-linux.yml`, `publish.yml` |
+| `sign` | key-based signing that produces a cosign-compatible Sigstore bundle (v0.3) stored as an OCI 1.1 referrer with the fallback tag where the registry lacks the referrers API; keys from a file, `env://` or a KMS URI; no transparency log ([0006](0006-trust-attestations-and-channel-manifest.md)) |
+| `profile` | deployment-profile configuration (`github`, `private`, `hybrid`): canonical registry, mirrors, signature provider and verification material, channel URL and trust anchors ([0011](0011-deployment-profiles-and-reference-registry.md)) |
+| `publish` | orchestration of every publication stage: refuse an existing build tag, pack, validate, push, sign (key) or hand off to GitHub attestation, self-verify by re-pull on a clean cache, emit the promotion request ([0007](0007-publication-pipeline.md)) |
+| `cmd/weaveoci` | `pack`, `push`, `pull`, `inspect`, `verify`, `sign`, `publish`, `profile`, `export-layout`, `import-layout`, `republish`, `gc`, `healthcheck` |
+| `.github/workflows/` | reusable `build-macos.yml`, `build-windows.yml`, `build-linux.yml`, `publish.yml` (thin wrappers over `weaveoci publish`); `ci.yml` quality gates ([0013](0013-quality-gates.md)); `release-images.yml` ([0012](0012-container-images.md)) |
+| `deploy/zot/` | `Dockerfile`, `config/store.json`, `config/mirror.json`, `compose.yaml` for `weave-zot` ([0011](0011-deployment-profiles-and-reference-registry.md), [0012](0012-container-images.md)) |
+| `test/acceptance/` | godog features and steps run against the real `weaveoci` binary and real registries ([0013](0013-quality-gates.md)) |
 
 **Consumers and what they delete.**
 
@@ -96,11 +102,12 @@ Alternatives considered:
   CI, as the agent-modules repository already documents.
 - `go.work` at `~/GitHub/weave/go.work` is untracked; every consumer must validate with
   `GOWORK=off` before release.
-- Coverage floor follows hostweave practice: 90% per package.
+- Coverage gate follows hostweave practice and [0013](0013-quality-gates.md): ≥95% merged
+  total, ≥90% per package.
 
 ## Verification
 
-- `spec`: conformance suite over `spec/testdata/` fixtures (see
+- `spec`: conformance suite over `pkg/spec/testdata/` fixtures (see
   [0001](0001-vm-artifact-contract.md)); fuzz test on the config validator.
 - `chunk`: property test that chunk, reassemble and compare is the identity for random
   sparse inputs; zero-chunk digest equals the constant.
@@ -111,6 +118,11 @@ Alternatives considered:
   chain is verified and a tampered digest is rejected.
 - `cmd/weaveoci`: golden tests for `inspect` output; a `republish` test that converts
   a legacy fixture into a conformant artifact.
+- `sign`: a bundle signed by `sign` with a test key verifies with `cosign verify --key
+  --insecure-ignore-tlog` (cosign v3.1.3) and with the module's own `verify`, on zot
+  (referrers API) and on `registry:3.1.2` (fallback tag).
+- `publish`: acceptance features run the whole stage sequence against `weave-zot`
+  ([0013](0013-quality-gates.md)).
 - Consumer contract tests in hostweave and both CLIs run against the module's fixtures.
 
 ## References

@@ -10,14 +10,19 @@ and the component layout in [08-target-architecture.md](08-target-architecture.m
 
 ## Summary
 
-Two mechanisms, each doing one job:
+Two mechanisms, each doing one job. The build-time signature is pluggable by
+deployment profile ([13-deployment-profiles.md](13-deployment-profiles.md),
+[decision 0011](decisions/0011-deployment-profiles-and-reference-registry.md)); the channel
+manifest is mandatory in every profile.
 
 | Mechanism | Answers | Produced by | Verified by |
 |---|---|---|---|
-| **Build attestation** (Sigstore bundle as an OCI referrer, from `actions/attest`) | "Which workflow, at which commit, built this exact digest from which inputs?" | The publishing workflow, automatically, for every pushed manifest | CI self-check; hostweave server at pin time; `gh attestation verify`; any ecosystem verifier |
+| **Build-time signature**, GitHub profile: GitHub artifact attestation (Sigstore bundle as an OCI referrer, from `actions/attest`) | "Which workflow, at which commit, built this exact digest from which inputs?" | The publishing workflow, automatically, for every pushed manifest | CI self-check; hostweave server at pin time; `gh attestation verify`; any ecosystem verifier |
+| **Build-time signature**, private profile: cosign-format Sigstore bundle signed with a file or KMS key, stored as an OCI referrer | "Did a holder of the organisation's publishing key sign this exact digest?" | `weaveoci publish`, from any CI or a workstation | `weaveoci publish` self-check; hostweave server; `cosign verify --key … --insecure-ignore-tlog` |
 | **Channel manifest** (minisign-style Ed25519 chain owned by weaveplatform-manifest) | "Is this digest one the platform has promoted for this channel?" | A human merging the promotion pull request | hostweave server and agents, guestweave CLIs, offline devices, with nothing but the root key embedded in the binary |
 
-Attestations give provenance and ecosystem interoperability. The channel manifest
+The build-time signature gives provenance (keyless attestations) or key-holder
+authenticity (key-based bundles) and ecosystem interoperability. The channel manifest
 gives an air-gap-capable promotion gate that already exists for agent modules. The
 platform's own trust-chain document rules out depending on Sigstore infrastructure
 for the gate: "no Fulcio, no Rekor, no CA"
@@ -43,6 +48,11 @@ for the gate: "no Fulcio, no Rekor, no CA"
   (`deploymenttheory/weaveplatform-agent-modules@main` `docs/release-pipeline.md`).
   Images follow the same path: a build that passed its own verification is
   *published*; a digest listed in the signed channel is *promoted*.
+- **Private deployments cannot rely on GitHub.** GitHub attestations need GitHub
+  Actions and, for private repositories, GitHub Enterprise Cloud. A private
+  organisation publishing to its own zot signs with a key it controls instead; the
+  bundle format and referrer shape are the same, so consumers run one verifier with
+  two policies (certificate identity or public key).
 
 ## 2. GitHub artifact attestations
 
@@ -92,8 +102,11 @@ Facts, as of 2026-10-02:
 
 ## 3. cosign
 
-cosign is the fallback for signing outside GitHub Actions (a developer republishing
-an image by hand, or a mirror re-signing). Facts, as of 2026-10-02:
+cosign key-based signing is the **build-time signature of the private profile**
+(project owner's decision, 2026-10-02), and remains the tool for re-signing on a mirror.
+The shared module signs natively in Go and produces the same bundle and referrer, so no
+cosign binary is needed to publish; `cosign verify` stays an interoperable external
+check. Facts, as of 2026-10-02:
 
 - Latest cosign is v3.1.3 (2026-08-06); latest sigstore-go is v1.3.0 (2026-07-30)
   (GitHub releases).
@@ -117,6 +130,29 @@ an image by hand, or a mirror re-signing). Facts, as of 2026-10-02:
 - Key-based signing supports files, `env://`, `awskms://`, `azurekms://`,
   `gcpkms://`, `hashivault://` and `k8s://`; `--tlog-upload=false` is deprecated
   since v3.0.3 ([cosign sign](https://raw.githubusercontent.com/sigstore/cosign/main/doc/cosign_sign.md)).
+- **Key-based signing without a transparency log (v3.1.3).** Preferred: create a
+  signing config with no services (`cosign signing-config create --out offline-sc.json`)
+  and sign with `cosign sign --key cosign.key --signing-config offline-sc.json
+  --trusted-root tr.json <ref@sha256:…>`. Legacy form:
+  `--use-signing-config=false --tlog-upload=false`. Because `--use-signing-config`
+  defaults to true, `--tlog-upload=false` on its own fails in v3
+  ([common.go L433-462](https://github.com/sigstore/cosign/blob/v3.1.3/cmd/cosign/cli/signcommon/common.go),
+  [issue 5043](https://github.com/sigstore/cosign/issues/5043)).
+- **Key-based verification:** `cosign verify --key cosign.pub --insecure-ignore-tlog
+  <ref@digest>`; `--private-infrastructure` is deprecated in its favour
+  ([verify options](https://github.com/sigstore/cosign/blob/v3.1.3/cmd/cosign/cli/options/verify.go)).
+- **Referrer shape:** empty config, `artifactType:
+  application/vnd.dev.sigstore.bundle.v0.3+json`, `subject` = signed manifest, bundle as
+  the only layer ([write.go L313-410](https://github.com/sigstore/cosign/blob/v3.1.3/pkg/oci/remote/write.go)).
+  On registries without the referrers API the `sha256-<hex>` fallback index tag is
+  maintained automatically
+  ([ggcr write.go L506-593](https://github.com/google/go-containerregistry/blob/v0.21.7/pkg/v1/remote/write.go)).
+- KMS URIs for keys: `awskms://`, `gcpkms://projects/…/cryptoKeys/…/versions/N`,
+  `azurekms://`, `hashivault://`, `k8s://ns/name`, `github://`, `gitlab://`
+  ([generate-key-pair](https://github.com/sigstore/cosign/blob/v3.1.3/doc/cosign_generate-key-pair.md)).
+- `sigstore/cosign-installer` v4.1.2 installs cosign v3.0.6 by default; workflows pin
+  `cosign-release: v3.1.3`
+  ([action.yml](https://github.com/sigstore/cosign-installer/blob/v4.1.2/action.yml)).
 - Sigstore lists GHCR, ECR, GAR, ACR, Docker Hub, Artifactory, distribution,
   GitLab, Harbor, Nexus, Quay and others as tested registries
   ([registry support](https://docs.sigstore.dev/cosign/system_config/registry_support/)).
@@ -172,21 +208,48 @@ What exists today:
 - Promotion is a `repository_dispatch` from the publishing workflow, a pull request
   that rewrites and re-signs `stable.json`, and a merge.
 
-What images need:
+What images need, and what phase 2 implemented (2026-10-02):
 
-1. **Schema change in weaveplatform-api.** `channel-manifest.schema.json` has
-   `additionalProperties: false` at the top level, so an `images` section cannot
-   be added without a schema revision. The proposed shape is an `images[]` array
-   whose entries carry `repository`, `tag`, `digest` (the index digest),
-   `platforms[]` (`{os, arch, digest}` for each child manifest), `artifact_type`
-   and `promoted_at`. The exact fields are decided in
-   [decision 0006](decisions/0006-trust-attestations-and-channel-manifest.md).
-2. **An importable verifier.** `internal/manifestverify` cannot be imported by
-   hostweave or the guestweave CLIs. The shared module's `verify` package needs
-   either an extracted package in weaveplatform-manifest or weaveplatform-api, or a
-   small re-implementation against the same key and envelope formats. Extraction
-   is the prerequisite listed in [11-migration.md](11-migration.md) phase 2 and in
-   [12-open-questions.md](12-open-questions.md).
+1. **Where the code lives now.** The repositories named above have moved to the
+   `weaveplatform` GitHub organisation: weaveplatform-api, -sdk and -agent were merged
+   into `weaveplatform/weaveplatform-agent-core` (format types in its public
+   `sdk/manifest` module, verifier still in `internal/manifestverify`), and
+   weaveplatform-manifest is now `weaveplatform/weaveplatform-channels`. Several old
+   `deploymenttheory/*` remotes no longer resolve, so the local sibling checkouts are
+   stale ([12-open-questions.md](12-open-questions.md) Q26).
+2. **A byte-compatible re-implementation, not an import.** `pkg/channel` in this
+   repository re-implements the roughly 60-line chain check with the same file
+   formats: `.pub`, `.key` and `.sig` JSON (`schema`, `key_id`, base64 values), Ed25519
+   over `context + 0x00 + exact file bytes`, contexts `weave-endorse-v1` and
+   `weave-manifest-v1`, root key id `root`, and manifestverify's order (endorsement,
+   manifest signature, then parsing, then expiry and sequence). Importing
+   agent-core's `sdk/manifest` would have pulled gRPC and protobuf into every
+   consumer for four helper functions.
+3. **The `images` section.** Implemented as an optional top-level array; agents that
+   predate it decode non-strictly and ignore it, and the signature covers the exact
+   bytes, so existing tooling (`weavemanifest sign`/`verify`) is unaffected. Field
+   names follow the manifest's existing snake_case style:
+
+   ```json
+   "images": [{
+     "repository": "deploymenttheory/weave-images/ubuntu-24.04",
+     "tag": "24.04-20260915-r1",
+     "digest": "sha256:…index…",
+     "platforms": [{"os": "linux", "arch": "arm64", "digest": "sha256:…"}],
+     "signature": {"provider": "cosign-key", "key_id": "<cosign key hint>"},
+     "build_date": "2026-10-02T08:00:00Z"
+   }]
+   ```
+
+   `repository` is the repository path without the registry host, so the same entry
+   admits the image whether it is pulled from GHCR, a zot mirror or an air-gapped
+   layout. `weaveoci channel new|keygen|endorse|promote|sign|verify` lets an
+   organisation run its own channel without the agent-core tooling.
+4. **Still required elsewhere.** agent-core's `schema/channel-manifest.schema.json`
+   (top-level `additionalProperties: false`) must gain `images`, and already lacks
+   `sequence`, `expires` and module `subscribes`, which CI writes today; the
+   weaveplatform-channels promote workflow must learn to write image entries; and no
+   real root key exists yet (core's embedded `keys/root.pub` is empty).
 3. **A new dispatch event**, `image-published`, carrying repository, tag, index
    digest and the attestation reference, mirroring the existing
    `module-published` event in `module-release.yml`.
@@ -231,12 +294,12 @@ same way as the provenance bundle.
 
 | Point | Verifier | Checks | On failure |
 |---|---|---|---|
-| CI, after push | Publishing workflow | Pull the manifest by digest; verify the provenance bundle via the fallback tag; verify every chunk digest; run the contract validator ([09](09-artifact-contract-v1.md)) | Workflow fails; no dispatch is sent |
-| Promotion | Reviewer of the promotion PR plus `weavemanifest verify` in CI | Digest in the PR matches the dispatch; attestation verifies against the expected workflow identity; `stable.json` re-signs cleanly | PR not merged |
-| hostweave server, at pin time | `pkg/images` through the shared `verify` package | Digest is listed in the configured channel (mandatory); attestation verifies (recorded as evidence); platform and artifact type match the request | Version recorded as `unsupported` or `unavailable` (`deploymenttheory/hostweave@main` `pkg/types/image.go:117-135`) |
+| CI, after push | `weaveoci publish` (wrapped by the workflow in the GitHub profile) | Pull the manifest by digest; verify the build-time bundle (attestation identity or public key) through the referrers API or fallback tag; verify every chunk digest; run the contract validator ([09](09-artifact-contract-v1.md)) | Workflow fails; no dispatch is sent |
+| Promotion | Reviewer of the promotion PR plus `weavemanifest verify` in CI | Digest in the PR matches the promotion request; the build-time signature verifies against the expected workflow identity or key ID; `stable.json` re-signs cleanly | PR not merged |
+| hostweave server, at pin time | `pkg/images` through the shared `verify` package | Digest is listed in a channel signed under a configured trust anchor (mandatory); build-time signature verifies as the channel entry specifies (recorded as evidence); platform and artifact type match the request | Version recorded as `unsupported` or `unavailable` (`deploymenttheory/hostweave@main` `pkg/types/image.go:117-135`) |
 | hostweave agent, at pull | Runtime driver through `cache` + `verify` | Manifest digest equals the dispatched digest; every chunk's compressed and uncompressed digests match; channel listing re-checked when the agent has a channel | Attempt fails as a capacity-independent error; no clone |
-| guestweave CLI, at pull | `weave pull` with `--verify=channel\|attestation\|none` | Same chunk checks always; channel or attestation as configured | Pull refused unless `--verify=none` was requested |
-| Offline device | Same code with the embedded root key and a downloaded `trusted_root.jsonl` | Channel always; attestation when a trusted root is present | As above |
+| guestweave CLI, at pull | `weave pull` with `--verify=channel\|signature\|both\|none` | Same chunk checks always; channel and/or build-time signature (attestation identity or public key) as configured | Pull refused unless `--verify=none` was requested |
+| Offline device | Same code with the configured channel anchors and, for attestations, a downloaded `trusted_root.jsonl` | Channel always; key-based bundles always (no network needed); attestations when a trusted root is present | As above |
 
 The chunk-level digest checks are not optional anywhere; they are part of the
 artifact contract. Only the trust-policy checks vary by consumer.
@@ -258,6 +321,7 @@ sequenceDiagram
     R-->>C: index → bundle manifest → bundle blob
     C->>V: sigstore-go: verify bundle against trusted root + policy(digest, identity)
     V-->>C: provenance OK (or "no trusted root: skipped", recorded)
+    Note over C,V: private profile: verify with the public key instead (no trusted root, no tlog)
     C->>R: GET blobs (chunks), Range on resume
     C->>V: per-chunk compressed digest (descriptor) + uncompressed digest (annotation)
     V-->>C: OK → reassemble sparse disk → clone
@@ -292,6 +356,26 @@ res, err := v.Verify(bundle, verify.NewPolicy(
     verify.WithCertificateIdentity(id)))
 ```
 
+**Key-based bundles (private profile).** The same `Verify` call with public-key trusted
+material and no transparency log, as cosign itself does it
+([cosign verify.go L250-290](https://github.com/sigstore/cosign/blob/v3.1.3/pkg/cosign/verify.go),
+[trusted_material.go L117-167](https://github.com/sigstore/sigstore-go/blob/v1.3.0/pkg/root/trusted_material.go)):
+
+```go
+sv, err := signature.LoadVerifier(pubKey, crypto.SHA256) // github.com/sigstore/sigstore/pkg/signature
+tm := root.NewTrustedPublicKeyMaterial(func(string) (root.TimeConstrainedVerifier, error) {
+    return root.NewExpiringKey(sv, time.Time{}, time.Time{}), nil
+})
+v, err := verify.NewVerifier(tm, verify.WithNoObserverTimestamps())
+res, err := v.Verify(bundle, verify.NewPolicy(
+    verify.WithArtifactDigest("sha256", manifestDigestBytes),
+    verify.WithKey()))
+```
+
+`root.NewTrustedPublicKeyMaterialFromMapping` maps key IDs to keys for rotation. The
+channel entry for an image names the expected key ID, so a stolen key from another
+organisation's anchor cannot satisfy the policy.
+
 Discovery is the caller's job and runs in this order:
 
 1. `GET /v2/<repo>/referrers/<digest>?artifactType=…` (oras-go v2
@@ -301,7 +385,9 @@ Discovery is the caller's job and runs in this order:
    registry holds nothing, for example on a mirror that did not copy referrers.
 
 **Channel manifest.** Fetch `stable.json` and its `.sig`, verify the signing key's
-endorsement against the embedded root public key, verify the manifest signature,
+endorsement against one of the configured channel trust anchors (deploymenttheory's
+root by default; a private organisation adds its own `weavemanifest` root,
+[13 §Channel trust](13-deployment-profiles.md#channel-trust-in-private-deployments)), verify the manifest signature,
 then look the digest up. The key and envelope formats are those documented in
 `weaveplatform-manifest@main` `docs/trust-chain.md`; the implementation is the
 extracted verifier described in §4.

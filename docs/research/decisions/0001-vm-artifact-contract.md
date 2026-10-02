@@ -138,7 +138,7 @@ Alternatives considered:
 
 ## Verification
 
-- Fixtures to exist under `spec/testdata/`: `macos-26.0-25A354.manifest.json`,
+- Fixtures to exist under `pkg/spec/testdata/`: `macos-26.0-25A354.manifest.json`,
   `windows-11-25H2-26200.6584.manifest.json`, `ubuntu-24.04-20260915.manifest.json`, an
   index for each, and a config blob for each.
 - Conformance tests to exist in the shared module: `TestConformance_MediaTypes`,

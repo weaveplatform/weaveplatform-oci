@@ -31,6 +31,17 @@ runner labels and channels.
 | Windows | hosted `ubuntu-*` with KVM, or self-hosted Linux or Windows | ISO acquired with go-sdk-winmediafoundry, `autounattend.xml` plus virtio drivers, installed under QEMU, agent baked, sysprep-equivalent stripping, packed from the raw disk |
 | Linux | hosted `ubuntu-*` with KVM | bootc image built and pushed, raw disk derived with `image-builder --type raw`; or cloud image verified, converted to raw, booted once with a NoCloud seed, packed |
 
+**All stages live in `weaveoci publish`.** Every stage below is implemented once in the
+shared module's `publish` package and exposed as `weaveoci publish --profile <name>`. It
+runs the same way from GitHub Actions, any other CI system, a self-hosted runner or a
+workstation, natively or as `docker run ghcr.io/deploymenttheory/weaveoci publish …`
+([0012](0012-container-images.md)). The GitHub reusable workflows are thin wrappers that
+install `weaveoci`, call it and add the GitHub-only steps (`actions/attest`, the
+`repository_dispatch`). In the `private` profile the signature stage signs with a
+key ([0006](0006-trust-attestations-and-channel-manifest.md)) and the promotion request is
+written as a file or a pull request against the organisation's own channel repository,
+so publication needs no GitHub service.
+
 **Stages of `publish.yml`.** Resolve the build tag and refuse if it already exists;
 pack with `weaveoci pack` and run the conformance validator; push with `weaveoci push`
 (HEAD skip, mount, retry); run `actions/attest` with `push-to-registry: true`; verify the
@@ -45,6 +56,9 @@ written by the build workflow; promotion writes them.
 as the modules pipeline does. Source media for macOS and Windows is fetched from Apple
 and Microsoft endpoints at build time and cached on the self-hosted runner; it is never
 stored in a public package.
+
+**weaveplatform-oci's own images.** The `weaveoci` and `weave-zot` container images are
+released by a separate workflow, `release-images.yml` ([0012](0012-container-images.md)).
 
 **Cadence.** A scheduled monthly rebuild of every `stable` image, plus on-demand builds
 when a source media version or a template changes. Every build produces a new `-r<rev>`
@@ -63,6 +77,8 @@ chunk before a human is asked to promote.
 
 Alternatives considered:
 
+- **Stage logic in GitHub workflow YAML.** Simplest for the GitHub profile, but it ties
+  publication to GitHub Actions and leaves the private profile with nothing. Rejected.
 - **Build in each consumer repository.** Spreads three pipelines over three repositories
   and three sets of secrets. Rejected.
 - **Packer with a QEMU or Hyper-V builder as the orchestrator.** Mature, but it adds a
@@ -95,6 +111,9 @@ Alternatives considered:
 
 - A dry-run mode of each build workflow that stops after `weaveoci pack` and the
   conformance validator, runnable on a pull request without pushing.
+- Acceptance features run `weaveoci publish --profile private` end to end against
+  `weave-zot`: refuse existing tag, pack, push, key-sign, self-verify, promotion request
+  written ([0013](0013-quality-gates.md)).
 - `publish.yml` integration test against a scratch package: push, attest, verify,
   re-pull, dispatch to a test repository, and a second run that fails on the existing
   tag.

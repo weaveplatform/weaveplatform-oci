@@ -15,10 +15,16 @@ referrers API, no immutable tags and accepts only classic personal access tokens
 
 ## Decision
 
-**Canonical registry.** `ghcr.io/deploymenttheory` is the canonical registry. Publication
-happens only from GitHub Actions in `weaveplatform-oci` ([0007](0007-publication-pipeline.md)).
-Any OCI 1.1 registry may hold a mirror; a mirror is configured as a registry profile on
-the consumer, never as a fork of the publication pipeline.
+**Canonical registry by profile.** The canonical registry depends on the deployment
+profile ([0011](0011-deployment-profiles-and-reference-registry.md)). In the `github`
+profile, and as the upstream of the `hybrid` profile, it is `ghcr.io/deploymenttheory`,
+published from GitHub Actions in `weaveplatform-oci`. In the `private` profile it is an
+organisation's `weave-zot` (or a supported Harbor or distribution v3), published by
+`weaveoci publish` from any CI system or workstation
+([0007](0007-publication-pipeline.md)). Any OCI 1.1 registry may hold a mirror; a mirror
+is configured as a registry profile on the consumer, never as a fork of the publication
+pipeline. The repository and tag grammar below is the same in every profile; only the
+host and organisation prefix change.
 
 **Repositories.** `ghcr.io/deploymenttheory/weave-images/<family>-<major>[-<variant>]`, for
 example `macos-26-vanilla`, `macos-26-base`, `windows-11-base`, `windows-server-2025-base`,
@@ -44,7 +50,11 @@ through on failure. A site mirror is a zot or Harbor pull-through cache configur
 preserve digests. Air-gapped sites import `oci-layout` directories exported by
 `weaveoci export-layout`; digests and referrers survive the transfer unchanged.
 
-**Credentials.** Devices pulling private packages from GHCR use a service account's
+**Credentials.** In the `private` profile, people authenticate to zot with htpasswd or
+OpenID, publishers and hostweave with robot users or API keys, and devices through the
+OS keychain; in the `hybrid` profile devices authenticate only to the site mirror, which
+holds the single upstream credential ([0011](0011-deployment-profiles-and-reference-registry.md)).
+In the `github` profile, devices pulling private packages from GHCR use a service account's
 classic PAT with `read:packages` only, stored in the OS keychain through the Docker
 credential-helper protocol. Workflows push with `GITHUB_TOKEN` and the package's
 "Manage Actions access" set to Write for the publishing repository. hostweave delivers
@@ -64,10 +74,9 @@ tags costs nothing in correctness.
 
 Alternatives considered:
 
-- **Self-hosted registry (Harbor or zot) from day one.** Gives the referrers API, tag
-  immutability rules, OIDC and robot accounts now. Rejected for now because it adds
-  infrastructure the project does not yet need; the mirror design keeps the option open
-  and [0008](0008-device-cache-gc-and-mirrors.md) specifies the profile shape.
+- **GHCR as the only canonical registry.** Superseded by the project owner's request for
+  a privately hosted option; the self-hosted path is now the `private` profile in
+  [0011](0011-deployment-profiles-and-reference-registry.md), with zot as the reference.
 - **Cloud registries (ECR, ACR, Artifact Registry).** All support referrers, 200 GB layers
   and short-lived federated tokens. Rejected as canonical because builds run in GitHub
   Actions and the organisation has no primary cloud; any of them can be a mirror.
@@ -79,8 +88,8 @@ Alternatives considered:
 
 ## Constraints
 
-- GHCR does not accept GitHub App installation tokens, so device credentials are
-  long-lived PATs until GitHub changes that. The rotation period is a policy decision.
+- GHCR does not accept GitHub App installation tokens, so in the `github` profile device credentials are
+  long-lived PATs until GitHub changes that; the `private` and `hybrid` profiles avoid this. The rotation period is a policy decision.
 - GHCR "currently" charges nothing for container storage and bandwidth and promises at
   least a month's notice. Private multi-GB packages carry billing risk.
 - Pull rate and egress limits on GHCR are undocumented; users of third-party VM tooling have hit
@@ -109,7 +118,7 @@ Alternatives considered:
 
 ## References
 
-- [04-registries-and-github.md](../04-registries-and-github.md), [05-supply-chain.md](../05-supply-chain.md), [08-target-architecture.md](../08-target-architecture.md)
+- [04-registries-and-github.md](../04-registries-and-github.md), [05-supply-chain.md](../05-supply-chain.md), [08-target-architecture.md](../08-target-architecture.md), [13-deployment-profiles.md](../13-deployment-profiles.md)
 - GHCR: <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>, <https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages>, <https://docs.github.com/en/billing/concepts/product-billing/github-packages>
 - GitHub App tokens not accepted: <https://github.com/orgs/community/discussions/171423>
 - zot mirroring: <https://zotregistry.dev/v2.1.21/articles/mirroring/>; Harbor proxy cache: <https://goharbor.io/docs/main/administration/configure-proxy-cache/>

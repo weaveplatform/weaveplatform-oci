@@ -4,6 +4,8 @@ Terms used across the research set. Primer-level detail is in
 [01-oci-primer.md](01-oci-primer.md); the contract that gives the weave-specific terms
 their exact meaning is [09-artifact-contract-v1.md](09-artifact-contract-v1.md).
 
+**Acceptance test.** A godog (Gherkin) feature that drives the built `weaveoci` binary against real registries started with testcontainers. Every implementation phase ships its own features under `test/acceptance/features/`. See [0013](decisions/0013-quality-gates.md).
+
 **Annotation.** A string-to-string map on a manifest, index or descriptor. Keys are
 reverse-DNS; `org.opencontainers.*` is reserved. See [01-oci-primer.md](01-oci-primer.md).
 
@@ -24,11 +26,11 @@ with the disk. See [09-artifact-contract-v1.md](09-artifact-contract-v1.md).
 **bootc.** "Bootable containers": a Linux OS packaged as an OCI image that updates itself
 in place. See [02-prior-art.md](02-prior-art.md).
 
-**Bundle (VM).** The on-disk directory a guestweave CLI keeps for one VM: config, disk and
-state files. See [03-current-state.md](03-current-state.md).
-
 **Bundle (Sigstore).** The single JSON envelope holding a signature, certificate and
 transparency-log proof. See [05-supply-chain.md](05-supply-chain.md).
+
+**Bundle (VM).** The on-disk directory a guestweave CLI keeps for one VM: config, disk and
+state files. See [03-current-state.md](03-current-state.md).
 
 **CAS.** Content-addressed storage: blobs stored and named by their digest, as in a
 registry or the local cache. See [06-large-artifacts.md](06-large-artifacts.md).
@@ -42,6 +44,10 @@ layer. See [06-large-artifacts.md](06-large-artifacts.md).
 
 **containerDisk.** KubeVirt's convention of shipping a qcow2 or raw disk at `/disk/`
 inside an ordinary container image. Prior art only. See [02-prior-art.md](02-prior-art.md).
+
+**Coverage gate.** The CI check that fails unless merged coverage from the Linux, macOS and Windows runs is at least 95 % in total and at least 90 % per package. See [0013](decisions/0013-quality-gates.md).
+
+**Deployment profile.** A named configuration that sets the canonical registry, mirrors, signing provider and verification policy: `github`, `private` or `hybrid`. The artifact contract and the code are the same in all three. See [13-deployment-profiles.md](13-deployment-profiles.md).
 
 **Descriptor.** A typed pointer `{mediaType, digest, size, …}` to a blob. See
 [01-oci-primer.md](01-oci-primer.md).
@@ -68,6 +74,8 @@ referrers API, so referrers can still be found. GHCR requires it. See
 boots only on a compatible model, so it is carried in the config.
 
 **HCS.** Windows Host Compute Service, the layer guestweave-cli-windows drives directly.
+
+**Healthcheck endpoint.** zot's unauthenticated `/livez`, `/readyz` and `/startupz` paths. `weave-zot` probes `/readyz` with `weaveoci healthcheck` because the distroless image has no shell or curl. See [13-deployment-profiles.md](13-deployment-profiles.md).
 
 **Image index.** An OCI document listing manifests, usually one per platform. See
 [01-oci-primer.md](01-oci-primer.md).
@@ -125,6 +133,8 @@ in a consumer's configuration. See [04-registries-and-github.md](04-registries-a
 **Sidecar manifest.** The JSON file the modules pipeline stamps with per-artifact digests
 before an ORAS push. See [03-current-state.md](03-current-state.md).
 
+**Signing config (cosign).** The cosign v3 file that lists which Sigstore services to use. A signing config with no services is how the private profile signs with a key and no transparency log. See [05-supply-chain.md](05-supply-chain.md).
+
 **SLSA.** Supply-chain Levels for Software Artifacts, the provenance framework GitHub
 attestations implement. See [05-supply-chain.md](05-supply-chain.md).
 
@@ -135,6 +145,8 @@ are written. See [06-large-artifacts.md](06-large-artifacts.md).
 
 **Tart.** (historical; see [02-prior-art.md](02-prior-art.md)) The macOS VM tool whose
 wire format guestweave-cli-macos currently ports. Not a dependency of the target design.
+
+**Trust anchor.** A public key a consumer is configured to trust without further proof: the minisign channel root, or the cosign public key of the private profile. See [13-deployment-profiles.md](13-deployment-profiles.md).
 
 **Trusted root.** The Sigstore document listing current certificate-authority,
 transparency-log and timestamp keys needed to verify a bundle.
@@ -148,5 +160,7 @@ state. Never shipped; regenerated per VM.
 **vTPM.** A virtual TPM; its state is per-VM secret material and never part of an image.
 
 **VZ.** Apple's Virtualization.framework.
+
+**weave-zot.** The container image `ghcr.io/deploymenttheory/weave-zot`: upstream zot pinned by digest with weave config roles (`private`, `mirror`) and a healthcheck. The reference private registry and site mirror. See [0012](decisions/0012-container-images.md).
 
 **zstd.** The Zstandard compressor used per chunk in the contract.

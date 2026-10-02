@@ -30,6 +30,9 @@ decisions borrow from or deliberately avoid.
 | 0008 | [Device cache, garbage collection and mirrors](0008-device-cache-gc-and-mirrors.md) |
 | 0009 | [Guest state: carry versus regenerate](0009-guest-state-carry-vs-regenerate.md) |
 | 0010 | [Remove Tart and Lume compatibility from guestweave-macos](0010-remove-tart-and-lume-compatibility.md) |
+| 0011 | [Deployment profiles and the reference private registry](0011-deployment-profiles-and-reference-registry.md) |
+| 0012 | [Container images published by weaveplatform-oci](0012-container-images.md) |
+| 0013 | [Quality gates: coverage and acceptance per phase](0013-quality-gates.md) |
 
 Fixed decisions taken by the project owner on 2026-10-02, which these records elaborate
 and do not reopen:
@@ -45,3 +48,15 @@ and do not reopen:
    from-source modes and must remain usable without any registry.
 6. Linux images derive from bootc images where practical, otherwise from upstream cloud
    images with verified checksums.
+
+Further decisions taken by the project owner on 2026-10-02 when the scope grew to
+include private hosting and quality gates:
+
+7. Three deployment profiles from one codebase: `github`, `private` and `hybrid`. zot is
+   the reference private registry; Harbor and CNCF distribution v3 are supported targets.
+8. The private profile signs with cosign-compatible key-based signing (file or KMS key)
+   plus the minisign channel manifest.
+9. `weaveplatform-oci` publishes its own container images to GHCR:
+   `ghcr.io/deploymenttheory/weaveoci` and `ghcr.io/deploymenttheory/weave-zot`.
+10. The implementation is Go, gated at ≥95% merged test coverage, and every
+    implementation phase delivers its own acceptance tests.

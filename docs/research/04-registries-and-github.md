@@ -13,13 +13,16 @@ mirrors). The artifact shape it assumes is defined in
 
 ## Summary
 
-- GHCR (`ghcr.io`) is the canonical registry. It stores OCI artifacts with custom
+- GHCR (`ghcr.io`) is the canonical registry in the GitHub and hybrid deployment
+  profiles; zot is the reference registry for the private profile, run as the
+  `weave-zot` container ([§4.1](#41-private-and-hybrid-hosting),
+  [13-deployment-profiles.md](13-deployment-profiles.md)). GHCR stores OCI artifacts with custom
   config and layer media types, and it is free for container storage and bandwidth
   today. It has four gaps the design must work around: no referrers API, no
   immutable tags, a 10 GB per-layer and 10-minute per-upload limit, and
   authentication only by classic personal access token or `GITHUB_TOKEN`.
-- Every other registry in the comparison table below is a *mirror* in the design,
-  never a fork. Registry profiles with mirror lists, pull-through caches (zot,
+- Apart from zot in the private profile, every other registry in the comparison table
+  below is a *mirror* or a supported target, never a fork of the publication pipeline. Registry profiles with mirror lists, pull-through caches (zot,
   Harbor) and `oci-layout` export cover offices, air gaps and clouds.
 - macOS and Windows images may only live in org-private repositories. Linux images
   built from community distributions may be public. The licence clauses are quoted
@@ -216,6 +219,27 @@ or must appear in the reference, is settled in
 [decision 0008](decisions/0008-device-cache-gc-and-mirrors.md): mirrors are an
 ordered list on the profile and the client tries them before the canonical host,
 always verifying the same digest.
+
+### 4.1 Private and hybrid hosting
+
+The same artifacts, tools and trust chain run in three deployment profiles
+([13-deployment-profiles.md](13-deployment-profiles.md),
+[decision 0011](decisions/0011-deployment-profiles-and-reference-registry.md)):
+
+| Profile | Canonical registry | Publisher | Build-time signature | Site registry |
+|---|---|---|---|---|
+| GitHub | GHCR | GitHub Actions wrapping `weaveoci publish` | GitHub artifact attestation | none |
+| Private | zot (`ghcr.io/deploymenttheory/weave-zot`), or Harbor / distribution v3 | `weaveoci publish` from any CI or a workstation | cosign-format bundle signed with a file or KMS key | optional zot mirror |
+| Hybrid | GHCR | GitHub Actions | GitHub artifact attestation | zot per site, `sync` on demand with `preserveDigest` |
+
+zot is the reference private registry because it is a single container with the
+referrers API, Range and resumable uploads, on-demand GHCR sync that preserves digests,
+and tag immutability through access control (`create` without `update`). Harbor and
+distribution v3 are supported targets; distribution v3 has no referrers API, so it
+exercises the fallback-tag path. The private profile removes the GHCR-specific gaps
+above (no referrers API, classic-PAT-only credentials, undocumented egress limits) and
+is the natural home for macOS and Windows images. The channel manifest remains
+mandatory in every profile ([05-supply-chain.md](05-supply-chain.md)).
 
 ## 5. Repository naming and tags on GHCR
 

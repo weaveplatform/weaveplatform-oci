@@ -1,0 +1,12 @@
+# Coverage gate (decision 0013): >=95% total, >=90% per package.
+# The profile is produced by `make cover`, which merges unit, acceptance and
+# per-OS runner coverage from cover/* with `go tool covdata`.
+profile: cover/coverage.out
+threshold:
+  file: 0
+  package: 90
+  total: 95
+exclude:
+  paths:
+    # Binary entry point: a thin shim over internal/cli.
+    - ^cmd/

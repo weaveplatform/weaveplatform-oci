@@ -17,7 +17,31 @@ mechanisms.
 
 ## Decision
 
-**At build time: provenance attestation.** The publish workflow runs `actions/attest`
+**At build time: a signature chosen by profile.** The build-time signature is pluggable
+and selected by the deployment profile ([0011](0011-deployment-profiles-and-reference-registry.md)):
+
+| Profile | Provider | Identity | Needs network at verify |
+|---|---|---|---|
+| `github` | GitHub artifact attestation (keyless Sigstore bundle with SLSA provenance) | workflow certificate, issuer `https://token.actions.githubusercontent.com` | no, with a shipped trusted root |
+| `private` | cosign-compatible key-based bundle from the shared module's `sign` package (file, `env://` or KMS key: `awskms://`, `azurekms://`, `gcpkms://`, `hashivault://`) | the public key | no |
+| `hybrid` | whatever the upstream published | as upstream | as upstream |
+
+**Private profile: key-based signature.** `weaveoci sign` (and `weaveoci publish`)
+writes a Sigstore bundle whose verification material is a public-key hint, with no
+transparency-log entry and no certificate, as an OCI 1.1 referrer with `artifactType:
+application/vnd.dev.sigstore.bundle.v0.3+json` and `subject` set to the index digest.
+On zot it is found through the referrers API; on distribution v3 and GHCR through the
+`sha256-<hex>` fallback tag. The format is the one cosign v3 writes, so `cosign verify
+--key cosign.pub --insecure-ignore-tlog <ref@digest>` verifies it, and cosign can be
+used instead of `weaveoci sign` (`cosign sign --key … --signing-config <no-services.json>`)
+without changing consumers. The module verifies it with sigstore-go v1.3.0:
+`root.NewTrustedPublicKeyMaterial` with `root.NewExpiringKey`, `verify.NewVerifier(tm,
+verify.WithNoObserverTimestamps())` and a policy of `verify.WithArtifactDigest` plus
+`verify.WithKey()`. Key rotation uses `root.NewTrustedPublicKeyMaterialFromMapping`
+keyed by the bundle's key hint. The public key is also uploaded to zot's trust extension
+so registry listings show signature status, which is informational only.
+
+**GitHub profile: provenance attestation.** The publish workflow runs `actions/attest`
 with `subject-name` set to the repository (no tag) and `subject-digest` set to the
 index digest, with `push-to-registry: true`. The predicate is SLSA provenance v1 whose
 `buildDefinition.externalParameters` record the template repository, ref and digest,
@@ -44,8 +68,13 @@ the attestation's certificate identity, and the build date.
 | publish workflow | after push | its own attestation resolves and verifies |
 | promotion reviewer | before merge | attestation identity matches the expected workflow and ref |
 | hostweave server | when an image version is resolved or pinned | digest is in the configured channel; attestation verified if reachable; evidence recorded on `ImageVersion` |
-| hostweave agent and guestweave | at pull, before reassembly | manifest digest equals the channel entry; every blob digest matches its descriptor; attestation verified when `--verify=attestation` |
+| hostweave agent and guestweave | at pull, before reassembly | manifest digest equals the channel entry; every blob digest matches its descriptor; attestation verified when `--verify=signature` |
 | air-gapped device | at import | channel manifest chain against the embedded root; bundle against a downloaded trusted root |
+
+**The channel manifest is mandatory in every profile.** Consumers carry a list of channel
+trust anchors: the deploymenttheory root embedded in core by default, plus any root an
+organisation mints with `weavemanifest keygen` for its private profile. A channel is
+accepted when its signing key chains to any configured anchor.
 
 The channel manifest is mandatory for hostweave: a digest not present in the channel is
 not dispatchable. For guestweave the default is `--verify=channel` when a channel is
@@ -80,9 +109,11 @@ Alternatives considered:
   no interoperability with `gh attestation verify`, Kyverno or policy-controller, and
   it cannot say which runner or inputs produced the bytes. Rejected as the sole
   mechanism.
-- **cosign key-based signing with a KMS key.** Workable on any registry, but it adds a
-  key to manage next to the minisign keys and gives weaker identity than keyless
-  workflow certificates. Not adopted; cosign remains an optional extra signature.
+- **Keyless Sigstore in the private profile.** Needs Fulcio, Rekor and a timestamp
+  authority reachable from the build, or a private Sigstore deployment; neither fits a
+  container-hosted registry or an air gap. Rejected; the private profile uses
+  cosign-compatible key-based signing, adopted at the project owner's request. It adds a
+  key to manage next to the minisign keys, which KMS URIs mitigate.
 - **Notation.** X.509 trust policies with no transparency log fit an enterprise CA, not
   a GitHub-only baseline. Not adopted.
 
@@ -102,11 +133,20 @@ Alternatives considered:
   and the verified timestamps are trustworthy on their own.
 - Sigstore rotates its trusted root a few times a year; devices that verify offline must
   receive a refreshed `trusted_root.json` through the same channel mechanism.
+- In cosign v3, `--tlog-upload=false` is deprecated and fails when combined with the
+  default `--use-signing-config`; key-based signing without a log uses a signing config
+  with no services. `sigstore/cosign-installer` v4.1.2 defaults to cosign v3.0.6 and must
+  pin v3.1.3.
+- Key-based bundles prove possession of the key, not which build produced the artifact;
+  the private profile relies on the channel promotion review for that.
 - cosign versions before 3.0.4 and 2.6.2 carried a bundle-verification flaw
   (GHSA-whqx-f9j3-ch6m); the module pins sigstore-go and tracks advisories.
 
 ## Verification
 
+- `verify` package tests: a key-signed bundle written by `sign` and one written by
+  cosign v3.1.3 both verify with the same public key and fail with another; both are
+  found through the referrers API on zot and through the fallback tag on `registry:3.1.2`.
 - `verify` package tests: a bundle produced by this repository's own `publish.yml`
   verifies against a pinned trusted root and fails with a wrong SAN regex; a channel
   manifest signed with a test chain verifies and a tampered digest is rejected; the
@@ -123,6 +163,8 @@ Alternatives considered:
 
 - [05-supply-chain.md](../05-supply-chain.md), [04-registries-and-github.md](../04-registries-and-github.md)
 - `actions/attest`: <https://github.com/actions/attest>; attestation docs: <https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations>; offline: <https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/secure-your-work/use-artifact-attestations/verify-attestations-offline>; `gh attestation verify`: <https://cli.github.com/manual/gh_attestation_verify>
+- cosign key-based signing and offline verification: <https://github.com/sigstore/cosign/blob/v3.1.3/doc/cosign_sign.md>, <https://github.com/sigstore/cosign/blob/v3.1.3/cmd/cosign/cli/options/verify.go>, <https://github.com/sigstore/cosign/issues/5043>; sigstore-go public-key material: <https://github.com/sigstore/sigstore-go/blob/v1.3.0/pkg/root/trusted_material.go>
+- [0011](0011-deployment-profiles-and-reference-registry.md), [13-deployment-profiles.md](../13-deployment-profiles.md)
 - Sigstore: <https://blog.sigstore.dev/cosign-3-0-available/>, <https://github.com/sigstore/sigstore-go>, <https://raw.githubusercontent.com/sigstore/sigstore-go/main/docs/verification.md>, fallback tag behaviour <https://raw.githubusercontent.com/sigstore/sigstore-js/main/packages/oci/src/image.ts>
 - SLSA v1.2: <https://slsa.dev/spec/>
 - Channel manifest chain: `deploymenttheory/weaveplatform-manifest@main docs/trust-chain.md`, `README.md`; schema `deploymenttheory/weaveplatform-api@main schema/channel-manifest.schema.json`; verifier `deploymenttheory/weaveplatform-agent@main internal/manifestverify`

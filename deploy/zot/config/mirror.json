@@ -1,0 +1,44 @@
+{
+  "distSpecVersion": "1.1.1",
+  "storage": {
+    "rootDirectory": "/var/lib/registry",
+    "dedupe": true,
+    "gc": true,
+    "gcDelay": "24h",
+    "gcInterval": "6h"
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000",
+    "realm": "weave-zot-mirror",
+    "readTimeout": "0s",
+    "writeTimeout": "0s",
+    "compat": ["docker2s2"],
+    "accessControl": {
+      "repositories": {
+        "**": { "anonymousPolicy": ["read"] }
+      }
+    }
+  },
+  "log": { "level": "info" },
+  "extensions": {
+    "sync": {
+      "enable": true,
+      "credentialsFile": "/etc/zot/sync-credentials.json",
+      "registries": [
+        {
+          "urls": ["https://ghcr.io"],
+          "onDemand": true,
+          "tlsVerify": true,
+          "preserveDigest": true,
+          "maxRetries": 3,
+          "retryDelay": "30s",
+          "syncTimeout": "6h",
+          "content": [{ "prefix": "deploymenttheory/weave-images/**" }]
+        }
+      ]
+    },
+    "search": { "enable": true },
+    "metrics": { "enable": true, "prometheus": { "path": "/metrics" } }
+  }
+}

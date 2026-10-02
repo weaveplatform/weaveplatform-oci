@@ -1,0 +1,53 @@
+{
+  "distSpecVersion": "1.1.1",
+  "storage": {
+    "rootDirectory": "/var/lib/registry",
+    "dedupe": true,
+    "gc": true,
+    "gcDelay": "24h",
+    "gcInterval": "6h",
+    "retention": {
+      "dryRun": false,
+      "delay": "24h",
+      "policies": [
+        {
+          "repositories": ["**"],
+          "deleteReferrers": false,
+          "deleteUntagged": true,
+          "keepTags": [{ "patterns": [".*"] }]
+        }
+      ]
+    }
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000",
+    "realm": "weave-zot",
+    "readTimeout": "0s",
+    "writeTimeout": "0s",
+    "auth": {
+      "htpasswd": { "path": "/etc/zot/htpasswd" },
+      "failDelay": 1
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "policies": [
+            { "users": ["publisher"], "actions": ["read", "create"] }
+          ],
+          "defaultPolicy": ["read"]
+        }
+      },
+      "adminPolicy": {
+        "users": ["admin"],
+        "actions": ["read", "create", "update", "delete"]
+      }
+    }
+  },
+  "log": { "level": "info" },
+  "extensions": {
+    "search": { "enable": true },
+    "trust": { "enable": true, "cosign": true, "notation": false },
+    "metrics": { "enable": true, "prometheus": { "path": "/metrics" } }
+  }
+}

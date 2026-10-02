@@ -24,7 +24,6 @@
 /vendor/
 /bin/
 /dist/
-/pkg/
 coverage.out
 coverage.html
 
@@ -48,3 +47,6 @@ __pycache__/
 *.exe
 *.dylib
 *.so
+# coverage and lint output
+/cover/
+golangci-lint-report.sarif

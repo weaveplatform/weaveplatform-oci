@@ -44,9 +44,12 @@ already hold an image.
 
 **Mirrors.** A registry profile is `{name, host, organisation, insecure, default,
 mirrors: [host...]}`. Resolution tries mirrors in order and falls back to the canonical
-host; digests are compared across sources so a mirror cannot substitute content. A site
-mirror is zot with `sync` on demand and `preserveDigest: true`, or a Harbor proxy-cache
-project; both preserve fallback-tag referrers. hostweave's `RegistryConnection` gains
+host; digests are compared across sources so a mirror cannot substitute content. The
+reference site mirror is `weave-zot` in its mirror role
+([0011](0011-deployment-profiles-and-reference-registry.md),
+[0012](0012-container-images.md)): `sync` on demand with `preserveDigest: true` and
+`http.compat: ["docker2s2"]`. A Harbor proxy-cache project is a supported alternative;
+both preserve referrers. hostweave's `RegistryConnection` gains
 the same `mirrors` list.
 
 **Air gap.** `weaveoci export-layout <ref> <dir>` writes an `oci-layout` directory
@@ -90,8 +93,14 @@ Alternatives considered:
   in guestweave-cli-macos behind the interface.
 - Quota is per device, not per user; two users sharing a Mac share the cache and the
   pins.
-- A zot mirror in `docker2s2` compatibility mode must set `preserveDigest`, or digests
-  change and verification fails.
+- A zot mirror must set `preserveDigest: true`, which zot only accepts with
+  `http.compat: ["docker2s2"]`; without it digests change and verification fails.
+- zot defaults to 60 s HTTP read and write timeouts since v2.1.17 and garbage-collects
+  unreferenced blobs older than `gcDelay`; the mirror role disables the timeouts and sets
+  `gcDelay` above the longest sync of a multi-GiB image.
+- zot's on-demand sync can hang on stale staging data
+  ([#4357](https://github.com/project-zot/zot/issues/4357)); consumers fall through to the
+  next mirror or the canonical host on timeout.
 - Mirror traffic to GHCR itself still needs a classic PAT ([0002](0002-registry-repositories-tags-visibility.md)).
 
 ## Verification
@@ -103,6 +112,8 @@ Alternatives considered:
 - Round trip: `export-layout` then `import-layout` on a clean cache yields the same
   digests and the same referrers.
 - hostweave agent: GC runs after `Destroy`; `attr.cache.*` fingerprints appear.
+- Acceptance: pull through `weave-zot` in the mirror role started by testcontainers-go
+  and compare digests and referrers with the upstream ([0013](0013-quality-gates.md)).
 - Migration phase 8 drill against a zot `sync` instance and an `oci-layout` tarball.
 - Existing evidence: `deploymenttheory/guestweave-cli-macos@main internal/vm/storage/oci.go`,
   `internal/vm/storage/diskspace.go`; `deploymenttheory/guestweave-cli-windows@main internal/oci/cache/cache.go`

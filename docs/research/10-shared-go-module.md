@@ -19,7 +19,10 @@ exists yet. [Decision 0004](decisions/0004-shared-go-module.md) approves the sha
 | zstd | `github.com/klauspost/compress/zstd` | pure Go (no CGO), the de-facto Go zstd used by containerd and oras tooling, writes the frame content-size field the contract requires, and decodes concurrently (<https://github.com/klauspost/compress>) |
 | JSON Schema | `github.com/santhosh-tekuri/jsonschema/v6` | pure Go, draft 2020-12 support including `if/then` and `contentEncoding`, embeds the schema at compile time (<https://github.com/santhosh-tekuri/jsonschema>) |
 | Digests | `github.com/opencontainers/go-digest`, `github.com/opencontainers/image-spec/specs-go/v1` | the OCI types oras-go already depends on |
-| Sigstore | `github.com/sigstore/sigstore-go` v1.3.0 | bundle verification; discovery is written here (see [05-supply-chain.md](05-supply-chain.md)) |
+| Sigstore | `github.com/sigstore/sigstore-go` v1.3.0 | bundle verification for attestations and for cosign key signatures (`root.NewTrustedPublicKeyMaterial`, `root.NewExpiringKey`, `verify.NewVerifier(tm, verify.WithNoObserverTimestamps())`, `verify.WithKey()`); discovery is written here (see [05-supply-chain.md](05-supply-chain.md), <https://github.com/sigstore/sigstore-go/blob/v1.3.0/pkg/root/trusted_material.go>) |
+| Signing | `github.com/sigstore/sigstore/pkg/signature` and its KMS providers | loads file, `env://` and KMS keys (`awskms://`, `gcpkms://`, `azurekms://`, `hashivault://`) for the private profile's cosign-compatible key signatures without shelling out to cosign (<https://github.com/sigstore/sigstore>) |
+| Acceptance tests | `github.com/cucumber/godog` | Gherkin acceptance suites, the convention hostweave already uses (decision 0018); version pinned at implementation *(unverified: current release not checked)* (<https://github.com/cucumber/godog>) |
+| Integration containers | `github.com/testcontainers/testcontainers-go` v0.44.0 | starts `weave-zot` and `registry:3.1.2` for acceptance and integration tests; there is no zot module, so the generic API with `wait.ForHTTP("/readyz")` is used (<https://github.com/testcontainers/testcontainers-go/tree/v0.44.0>) |
 
 Dependencies that are deliberately **not** used: `google/go-containerregistry` as the
 transport (image-centric, single-PATCH uploads, open large-blob issues; it stays in
@@ -29,7 +32,7 @@ needs CGO.
 
 ## 2. Package map
 
-Packages sit at the repository root, replacing the template's `workload/` directory.
+Public packages (importable by hostweave and the guestweave CLIs) live under `pkg/`; packages used only by this project live under `internal/`. The CLI entry point is `cmd/weaveoci`.
 
 | Package | Responsibility | Depends on |
 |---|---|---|
@@ -40,10 +43,15 @@ Packages sit at the repository root, replacing the template's `workload/` direct
 | `cache` | Content-addressed store: `blobs/sha256/<hex>`, `refs/` index of resolved references, in-use pins, LRU garbage collection, quota, disk-space guard interface, oci-layout import and export | spec, oras-go oci store |
 | `verify` | Sigstore bundle verification with a trusted root; channel-manifest verification through an extracted `weaveplatform-manifest` verifier; a policy combinator that says which evidence is required for which operation | sigstore-go, weaveplatform-manifest (prerequisite) |
 | `disk/vhd` | Raw disk → VHD or VHDX for the Windows consumer, and the reverse for push | — |
+| `profile` | Loads and validates the deployment profile file: profile kind (`github`, `private`, `hybrid`), registries and mirrors, signing provider (`github-attestation`, `cosign-key`, `none`), verification policy and channel trust anchors ([13-deployment-profiles.md](13-deployment-profiles.md)) | spec, client (types only), verify (types only) |
+| `sign` | Signing providers behind one interface. `cosign-key` builds a Sigstore bundle with a file, `env://` or KMS key and no transparency log, and pushes it as an OCI 1.1 referrer (artifactType `application/vnd.dev.sigstore.bundle.v0.3+json`) that cosign v3 verifies with `--key --insecure-ignore-tlog`. `github-attestation` only checks that the workflow produced one, because `actions/attest` does the signing | sigstore, client |
+| `publish` | The publish pipeline as a library: refuse an existing build tag, pack, validate, push all blobs then manifests then index, sign through the profile's provider, verify the signature, re-pull and compare digests, emit the promotion request (`repository_dispatch` payload or a channel-entry file) | pack, client, sign, verify, profile |
+| `channel` | Channel manifests (phase 2): byte-compatible key, signature and manifest files with the weavemanifest and agent-core formats; chain verification (root endorses signing key, signing key signs the exact manifest bytes); expiry and anti-rollback; the `images` section; `Promote`, `New`, `Sign`, `Endorse`, `GenerateKey`; loading the four files from a path or URL ([05-supply-chain.md](05-supply-chain.md)) | go-digest |
 | `cmd/weaveoci` | Reference CLI over the packages | all |
 | `.github/workflows/` | Reusable build and publish workflows | — |
 
 Dependency direction is strictly downward: `spec` imports nothing from the module,
+`publish` is the only package that imports `sign` and `pack` together,
 `client` and `cache` never import `pack`, and `verify` never imports `client` (it is
 handed bytes). That keeps hostweave's server free of chunking code and the guestweave
 CLIs free of Sigstore when verification is off.
@@ -242,6 +250,7 @@ package verify
 type Evidence struct {
     Attestation *AttestationResult // sigstore bundle verified against TrustedRoot
     Channel     *ChannelResult     // digest listed in a verified channel manifest
+    Key         *KeyResult         // cosign key signature verified against a configured public key
 }
 
 type Policy struct {
@@ -249,14 +258,79 @@ type Policy struct {
     RequireAttestation bool
     Issuer             string // https://token.actions.githubusercontent.com
     SANRegexp          string // ^https://github.com/deploymenttheory/weaveplatform-oci/.github/workflows/publish.yml@refs/.*$
+    RequireKey         bool              // private profile: a cosign key signature must verify
+    PublicKeys         []crypto.PublicKey // trusted signing keys; key hints select among them during rotation
 }
 
 func Attestation(ctx context.Context, bundle []byte, subject digest.Digest, root *root.TrustedRoot, p Policy) (*AttestationResult, error)
 func Channel(ctx context.Context, manifest, sig []byte, keys ChannelKeys, subject digest.Digest) (*ChannelResult, error)
+// Key verifies a cosign key-signed bundle with no transparency log and no observer timestamps.
+func Key(ctx context.Context, bundle []byte, subject digest.Digest, keys []crypto.PublicKey) (*KeyResult, error)
 func Evaluate(p Policy, e Evidence) error // the combinator
 ```
 
-### 3.7 `disk/vhd`
+### 3.7 `profile`
+
+```go
+package profile
+
+type Kind string // "github" | "private" | "hybrid"
+
+type SigningProvider string // "github-attestation" | "cosign-key" | "none"
+
+type Profile struct {
+    Name      string
+    Kind      Kind
+    Registry  client.Profile      // canonical host and organisation
+    Mirrors   []string            // read-only, tried first (hybrid)
+    Signing   Signing             // provider plus key reference for cosign-key
+    Verify    verify.Policy       // what consumers require on pull
+    Channel   ChannelAnchors      // root public keys and channel URL or file
+}
+
+type Signing struct {
+    Provider SigningProvider
+    KeyRef   string // file path, env://NAME, awskms://…, gcpkms://…, azurekms://…, hashivault://…
+    PubRef   string // public key used by verifiers in the private profile
+}
+
+func Load(path string) ([]Profile, error) // YAML; unknown keys are errors, as in hostweave's config loader
+func (p Profile) Validate() error          // e.g. private requires cosign-key, github forbids cosign-key without opt-in
+```
+
+### 3.8 `sign` and `publish`
+
+```go
+package sign
+
+type Signer interface {
+    // Sign creates and pushes a signature referrer for subject; returns the referrer descriptor.
+    Sign(ctx context.Context, repo string, subject ocispec.Descriptor) (ocispec.Descriptor, error)
+}
+
+func NewCosignKey(ctx context.Context, keyRef string, c *client.Client) (Signer, error)
+func NewGitHubAttestation(c *client.Client, workflowIdentity string) Signer // verifies presence only
+
+package publish
+
+type Request struct {
+    Profile  profile.Profile
+    Bundle   string   // bundle directory or oci-layout
+    Repo     string   // weave-images/ubuntu-24.04
+    Tags     []string // build tag first; channel tags are refused
+}
+
+type Result struct {
+    Index     ocispec.Descriptor
+    Platforms []ocispec.Descriptor
+    Signature ocispec.Descriptor
+    Promotion PromotionRequest // dispatch payload or channel-entry JSON
+}
+
+func Run(ctx context.Context, r Request) (Result, error)
+```
+
+### 3.9 `disk/vhd`
 
 ```go
 package vhd
@@ -296,12 +370,16 @@ built without a registry profile behaves exactly as today.
 |---|---|
 | `pack <bundle-dir> --out <oci-layout>` | Chunk disks, write config and state blobs, emit manifest and index into an OCI layout; prints the index digest |
 | `push <oci-layout-or-dir> <ref> [--tag …]` | Push with HEAD-skip and mount; refuses a `-r<rev>` tag that already resolves |
-| `pull <ref> [--to <dir>] [--verify channel\|attestation\|both\|none]` | Resolve, verify, fetch into the cache, optionally unpack a bundle |
+| `pull <ref> [--to <dir>] [--verify channel\|signature\|both\|none]` | Resolve, verify, fetch into the cache, optionally unpack a bundle |
 | `inspect <ref\|layout> [--strict] [--deep]` | Print the `Description`; `--strict` runs the conformance checklist; `--deep` verifies chunk content |
 | `verify <ref> --policy <file>` | Discover referrers (API, then fallback tag), verify bundles, check channel membership |
 | `export-layout <ref> <dir>` / `import-layout <dir>` | Air-gap transfer with digests preserved |
 | `republish <src-bundle-or-legacy-ref> <ref>` | One-off conversion of an existing local bundle (or a previously pulled image) into a v1 artifact |
 | `gc [--keep <bytes>]` | LRU garbage collection of the local cache honouring pins |
+| `publish <bundle> <repo> --tag <build-tag> [--profile <name>]` | Runs the whole publish pipeline from the `publish` package on any CI system; the GitHub workflows are thin wrappers around it |
+| `sign <ref@digest> [--key <ref>]` | Signs an existing image with the profile's provider; cosign-compatible bundle as a referrer |
+| `profile show\|validate [--file <path>]` | Prints the resolved profile or validates a profile file |
+| `healthcheck [--url http://127.0.0.1:5000/readyz]` | Exits 0 when the URL returns 200; copied into the distroless `weave-zot` image as its `HEALTHCHECK`, because that image has no shell, curl or wget |
 
 The CLI is the reference consumer the conformance suite runs; the guestweave CLIs do
 not shell out to it.
@@ -316,15 +394,89 @@ not shell out to it.
 | `publish.yml` | `ubuntu-latest` | `bundle` artifact or layout, `repository`, `tags` | `packages: write`, attestation permissions, `RELEASE_PLEASE_PAT` for the cross-repo dispatch | `weaveoci pack`, `push`, `actions/attest push-to-registry`, `weaveoci verify` self-check, `repository_dispatch image-published` to weaveplatform-manifest |
 
 Callers pass `uses: deploymenttheory/weaveplatform-oci/.github/workflows/publish.yml@v1`.
+`publish.yml` installs or runs the `ghcr.io/deploymenttheory/weaveoci` image and calls
+`weaveoci publish`; it adds only the GitHub-specific steps (`actions/attest`, the cross-repo
+dispatch). A further workflow, `release-images.yml`, builds and publishes the `weaveoci` and
+`weave-zot` container images ([0012](decisions/0012-container-images.md)).
+
+## 6.1 Implementation notes (phase 2, 2026-10-02)
+
+- **Signing builds bundles from protobuf types.** `pkg/sign` assembles the Sigstore
+  v0.3 bundle itself (DSSE pre-authentication encoding, ECDSA P-256 over SHA-256, a
+  public-key hint of `base64(sha256(PKIX DER))`) instead of calling sigstore-go's
+  `pkg/sign`, which pulls rekor's PGP support and the deprecated
+  `golang.org/x/crypto/openpgp` (GO-2026-5932, no fix). Verification still uses
+  sigstore-go's verifier, and `cosign verify --key … --insecure-ignore-tlog`
+  accepts the result (acceptance feature `phase2_push_pull_sign`).
+- **KMS providers live in the binary.** `cmd/weaveoci` registers the AWS, Azure, GCP
+  and Vault providers; library consumers do not inherit the cloud SDKs. gRPC is
+  pinned at v1.83.1 for GO-2026-6348, which the GCP provider made reachable.
+- **`verify` stays transport-free.** It takes a `Source` (referrers plus fetch);
+  `client.Bind(ref)` provides one for a registry and `verify.StoreSource` one for the
+  cache or an imported layout, where referrers are graph predecessors.
+- **oras-go v2.6.2 GC bug.** `oci.Store.GC` loops forever when a referrer's subject
+  is no longer tagged (its loop variable is shadowed). `pkg/cache` deletes an
+  evicted image's referrers before collecting, so the bug is never reached; it should
+  be reported upstream ([12-open-questions.md](12-open-questions.md) Q27).
+- **Pull resumes at blob granularity.** `client.Pull` skips blobs the destination
+  holds, so an interrupted pull refetches at most the chunks in flight; ranged
+  resume inside a 512 MiB chunk is not implemented.
+
+## 7. Repository layout
+
+| Path | Contents |
+|---|---|
+| `pkg/spec`, `pkg/chunk`, `pkg/pack`, `pkg/conformance`, `pkg/client`, `pkg/cache`, `pkg/verify`, `pkg/sign`, `pkg/publish`, `pkg/profile`, `pkg/disk/vhd` | Public library packages (`spec`, `chunk`, `pack` and `conformance` exist since phase 1) |
+| `internal/cli`, `internal/buildinfo`, `internal/testbundle` | Project-only packages: CLI commands, version metadata, the test bundle generator |
+| `cmd/weaveoci/` | Thin `main`; commands live in `internal/cli` so they are unit-tested |
+| `internal/testbundle/` | Generator for small sparse contract bundles used by unit and acceptance tests |
+| `deploy/zot/` | `Dockerfile` (`FROM ghcr.io/project-zot/zot:v2.1.21@sha256:…`, copies config roles and the `weaveoci` healthcheck binary), `config/private.json`, `config/mirror.json`, `compose.yaml` with volumes, TLS and healthcheck ([13-deployment-profiles.md](13-deployment-profiles.md)) |
+| `test/acceptance/` | godog features per migration phase (`features/phase1_pack_inspect.feature` and so on), step definitions driving the built `weaveoci` binary, and testcontainers fixtures for `weave-zot` and `registry:3.1.2` |
+| `Makefile`, `.testcoverage.yml` | Local parity with CI: `make test`, `accept`, `cover` (≥95% total, ≥90% per package), `lint`, `vuln`, `build`, `image-zot`, `fixtures`, `gate` |
+| `scripts/` | Helper scripts in any language when Make is not enough (none needed yet) |
+| `images/<repository>/` | Image definitions consumed by the build workflows ([0007](decisions/0007-publication-pipeline.md)) |
+| `.github/workflows/` | Quality gate, reusable build and publish workflows, container image release |
 Details and runner constraints are in [07-build-pipelines.md](07-build-pipelines.md).
 
-## 7. Testing strategy
+### 7.1 Bundle directory format
 
-- **Fixtures** under `spec/testdata`: every example in the contract (macOS, Windows,
+`weaveoci pack` reads, and `weaveoci unpack` writes, a bundle directory: raw disk
+files, state files and a `bundle.json` naming them. Paths are relative to the
+bundle and may not escape it; unknown keys are errors. The producer supplies the
+config fields it chooses; `pack` computes disk sizes, chunk counts, zero counts and
+state media types, and derives the contract annotations. Packing an unpacked bundle
+reproduces the original manifest digest.
+
+```json
+{
+  "schemaVersion": 1,
+  "guest": {"os": "darwin", "arch": "arm64", "osVersion": "26.0", "osBuild": "25A354", "variant": "vanilla"},
+  "firmware": {"type": "apple", "secureBoot": false, "tpm": "none", "hardwareModel": "<base64>"},
+  "resources": {"cpu": {"min": 2, "default": 4}, "memory": {"min": 4294967296, "default": 8589934592}},
+  "provisioning": {"credentialHint": "set-at-first-boot"},
+  "build": {"template": "macos-26-vanilla", "templateRef": "<repo>@<commit>", "sourceMedia": [], "created": "2026-10-02T08:00:00Z"},
+  "disks": [{"name": "disk0", "role": "system", "path": "disk.img"}],
+  "state": [{"name": "auxstorage", "path": "nvram.bin", "semantics": "carry", "required": true}],
+  "annotations": {"org.opencontainers.image.version": "26.0-25A354-r1", "org.opencontainers.image.revision": "<commit>", "org.opencontainers.image.source": "<url>"}
+}
+```
+
+### 7.2 HTTP and CLI conventions
+
+- Any REST API or HTTP test double in this repository uses [chi](https://github.com/go-chi/chi),
+  as hostweave does. The first such surface is the fault-injecting test registry
+  planned for phase 2's `client` tests.
+- The CLI uses cobra without viper. Configuration (the phase 2 profile file) is
+  strict YAML where unknown keys are errors, with flag over environment over file
+  precedence, following hostweave's `internal/config`.
+
+## 8. Testing strategy
+
+- **Fixtures** under `pkg/spec/testdata`: every example in the contract (macOS, Windows,
   Linux manifests and configs; the index), plus negative cases (ecid present, gap in
   chunk indexes, state layer without config entry, non-GOARCH platform). Fixtures are
   normative: a contract change and its fixture change land in one commit.
-- **Conformance suite** (`spec/conformance`): a Go test helper that any consumer can
+- **Conformance suite** (`pkg/conformance`): a Go test helper that any consumer can
   run against its own output (`conformance.Run(t, index, fetcher)`), mirroring how
   hostweave's `pkg/runtime/runtimetest` and `pkg/store/storetest` contract suites work.
 - **Fake registry**: oras-go's `content/memory` and `content/oci` stores for unit
@@ -335,17 +487,32 @@ Details and runner constraints are in [07-build-pipelines.md](07-build-pipelines
 - **Chunk tests**: round-trip random and sparse disks at a reduced `ChunkSize`; verify
   hole punching through a fake `SparseWriter`; verify resume by corrupting one range.
 - **Large-blob integration** (`-tags registry_integration`): push and pull a
-  multi-GiB sparse image against a local `zot` container and against GHCR in a nightly
-  job; measure Range resume.
+  multi-GiB sparse image against `weave-zot` and `registry:3.1.2` containers, and against
+  GHCR in a nightly opt-in job; measure Range resume. zot does not check that layers exist
+  when the config media type is not the OCI image config, so `client` must push every
+  chunk and state blob before the manifest that references them; a test asserts that
+  order. The zot read and write timeouts (60 s by default) and `gcDelay` must exceed the
+  longest push, which the `weave-zot` config roles set.
+- **Acceptance tests** (`test/acceptance`, godog): every migration phase ships at least
+  one feature file that drives the real `weaveoci` binary against real registries started
+  with testcontainers-go v0.44.0: `weave-zot` (referrers API path) through the generic
+  container API with `wait.ForHTTP("/readyz")`, and `registry:3.1.2` (fallback-tag path)
+  through the `registry` module. A phase is not done until its features pass in CI
+  ([0013](decisions/0013-quality-gates.md)).
 - **Verification tests**: recorded Sigstore bundles and a test trusted root; channel
   manifests signed with test keys from `weavemanifest keygen`.
-- **Coverage floor**: 90 % per package, enforced in CI as hostweave does
-  (decision 0018); `-race -shuffle on`.
-- **Platform tests**: the APFS sparse writer and Foundation disk guard are tested in
-  guestweave-cli-macos, the NTFS sparse writer and `disk/vhd` behaviour against HCS in
-  guestweave-cli-windows; the module's own CI is Linux-only.
+- **Coverage gate**: merged coverage of unit, integration and platform runs must be at
+  least 95 % in total and at least 90 % per package, enforced by a script in `scripts/`
+  in the quality-gate workflow, as hostweave does (decision 0018); tests run with
+  `-race -shuffle on`; `golangci-lint` and `govulncheck` run in the same gate
+  ([0013](decisions/0013-quality-gates.md)).
+- **Platform tests**: the module's sparse writers have build-tagged implementations for
+  darwin, linux and windows. CI runs the unit suite on `ubuntu-latest`, `macos-latest`
+  and `windows-latest`, and merges the three coverage profiles before the gate, so
+  platform-specific code counts towards 95 %. The Foundation purgeable-space disk guard
+  stays in guestweave-cli-macos and HCS attach behaviour in guestweave-cli-windows.
 
-## 8. Non-goals
+## 9. Non-goals
 
 - A general-purpose container-image library; hostweave keeps go-containerregistry for
   the moby runtime.

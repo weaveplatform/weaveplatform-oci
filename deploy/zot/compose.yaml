@@ -1,0 +1,37 @@
+# Reference private deployment (docs/research/13-deployment-profiles.md).
+#   1. create ./htpasswd with bcrypt entries for "publisher" and "admin":
+#        htpasswd -bBn publisher '<password>' >> htpasswd
+#   2. docker compose up -d
+# The mirror service is optional (profile "mirror"): it serves GHCR content
+# on demand with digests preserved. Put both behind TLS before exposing them
+# beyond localhost (add http.tls to the config or terminate TLS in a proxy).
+name: weave-zot
+
+services:
+  registry:
+    image: ${WEAVE_ZOT_IMAGE:-ghcr.io/deploymenttheory/weave-zot:latest}
+    build:
+      context: ../..
+      dockerfile: deploy/zot/Dockerfile
+    command: ["serve", "/etc/zot/roles/private.json"]
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry-data:/var/lib/registry
+      - ./htpasswd:/etc/zot/htpasswd:ro
+    restart: unless-stopped
+
+  mirror:
+    profiles: ["mirror"]
+    image: ${WEAVE_ZOT_IMAGE:-ghcr.io/deploymenttheory/weave-zot:latest}
+    command: ["serve", "/etc/zot/roles/mirror.json"]
+    ports:
+      - "5001:5000"
+    volumes:
+      - mirror-data:/var/lib/registry
+      - ./sync-credentials.json:/etc/zot/sync-credentials.json:ro
+    restart: unless-stopped
+
+volumes:
+  registry-data:
+  mirror-data:

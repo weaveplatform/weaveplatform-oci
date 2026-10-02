@@ -22,8 +22,10 @@ consumer.
 2. The [target architecture](08-target-architecture.md) shows how the pieces fit.
 3. The [artifact contract](09-artifact-contract-v1.md) and the [shared Go module](10-shared-go-module.md) are the
    normative drafts.
-4. [Migration](11-migration.md) sequences the work; [open questions](12-open-questions.md) lists what is unresolved.
-5. The [decision records](decisions/README.md) state the contracts and rationale in the same form hostweave uses.
+4. [Deployment profiles](13-deployment-profiles.md) explains the github, private and hybrid deployments and the
+   `weave-zot` reference registry.
+5. [Migration](11-migration.md) sequences the work; [open questions](12-open-questions.md) lists what is unresolved.
+6. The [decision records](decisions/README.md) state the contracts and rationale in the same form hostweave uses.
 
 ## Document map
 
@@ -41,8 +43,9 @@ consumer.
 | [10-shared-go-module.md](10-shared-go-module.md) | Package map, API sketches, consumer mapping, CLI verbs, reusable workflows, testing |
 | [11-migration.md](11-migration.md) | Phases across repositories, what each delivers, what stays optional in guestweave |
 | [12-open-questions.md](12-open-questions.md) | Unresolved questions, who resolves them and what they block |
+| [13-deployment-profiles.md](13-deployment-profiles.md) | github, private and hybrid profiles; the `weave-zot` reference registry; cosign key signing; the `weaveoci` and `weave-zot` container images |
 | [glossary.md](glossary.md) | Terms used across the set |
-| [decisions/](decisions/README.md) | Decision records 0001–0010 |
+| [decisions/](decisions/README.md) | Decision records 0001–0013 |
 
 ## Versions at the research baseline
 
@@ -57,10 +60,13 @@ consumer.
 | actions/attest | 4.2.2 | attest-build-provenance v4 wraps it |
 | bootc | 1.16.13 | |
 | osbuild/image-builder | v85.0.0 | home of bootc-image-builder |
-| zot | 2.1.21 | |
+| zot | 2.1.21 | reference private registry, base of `weave-zot` |
 | Harbor | 2.15.2 | |
 | CNCF distribution | 3.1.2 | no referrers API yet |
 | go-containerregistry | v0.22.1 | used by hostweave today |
+| ko | v0.19.1 | builds the `weaveoci` container image |
+| testcontainers-go | v0.44.0 | starts `weave-zot` and `registry:3.1.2` in acceptance tests |
+| distribution image | `registry:3.1.2` | fallback-tag test target |
 
 ## Conventions
 
@@ -80,6 +86,13 @@ consumer.
 4. GHCR is the canonical registry, published from GitHub Actions; any OCI registry can mirror it. Linux images may be public; macOS and Windows images are organisation-private.
 5. hostweave consumes OCI only. The guestweave CLIs keep their from-source modes and must work without a registry.
 6. Linux images use a bootc OCI image as the source of truth where practical, with upstream cloud images as the fallback; hostweave's QEMU runtime becomes an OCI consumer.
+7. Three deployment profiles share one codebase: github, private and hybrid. zot is the reference private registry; Harbor and distribution v3 are supported targets.
+8. The private profile signs with cosign key-based signing (file or KMS key) plus the minisign channel manifest.
+9. `weaveplatform-oci` publishes its own `ghcr.io/deploymenttheory/weaveoci` and `ghcr.io/deploymenttheory/weave-zot` container images to GHCR.
+
+The implementation is Go, with helper scripts in any language. Every implementation phase must pass
+godog acceptance tests and a merged coverage gate of at least 95 % in total
+([0013](decisions/0013-quality-gates.md)).
 
 ## Relationship to other repositories
 
