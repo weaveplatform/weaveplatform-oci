@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/weaveplatform/weaveplatform-oci/pkg/spec/schema/vm-config-v1.schema.json",
+  "title": "weave VM artifact config v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "guest", "firmware", "disks", "state", "resources", "provisioning", "build"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "guest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "osVersion", "osBuild"],
+      "properties": {
+        "os": { "enum": ["darwin", "windows", "linux"] },
+        "arch": { "enum": ["arm64", "amd64"] },
+        "osVersion": { "type": "string", "minLength": 1 },
+        "osBuild": { "type": "string", "minLength": 1 },
+        "edition": { "type": "string" },
+        "variant": { "type": "string" },
+        "distro": { "type": "string" }
+      },
+      "if": { "properties": { "os": { "const": "linux" } } },
+      "then": { "required": ["distro"] }
+    },
+    "firmware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "secureBoot", "tpm"],
+      "properties": {
+        "type": { "enum": ["apple", "uefi", "bios"] },
+        "secureBoot": { "type": "boolean" },
+        "tpm": { "enum": ["none", "required"] },
+        "hardwareModel": { "type": "string", "contentEncoding": "base64" },
+        "minHostOS": { "type": "string" }
+      }
+    },
+    "disks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "role", "logicalSize", "chunkSize", "chunkCount", "compression", "zeroChunks"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^disk[0-9]+$" },
+          "role": { "enum": ["system", "data"] },
+          "logicalSize": { "type": "integer", "minimum": 1 },
+          "chunkSize": { "const": 536870912 },
+          "chunkCount": { "type": "integer", "minimum": 1 },
+          "compression": { "const": "zstd" },
+          "zeroChunks": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "state": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "mediaType", "semantics", "required"],
+        "properties": {
+          "name": { "enum": ["auxstorage", "uefivars", "firmware-policy"] },
+          "mediaType": {
+            "enum": [
+              "application/vnd.weave.guest.state.auxstorage.v1",
+              "application/vnd.weave.guest.state.uefivars.v1",
+              "application/vnd.weave.guest.state.firmware-policy.v1+json"
+            ]
+          },
+          "semantics": { "enum": ["carry", "regenerate"] },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu", "memory"],
+      "properties": {
+        "cpu": { "$ref": "#/$defs/minDefault" },
+        "memory": { "$ref": "#/$defs/minDefault" }
+      }
+    },
+    "provisioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["credentialHint"],
+      "properties": {
+        "defaultUser": { "type": "string" },
+        "credentialHint": { "enum": ["baked", "set-at-first-boot", "cloud-init", "none"] },
+        "agent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["template", "templateRef", "sourceMedia", "created"],
+      "properties": {
+        "template": { "type": "string" },
+        "templateRef": { "type": "string" },
+        "sourceMedia": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "uri", "digest"],
+            "properties": {
+              "kind": { "enum": ["ipsw", "iso", "esd", "cloud-image", "bootc"] },
+              "uri": { "type": "string" },
+              "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+            }
+          }
+        },
+        "created": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "$defs": {
+    "minDefault": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "default"],
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "default": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

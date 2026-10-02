@@ -144,7 +144,7 @@ formatters:
       sections:
         - Standard
         - Default
-        - Prefix(github.com/deploymenttheory)
+        - Prefix(github.com/weaveplatform)
 
   # Exclude generated or special‐case files from formatting checks
   exclusions:
