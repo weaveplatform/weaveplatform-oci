@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
-	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/fetch"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/publish"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
@@ -107,51 +108,46 @@ func newPull(stdout io.Writer, g *globals) *cobra.Command {
 		Args:  usageArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			c, p, err := g.client()
+			c, _, err := g.client()
 			if err != nil {
 				return err
-			}
-			ref, err := c.Parse(args[0])
-			if err != nil {
-				return fmt.Errorf("%w: %w", errUsage, err)
-			}
-			pol, err := verify.FromProfile(ctx, p, ref.Repository, profile.VerifyMode(mode), nil)
-			if err != nil {
-				return err //nolint:wrapcheck // descriptive
 			}
 			store, err := g.openCache(cmd)
 			if err != nil {
 				return err
 			}
-			root, err := store.Pull(ctx, c, ref)
-			if err != nil {
-				return err //nolint:wrapcheck // names the reference
+			res, err := fetch.Pull(ctx, fetch.Request{
+				Client: c, Cache: store, Ref: args[0], Mode: profile.VerifyMode(mode),
+				Platform: platform, To: to, Assemble: o,
+			})
+			if errors.Is(err, fetch.ErrPlatform) {
+				return fmt.Errorf("%w: %w (use --platform os/arch)", errUsage, err)
 			}
-			ev, err := verify.Verify(ctx, pol, verify.StoreSource{Store: store.Target()}, root)
-			if err != nil {
-				return err //nolint:wrapcheck // names the digest
+			if errors.Is(err, fetch.ErrRequest) {
+				return fmt.Errorf("%w: %w", errUsage, err)
 			}
-			_, _ = fmt.Fprintf(stdout, "pulled %s %s (verify=%s)\n", ref, root.Digest, pol.Mode)
-			printEvidence(stdout, ev)
-			if to == "" {
+			if err != nil {
+				return err //nolint:wrapcheck // each stage names what failed
+			}
+			_, _ = fmt.Fprintf(
+				stdout,
+				"pulled %s %s (verify=%s)\n",
+				res.Reference,
+				res.Root.Digest,
+				res.Policy.Mode,
+			)
+			printEvidence(stdout, res.Evidence)
+			if res.Unpacked == nil {
 				return nil
-			}
-			m, err := selectManifest(cmd, store.Target(), root, platform)
-			if err != nil {
-				return err
-			}
-			r, err := pack.Unpack(ctx, store.Target(), m, to, o)
-			if err != nil {
-				return err //nolint:wrapcheck // names the disk
 			}
 			_, err = fmt.Fprintf(
 				stdout,
 				"unpacked %s into %s: fetched=%d zero=%d resumed=%d\n",
-				m.Digest,
+				res.Manifest.Digest,
 				to,
-				r.Stats.Fetched,
-				r.Stats.Zero,
-				r.Stats.Resumed,
+				res.Unpacked.Stats.Fetched,
+				res.Unpacked.Stats.Zero,
+				res.Unpacked.Stats.Resumed,
 			)
 			return err //nolint:wrapcheck // terminal write
 		},
