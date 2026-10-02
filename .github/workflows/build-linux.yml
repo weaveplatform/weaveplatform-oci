@@ -133,7 +133,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh attestation trusted-root | head -n1 > "$WORK/trusted_root.json"
+          # gh writes one trusted root per line; the first is public-good
+          # Sigstore. Read it from a file: under pipefail, head closing the
+          # pipe early kills gh with SIGPIPE (exit 141).
+          gh attestation trusted-root > "$WORK/trusted_roots.jsonl"
+          sed -n 1p "$WORK/trusted_roots.jsonl" > "$WORK/trusted_root.json"
+          jq -e '.mediaType | startswith("application/vnd.dev.sigstore.trustedroot")' "$WORK/trusted_root.json" > /dev/null
           cat > "$WORK/profiles.yaml" <<YAML
           schemaVersion: 1
           profiles:
