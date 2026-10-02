@@ -104,6 +104,15 @@
       "properties": {
         "template": { "type": "string" },
         "templateRef": { "type": "string" },
+        "base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "digest"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+          }
+        },
         "sourceMedia": {
           "type": "array",
           "items": {
@@ -111,7 +120,7 @@
             "additionalProperties": false,
             "required": ["kind", "uri", "digest"],
             "properties": {
-              "kind": { "enum": ["ipsw", "iso", "esd", "cloud-image", "bootc"] },
+              "kind": { "enum": ["ipsw", "iso", "esd", "cloud-image", "bootc", "package"] },
               "uri": { "type": "string" },
               "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
             }

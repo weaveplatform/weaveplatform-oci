@@ -39,7 +39,7 @@ The motivation for this project stems from the following factors:
 | [`pkg/`](pkg/) | The Go module consumers import: `spec`, `chunk`, `pack`, `conformance`, `client`, `cache`, `fetch`, `sign`, `verify`, `channel`, `publish`, `profile`, `source`, `disk/vhd` |
 | `weaveoci` | The CLI: pack, inspect, push, pull, publish, sign, verify, channel management, air-gap export and import, verified source fetch |
 | [`deploy/zot/`](deploy/zot/README.md) | `weave-zot`: zot preconfigured for multi-gigabyte VM artifacts, with private and mirror roles and a Compose deployment |
-| [`images/`](images/) | Image definitions. `linux/ubuntu-24.04` is built from Canonical's signed cloud images and published as `ghcr.io/weaveplatform/weave-images/ubuntu-24.04` |
+| [`images/`](images/) | Image definitions, in tiers: a `base` is the vendor OS unmodified, and derived tiers (`agent`, then workload layers) are built on it by digest. `linux/ubuntu-24.04-base` is built from Canonical's signed cloud images and published as `ghcr.io/weaveplatform/weave-images/ubuntu-24.04-base` |
 | [`.github/workflows/`](.github/workflows/) | The quality gate, the reusable Linux image build, and releases of the `weaveoci` and `weave-zot` container images and binaries |
 
 The consumers are [hostweave](https://github.com/weaveplatform/hostweave), which
@@ -84,16 +84,16 @@ make build      # bin/weaveoci-<os>-<arch> for every release platform
 
 ```sh
 # pull a published image, verified per the profile, and unpack it as sparse raw disks
-weaveoci pull weave-images/ubuntu-24.04:24.04-20260926-r1 --platform linux/arm64 --to ./ubuntu
+weaveoci pull weave-images/ubuntu-24.04-base:24.04-20260926-r1 --platform linux/arm64 --to ./ubuntu
 
 # check an image against the contract
-weaveoci export-layout weave-images/ubuntu-24.04:24.04-20260926-r1 ./layout
+weaveoci export-layout weave-images/ubuntu-24.04-base:24.04-20260926-r1 ./layout
 weaveoci inspect ./layout --strict --deep
 
 # build an image from a raw disk, verified against the distribution's signed checksums
 weaveoci source fetch <url> --checksums <url> --signature <url> --keyring keys.asc --fingerprint <fpr> --out disk.raw --record src.json
 weaveoci bundle init ./bundle --disk disk.raw --source src.json --os linux --arch arm64 ...
-weaveoci publish ./bundle --repository ubuntu-24.04 --tag 24.04-20260926-r1 --promotion-out entry.json
+weaveoci publish ./bundle --repository ubuntu-24.04-base --tag 24.04-20260926-r1 --promotion-out entry.json
 
 # run a channel of your own and move images across an air gap
 weaveoci channel promote stable.json entry.json && weaveoci channel sign signing.key stable.json

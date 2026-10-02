@@ -4,8 +4,8 @@
   "artifactType": "application/vnd.weave.guest.config.v1+json",
   "config": {
     "mediaType": "application/vnd.weave.guest.config.v1+json",
-    "digest": "sha256:7bff463f0f13ae2430121ed7ca848821078313d6ca27f0ce2a82fbc37178faf5",
-    "size": 1042
+    "digest": "sha256:4ce81011fefcd8db6991616fea47951ffd9baa86180bea241154f9899722fb16",
+    "size": 1036
   },
   "layers": [
     {
@@ -1703,12 +1703,13 @@
     "org.opencontainers.image.created": "2026-10-02T08:00:00Z",
     "org.opencontainers.image.revision": "0123abc",
     "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
-    "org.opencontainers.image.title": "macos-26-vanilla",
+    "org.opencontainers.image.title": "macos-26-base",
     "org.opencontainers.image.version": "26.0-25A354-r1",
     "run.weaveplatform.guest.arch": "arm64",
     "run.weaveplatform.guest.disk.totalSize": "68824334336",
     "run.weaveplatform.guest.os": "darwin",
     "run.weaveplatform.guest.osBuild": "25A354",
-    "run.weaveplatform.guest.osVersion": "26.0"
+    "run.weaveplatform.guest.osVersion": "26.0",
+    "run.weaveplatform.guest.variant": "base"
   }
 }

@@ -26,9 +26,10 @@ is configured as a registry profile on the consumer, never as a fork of the publ
 pipeline. The repository and tag grammar below is the same in every profile; only the
 host and organisation prefix change.
 
-**Repositories.** `ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]`, for
-example `macos-26-vanilla`, `macos-26-base`, `windows-11-base`, `windows-server-2025-base`,
-`ubuntu-24.04`, `fedora-bootc-46`. One repository holds one OS family and variant; the
+**Repositories.** `ghcr.io/weaveplatform/weave-images/<family>-<major>-<tier>`, for
+example `ubuntu-24.04-base`, `ubuntu-24.04-agent`, `macos-26-base`, `macos-26-agent`,
+`macos-26-xcode-26`, `windows-11-base`, `fedora-bootc-46-base`. The tier suffix is always
+present ([0014](0014-image-tiers.md)). One repository holds one OS family and tier; the
 image index inside a tag separates architectures. Container images for the hostweave
 moby runtime live in separate repositories and are never mixed into a VM index.
 

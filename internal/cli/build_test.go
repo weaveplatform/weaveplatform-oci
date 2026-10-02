@@ -258,6 +258,11 @@ func TestBundleInitUsage(t *testing.T) {
 		"dir is a file":    {append([]string{"bundle", "init", notRecord, "--disk", disk()}, base...), cli.ExitFailure},
 		"bad os in pack":   {[]string{"bundle", "init", filepath.Join(dir, "j"), "--disk", disk(), "--os", "plan9", "--arch", "amd64", "--template", "t", "--template-ref", "r", "--image-version", "1", "--revision", "r", "--source-url", "u"}, cli.ExitOK},
 		"second data disk": {append([]string{"bundle", "init", filepath.Join(dir, "k"), "--disk", disk(), "--disk", disk(), "--memory", "1073741824"}, base...), cli.ExitOK},
+		"bad base":         {append([]string{"bundle", "init", filepath.Join(dir, "l"), "--disk", disk(), "--variant", "agent", "--base", "no-digest"}, base...), cli.ExitUsage},
+		"derived tier": {append([]string{
+			"bundle", "init", filepath.Join(dir, "m"), "--disk", disk(), "--distro", "ubuntu", "--variant", "agent",
+			"--base", "ghcr.io/weaveplatform/weave-images/ubuntu-24.04-base:24.04-r1@sha256:" + strings.Repeat("a", 64),
+		}, base...), cli.ExitOK},
 	} {
 		t.Run(name, func(t *testing.T) {
 			if code, o, e := run(t, c.args...); code != c.code {
@@ -270,5 +275,10 @@ func TestBundleInitUsage(t *testing.T) {
 	); err != nil || len(b.File.Disks) != 2 ||
 		b.File.Disks[1].Role != "data" {
 		t.Fatalf("%+v %v", b, err)
+	}
+	d, err := pack.LoadBundle(filepath.Join(dir, "m"))
+	if err != nil || d.File.Guest.Variant != "agent" || d.File.Build.Base == nil ||
+		d.File.Build.Base.Digest != "sha256:"+strings.Repeat("a", 64) {
+		t.Fatalf("derived bundle lost its lineage: %+v %v", d.File.Build, err)
 	}
 }

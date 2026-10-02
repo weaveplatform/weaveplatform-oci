@@ -24,6 +24,9 @@ var derivedAnnotations = map[string]bool{
 	spec.AnnotationOSBuild:       true,
 	spec.AnnotationDistro:        true,
 	spec.AnnotationDiskTotalSize: true,
+	spec.AnnotationVariant:       true,
+	spec.AnnotationBaseName:      true,
+	spec.AnnotationBaseDigest:    true,
 }
 
 // UnpackResult reports what Unpack produced.

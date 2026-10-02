@@ -146,6 +146,7 @@ type bundleInit struct {
 	template, templateRef       string
 	created                     string
 	version, revision, repoURL  string
+	base                        string
 }
 
 func newBundle(stdout io.Writer) *cobra.Command {
@@ -213,7 +214,18 @@ func newBundle(stdout io.Writer) *cobra.Command {
 	)
 	f.StringVar(&b.guest.Distro, "distro", "", "linux distribution, e.g. ubuntu")
 	f.StringVar(&b.guest.Edition, "edition", "", "edition, e.g. Pro")
-	f.StringVar(&b.guest.Variant, "variant", "", "variant, e.g. base")
+	f.StringVar(
+		&b.guest.Variant,
+		"variant",
+		spec.TierBase,
+		"image tier: base, agent, or a further layer such as xcode-26",
+	)
+	f.StringVar(
+		&b.base,
+		"base",
+		"",
+		"for a derived tier, the weave image it was built on: <name>@sha256:<platform manifest>",
+	)
 	f.StringVar(&b.fw.Type, "firmware", "uefi", "firmware: uefi, bios or apple")
 	f.BoolVar(&b.fw.SecureBoot, "secure-boot", false, "the guest requires Secure Boot")
 	f.StringVar(&b.fw.TPM, "tpm", "none", "TPM: none or required")
@@ -233,7 +245,7 @@ func newBundle(stdout io.Writer) *cobra.Command {
 		"cloud-init",
 		"how consumers gain access, e.g. cloud-init",
 	)
-	f.StringVar(&b.template, "template", "", "image definition, e.g. images/linux/ubuntu-24.04")
+	f.StringVar(&b.template, "template", "", "image definition, e.g. images/linux/ubuntu-24.04-base")
 	f.StringVar(&b.templateRef, "template-ref", "", "repository@commit of the image definition")
 	f.StringVar(&b.created, "created", "", "build time, RFC 3339 (default now)")
 	f.StringVar(&b.version, "image-version", "", "image version annotation, normally the build tag")
@@ -281,6 +293,14 @@ func (b bundleInit) file(dir string) (pack.BundleFile, error) {
 	if err != nil {
 		return pack.BundleFile{}, bad("--memory: %v", err)
 	}
+	var base *spec.BaseImage
+	if b.base != "" {
+		name, dgst, ok := strings.Cut(b.base, "@")
+		if !ok || name == "" || dgst == "" {
+			return pack.BundleFile{}, bad("--base %q is not <name>@<digest>", b.base)
+		}
+		base = &spec.BaseImage{Name: name, Digest: dgst}
+	}
 	f := pack.BundleFile{
 		SchemaVersion: 1,
 		Guest:         b.guest,
@@ -291,7 +311,7 @@ func (b bundleInit) file(dir string) (pack.BundleFile, error) {
 		},
 		Provisioning: b.prov,
 		Build: spec.Build{
-			Template: b.template, TemplateRef: b.templateRef,
+			Template: b.template, TemplateRef: b.templateRef, Base: base,
 			SourceMedia: []spec.SourceMedia{}, Created: created,
 		},
 		Annotations: map[string]string{

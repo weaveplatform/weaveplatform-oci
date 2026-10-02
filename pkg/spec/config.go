@@ -5,8 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"time"
 )
+
+var digestPattern = regexp.MustCompile(`^sha256:[a-f0-9]{64}$`)
 
 // Config is the weave guest config document (contract §4). Field order is
 // fixed so that encoding a given value always yields the same bytes.
@@ -89,8 +92,17 @@ type Agent struct {
 type Build struct {
 	Template    string        `json:"template"`
 	TemplateRef string        `json:"templateRef"`
+	Base        *BaseImage    `json:"base,omitempty"`
 	SourceMedia []SourceMedia `json:"sourceMedia"`
 	Created     string        `json:"created"`
+}
+
+// BaseImage is the weave image a derived tier was built on (contract §4.4).
+// Digest is the base's platform manifest, not its index: the derived disk
+// starts from exactly that disk.
+type BaseImage struct {
+	Name   string `json:"name"`
+	Digest string `json:"digest"`
 }
 
 // SourceMedia is one input (IPSW, ISO, ESD, cloud image or bootc image).
@@ -181,7 +193,23 @@ func Validate(c Config) error {
 	if c.Guest.OS == OSLinux && c.Guest.Distro == "" {
 		ps.add(9, "guest.distro", "required for linux guests")
 	}
+	validateLineage(c, &ps)
 	return ps.err()
+}
+
+// validateLineage holds the tier rule: a base is built from vendor media and
+// names no parent; every other tier is built on a weave image and must name
+// it, or a rebuild of the base could not find what to cascade to.
+func validateLineage(c Config, ps *problems) {
+	base := c.Guest.Variant == "" || c.Guest.Variant == TierBase
+	switch {
+	case base && c.Build.Base != nil:
+		ps.add(9, "build.base", "a base image has no parent; set guest.variant to the derived tier")
+	case !base && c.Build.Base == nil:
+		ps.add(9, "build.base", "tier %q is derived and must name the image it was built on", c.Guest.Variant)
+	case !base && !digestPattern.MatchString(c.Build.Base.Digest):
+		ps.add(9, "build.base.digest", "not a sha256 digest: %q", c.Build.Base.Digest)
+	}
 }
 
 func validateFirmware(c Config, ps *problems) {

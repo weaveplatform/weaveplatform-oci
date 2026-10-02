@@ -155,14 +155,15 @@ A macOS 26.0 (build 25A354) arm64 image with a 64 GiB system disk (128 chunks of
     "org.opencontainers.image.version": "26.0-25A354-r1",
     "org.opencontainers.image.revision": "4c1e9d7f",
     "org.opencontainers.image.source": "https://github.com/weaveplatform/weaveplatform-oci",
-    "org.opencontainers.image.title": "macos-26-vanilla",
-    "org.opencontainers.image.description": "macOS 26.0 (25A354) vanilla, weave agent 0.2.0 baked",
+    "org.opencontainers.image.title": "macos-26-base",
+    "org.opencontainers.image.description": "macOS 26.0 (25A354), fresh install, no weave software",
     "org.opencontainers.image.vendor": "weaveplatform",
     "org.opencontainers.image.licenses": "LicenseRef-Apple-macOS-SLA",
     "run.weaveplatform.guest.os": "darwin",
     "run.weaveplatform.guest.arch": "arm64",
     "run.weaveplatform.guest.osVersion": "26.0",
     "run.weaveplatform.guest.osBuild": "25A354",
+    "run.weaveplatform.guest.variant": "base",
     "run.weaveplatform.guest.disk.totalSize": "68719476736",
     "run.weaveplatform.guest.hypervisors": "vz"
   }
@@ -180,7 +181,7 @@ The config document for this manifest:
     "osVersion": "26.0",
     "osBuild": "25A354",
     "edition": "",
-    "variant": "vanilla"
+    "variant": "base"
   },
   "firmware": {
     "type": "apple",
@@ -214,11 +215,10 @@ The config document for this manifest:
   },
   "provisioning": {
     "defaultUser": "admin",
-    "credentialHint": "set-at-first-boot",
-    "agent": { "name": "guestweave", "version": "0.2.0" }
+    "credentialHint": "set-at-first-boot"
   },
   "build": {
-    "template": "macos-vanilla",
+    "template": "macos-26-base",
     "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
     "sourceMedia": [
       {
@@ -354,6 +354,9 @@ state blobs (a QEMU or VZ consumer creates fresh UEFI variables).
     "run.weaveplatform.guest.distro": "ubuntu",
     "run.weaveplatform.guest.osVersion": "24.04",
     "run.weaveplatform.guest.osBuild": "20260915",
+    "run.weaveplatform.guest.variant": "agent",
+    "org.opencontainers.image.base.name": "ghcr.io/weaveplatform/weave-images/ubuntu-24.04-base:24.04-20260915-r1",
+    "org.opencontainers.image.base.digest": "sha256:3b1a…",
     "run.weaveplatform.guest.disk.totalSize": "21474836480",
     "run.weaveplatform.guest.hypervisors": "kvm,vz,hvf,hcs"
   }
@@ -365,17 +368,18 @@ Config excerpt:
 ```json
 {
   "guest": { "os": "linux", "arch": "arm64", "osVersion": "24.04", "osBuild": "20260915",
-             "edition": "", "variant": "", "distro": "ubuntu" },
+             "edition": "", "variant": "agent", "distro": "ubuntu" },
   "firmware": { "type": "uefi", "secureBoot": false, "tpm": "none", "minHostOS": "" },
   "disks": [ { "name": "disk0", "role": "system", "logicalSize": 21474836480,
                "chunkSize": 536870912, "chunkCount": 40, "compression": "zstd", "zeroChunks": 33 } ],
   "state": [],
   "provisioning": { "defaultUser": "ubuntu", "credentialHint": "cloud-init",
-                    "agent": { "name": "guestweave", "version": "0.2.0" } },
-  "build": { "template": "linux-cloud-image", "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
-             "sourceMedia": [ { "kind": "cloud-image",
-               "uri": "https://cloud-images.ubuntu.com/noble/20260915/noble-server-cloudimg-arm64.img",
-               "digest": "sha256:9e8f…" } ],
+                    "agent": { "name": "weave-agent", "version": "0.6.0" } },
+  "build": { "template": "ubuntu-24.04-agent", "templateRef": "github.com/weaveplatform/weaveplatform-oci@4c1e9d7f",
+             "base": { "name": "ghcr.io/weaveplatform/weave-images/ubuntu-24.04-base:24.04-20260915-r1",
+                       "digest": "sha256:3b1a…" },
+             "sourceMedia": [ { "kind": "package", "uri": "weave-agent_0.6.0_arm64.deb", "digest": "sha256:71c0…" },
+                              { "kind": "package", "uri": "osquery_5.19.0-1.linux_arm64.deb", "digest": "sha256:aa42…" } ],
              "created": "2026-10-02T06:30:00Z" }
 }
 ```
@@ -447,7 +451,7 @@ same digest. Sizes are bytes. Versions are strings.
 | `guest.osVersion` | string | yes | darwin: ProductVersion (`26.0`); windows: kernel version (`10.0.26200.6584`); linux: distro release (`24.04`, `42`) |
 | `guest.osBuild` | string | yes | darwin build (`25A354`); windows UBR build (`26200.6584`); linux image serial (`20260915`) |
 | `guest.edition` | string | no | windows edition (`Pro`, `Enterprise`); empty otherwise |
-| `guest.variant` | string | no | image variant (`vanilla`, `base`, `xcode-26`) |
+| `guest.variant` | string | no | image tier (§4.4): `base`, `agent`, or a further layer (`xcode-26`, `runner`); empty means `base` |
 | `guest.distro` | string | linux only | `ubuntu`, `fedora`, `debian`, `fedora-bootc`, … |
 | `firmware.type` | `apple` \| `uefi` \| `bios` | yes | darwin MUST be `apple` |
 | `firmware.secureBoot` | boolean | yes | whether the guest was installed with Secure Boot on |
@@ -474,7 +478,8 @@ same digest. Sizes are bytes. Versions are strings.
 | `provisioning.agent.name` / `.version` | string | no | in-guest agent baked into the image |
 | `build.template` | string | yes | pipeline template name |
 | `build.templateRef` | string | yes | `<repo>@<commit>` of the template |
-| `build.sourceMedia[]` | array | yes | each `{kind: ipsw|iso|esd|cloud-image|bootc, uri, digest}` |
+| `build.base.name` / `.digest` | string | derived tiers only | the weave image this one was built on: its reference and its platform manifest digest (§4.4) |
+| `build.sourceMedia[]` | array | yes | each `{kind: ipsw|iso|esd|cloud-image|bootc|package, uri, digest}`; a derived tier lists what it added (`package`) |
 | `build.created` | RFC 3339 | yes | equals `org.opencontainers.image.created` |
 
 ### 4.2 Forbidden content
@@ -602,6 +607,15 @@ Embedded in the `spec` package and published as `pkg/spec/schema/vm-config-v1.sc
       "properties": {
         "template": { "type": "string" },
         "templateRef": { "type": "string" },
+        "base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "digest"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+          }
+        },
         "sourceMedia": {
           "type": "array",
           "items": {
@@ -609,7 +623,7 @@ Embedded in the `spec` package and published as `pkg/spec/schema/vm-config-v1.sc
             "additionalProperties": false,
             "required": ["kind", "uri", "digest"],
             "properties": {
-              "kind": { "enum": ["ipsw", "iso", "esd", "cloud-image", "bootc"] },
+              "kind": { "enum": ["ipsw", "iso", "esd", "cloud-image", "bootc", "package"] },
               "uri": { "type": "string" },
               "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
             }
@@ -640,6 +654,33 @@ requires `firmware.type = apple` and `hardwareModel`; non-darwin MUST NOT carry
 `hardwareModel`; `chunkCount = ceil(logicalSize/chunkSize)`; `zeroChunks ≤ chunkCount`;
 every `state[]` entry has exactly one matching layer) are enforced by the `spec`
 validator and listed in §11.
+
+### 4.4 Image tiers and lineage
+
+Images come in tiers, each published to its own repository (§10.1):
+
+| Tier | `guest.variant` | Contents | Built from |
+|---|---|---|---|
+| base | `base` | the vendor operating system, unmodified: Canonical's cloud image, a fresh IPSW install, a fresh Windows install; no weave software | vendor media (`build.sourceMedia`), verified against the vendor's signatures |
+| agent | `agent` | base + weave-agent core + the full `guestweave-<os>-*` module set + osquery | a base image |
+| further layers | the layer name (`xcode-26`, `runner`) | agent + workload tooling | an agent image or another layer |
+
+Rules a validator enforces (rule 9):
+
+- A `base` image (or one with an empty `guest.variant`) MUST NOT carry `build.base`.
+- Every other tier MUST carry `build.base`, naming its parent by reference and by the
+  digest of the parent's **platform manifest** (not its index): the derived disk starts
+  from exactly that disk.
+- The manifest MUST carry `org.opencontainers.image.base.name` and
+  `org.opencontainers.image.base.digest` equal to `build.base` (rule 10), so registries,
+  `oras` and the promotion pipeline see lineage without fetching the config.
+
+Because disks are fixed 512 MiB chunks of guest LBA space (§5), every chunk the derived
+build did not touch has the same digest as the parent's: a push skips it and a consumer
+cache already holds it. A derived tier costs the registry only the chunks it changed.
+
+Derived tiers are rebuilt when their parent is republished, and promotion through the
+channel manifest refuses a child whose `build.base.digest` is not itself promoted.
 
 ## 5. Disk chunk layers
 
@@ -797,6 +838,9 @@ The guestweave CLIs already regenerate the MAC on clone (`--regenerate-random-ma
 | `run.weaveplatform.guest.osVersion` | equals `guest.osVersion` | MUST |
 | `run.weaveplatform.guest.osBuild` | equals `guest.osBuild` | MUST |
 | `run.weaveplatform.guest.distro` | equals `guest.distro` | MUST for linux |
+| `run.weaveplatform.guest.variant` | equals `guest.variant` | MUST when set |
+| `org.opencontainers.image.base.name` | equals `build.base.name` | MUST for derived tiers |
+| `org.opencontainers.image.base.digest` | equals `build.base.digest` | MUST for derived tiers |
 | `run.weaveplatform.guest.disk.totalSize` | sum of `disks[].logicalSize` | MUST |
 | `run.weaveplatform.guest.hypervisors` | comma-separated advisory list from `vz,hvf,hcs,kvm,tcg` | SHOULD |
 
@@ -848,19 +892,22 @@ makes standard platform matching fail and encodes the hypervisor into the artifa
 ### 10.1 Repository naming
 
 ```
-ghcr.io/weaveplatform/weave-images/<family>-<major>[-<variant>]
+ghcr.io/weaveplatform/weave-images/<family>-<major>-<tier>
 ```
 
-| Repository | Example contents |
-|---|---|
-| `weave-images/macos-26-vanilla` | macOS 26.x, fresh install, agent baked |
-| `weave-images/macos-26-base` | macOS 26.x with the base tool set |
-| `weave-images/windows-11-base` | Windows 11 client, base |
-| `weave-images/windows-server-2025-base` | Windows Server 2025, base |
-| `weave-images/ubuntu-24.04` | Ubuntu 24.04 cloud image, amd64 + arm64 |
-| `weave-images/fedora-bootc-46` | derived from `quay.io/fedora/fedora-bootc:46` |
+| Repository | Tier | Contents |
+|---|---|---|
+| `weave-images/ubuntu-24.04-base` | base | Ubuntu 24.04 cloud image, unmodified, amd64 + arm64 |
+| `weave-images/ubuntu-24.04-agent` | agent | ubuntu-24.04-base + weave-agent core, guestweave-linux-* modules, osquery |
+| `weave-images/macos-26-base` | base | macOS 26.x, fresh install |
+| `weave-images/macos-26-agent` | agent | macos-26-base + core, guestweave-macos-* modules, osquery |
+| `weave-images/macos-26-xcode-26` | layer | macos-26-agent + Xcode 26 |
+| `weave-images/windows-11-base` | base | Windows 11 client, fresh install |
+| `weave-images/windows-11-agent` | agent | windows-11-base + core, guestweave-windows-* modules, osquery |
+| `weave-images/fedora-bootc-46-base` | base | from `quay.io/fedora/fedora-bootc:46` |
 
-Rules: one guest OS family and major version per repository; variants are separate
+Rules: one guest OS family and major version per repository; the tier suffix is always
+present, so a bare `<family>-<major>` is never published; tiers are separate
 repositories, not tags, so that retention and visibility can differ per variant;
 container images for the moby runtime MUST NOT share a repository with VM artifacts.
 GHCR accepts nested package names (the org already publishes
@@ -974,7 +1021,7 @@ reports every failure rather than stopping at the first:
 
 ## 13. Worked size example
 
-A macOS 26 vanilla image on a 64 GiB disk (the layout observed in a local golden VM:
+A macOS 26 base image on a 64 GiB disk (the layout observed in a local golden VM:
 ~36 GB allocated of 64 GB logical; see [current state](03-current-state.md)).
 
 | Quantity | Value |

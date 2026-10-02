@@ -25,7 +25,7 @@ func validConfig(osName string) spec.Config {
 			Arch:      spec.ArchARM64,
 			OSVersion: "26.0",
 			OSBuild:   "25A354",
-			Variant:   "vanilla",
+			Variant:   "base",
 		},
 		Firmware: spec.Firmware{
 			Type:          "apple",
@@ -55,7 +55,7 @@ func validConfig(osName string) spec.Config {
 			Agent:          &spec.Agent{Name: "weave-agent", Version: "0.2.0"},
 		},
 		Build: spec.Build{
-			Template:    "macos-26-vanilla",
+			Template:    "macos-26-base",
 			TemplateRef: "weaveplatform/weaveplatform-oci@0123abc",
 			SourceMedia: []spec.SourceMedia{
 				{

@@ -238,6 +238,18 @@ func TestValidateSemanticRules(t *testing.T) {
 			*c = validConfig(spec.OSWindows)
 			c.State[1].Semantics = spec.SemanticsCarry
 		},
+		"base names a parent": func(c *spec.Config) {
+			c.Build.Base = &spec.BaseImage{Name: "r/x:1", Digest: fakeDigest("p").String()}
+		},
+		"untiered names a parent": func(c *spec.Config) {
+			c.Guest.Variant = ""
+			c.Build.Base = &spec.BaseImage{Name: "r/x:1", Digest: fakeDigest("p").String()}
+		},
+		"derived without parent": func(c *spec.Config) { c.Guest.Variant = spec.TierAgent },
+		"derived parent digest": func(c *spec.Config) {
+			c.Guest.Variant = spec.TierAgent
+			c.Build.Base = &spec.BaseImage{Name: "r/x:1", Digest: "sha256:nope"}
+		},
 	}
 	for name, mutate := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -254,6 +266,57 @@ func TestValidateSemanticRules(t *testing.T) {
 		if err := spec.Validate(validConfig(osName)); err != nil {
 			t.Errorf("%s: %v", osName, err)
 		}
+		if err := spec.Validate(derivedConfig(osName)); err != nil {
+			t.Errorf("%s derived: %v", osName, err)
+		}
+	}
+}
+
+func derivedConfig(osName string) spec.Config {
+	c := validConfig(osName)
+	c.Guest.Variant = spec.TierAgent
+	c.Build.Base = &spec.BaseImage{
+		Name:   "ghcr.io/weaveplatform/weave-images/" + osName + "-base:1-r1",
+		Digest: fakeDigest("base-" + osName).String(),
+	}
+	c.Build.SourceMedia = append(c.Build.SourceMedia, spec.SourceMedia{
+		Kind: "package", URI: "weave-agent_0.6.0_arm64.deb", Digest: fakeDigest("deb").String(),
+	})
+	return c
+}
+
+func TestDerivedImageCarriesLineage(t *testing.T) {
+	c := derivedConfig(spec.OSLinux)
+	a := spec.GuestAnnotations(c)
+	if a[spec.AnnotationBaseName] != c.Build.Base.Name || a[spec.AnnotationBaseDigest] != c.Build.Base.Digest {
+		t.Fatalf("lineage annotations = %v", a)
+	}
+	if a[spec.AnnotationVariant] != spec.TierAgent {
+		t.Fatalf("variant annotation = %q", a[spec.AnnotationVariant])
+	}
+	raw, err := c.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := spec.ParseConfig(raw)
+	if err != nil {
+		t.Fatalf("derived config does not round-trip: %v", err)
+	}
+	if *back.Build.Base != *c.Build.Base {
+		t.Fatalf("base = %+v, want %+v", back.Build.Base, c.Build.Base)
+	}
+
+	// The manifest must say what the config says: a listing reads lineage
+	// from annotations without fetching the config.
+	m, cfgRaw := manifestFor(t, c)
+	m.Annotations[spec.AnnotationBaseDigest] = fakeDigest("other").String()
+	var ve *spec.ValidationError
+	if _, err := spec.Inspect(mustJSON(t, m), cfgRaw); !errors.As(err, &ve) || !ve.HasRule(10) {
+		t.Fatalf("mismatched base digest: want rule 10, got %v", err)
+	}
+	delete(m.Annotations, spec.AnnotationBaseName)
+	if _, err := spec.Inspect(mustJSON(t, m), cfgRaw); !errors.As(err, &ve) || !ve.HasRule(10) {
+		t.Fatalf("missing base name: want rule 10, got %v", err)
 	}
 }
 

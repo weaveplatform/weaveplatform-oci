@@ -68,6 +68,13 @@ func GuestAnnotations(c Config) map[string]string {
 	if c.Guest.Distro != "" {
 		a[AnnotationDistro] = c.Guest.Distro
 	}
+	if c.Guest.Variant != "" {
+		a[AnnotationVariant] = c.Guest.Variant
+	}
+	if b := c.Build.Base; b != nil {
+		a[AnnotationBaseName] = b.Name
+		a[AnnotationBaseDigest] = b.Digest
+	}
 	return a
 }
 
