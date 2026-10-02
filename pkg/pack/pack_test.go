@@ -388,12 +388,12 @@ func TestUnpackErrors(t *testing.T) {
 		t.Fatalf("oversized config accepted: %v", err)
 	}
 	notJSON := []byte("not json")
-	nd := content.NewDescriptorFromBytes(spec.MediaTypeManifest, notJSON)
-	_ = store.Push(ctx, nd, bytes.NewReader(notJSON))
+	notJSONDesc := content.NewDescriptorFromBytes(spec.MediaTypeManifest, notJSON)
+	_ = store.Push(ctx, notJSONDesc, bytes.NewReader(notJSON))
 	if _, err := pack.Describe(
 		ctx,
 		store,
-		nd,
+		notJSONDesc,
 	); err == nil ||
 		!strings.Contains(err.Error(), "decode manifest") {
 		t.Fatalf("non-JSON manifest: %v", err)

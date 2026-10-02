@@ -14,7 +14,7 @@ var ErrNoMatchingPlatform = errors.New("no index child matches the requested pla
 
 // Problem is one conformance failure. Rule is the rule number from the
 // contract's conformance checklist (§12); zero means a structural problem
-// found before the checklist applies (unparseable JSON, for example).
+// found before the checklist applies (unparsable JSON, for example).
 type Problem struct {
 	Rule    int
 	Path    string

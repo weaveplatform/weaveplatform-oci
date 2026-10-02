@@ -2,7 +2,7 @@
 # (docs/research/decisions/0011 and 0012). The upstream image is distroless,
 # so the static weaveoci binary provides the container health check.
 ARG ZOT_IMAGE=ghcr.io/project-zot/zot:v2.1.21@sha256:6b69512c00dceaad05b1144e6079aac6aa7309d7fd200f9947ecb1de09cf48c8
-ARG GO_IMAGE=golang:1.27
+ARG GO_IMAGE=golang:1.27@sha256:e0174e51e81218523251d85d248a90d24c3d5e81543b4f07a5d66229397db190
 
 FROM --platform=$BUILDPLATFORM ${GO_IMAGE} AS weaveoci
 ARG TARGETOS

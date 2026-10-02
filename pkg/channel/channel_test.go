@@ -250,7 +250,7 @@ func TestVerifyChain(t *testing.T) {
 	) {
 		t.Fatal(err)
 	}
-	// expiry: past, unparseable
+	// expiry: past, unparsable
 	for exp, want := range map[string]bool{"2026-10-01T00:00:00Z": true, "soon": true, "2027-01-01T00:00:00Z": false} {
 		var doc map[string]any
 		_ = json.Unmarshal(c.bundle.Manifest, &doc)

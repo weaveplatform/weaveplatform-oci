@@ -7,5 +7,3 @@ Go module and the reusable publication workflows.
 Start with the [research set](research/README.md). It holds the research reports, the
 target architecture, the draft artifact contract, the shared-module design, the migration
 plan and the decision records.
-
-The [Markdown syntax guide](markdown-syntax-guide.md) is kept from the repository template.

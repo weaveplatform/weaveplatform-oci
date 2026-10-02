@@ -26,7 +26,7 @@ func TestEndorsedGarbageAndSortByTag(t *testing.T) {
 	) {
 		t.Fatal(err)
 	}
-	// a valid chain whose manifest signature file is unparseable
+	// a valid chain whose manifest signature file is unparsable
 	b = c.bundle
 	b.ManifestSig = []byte("{")
 	if _, _, err := channel.Verify(

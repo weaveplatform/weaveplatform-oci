@@ -257,7 +257,7 @@ func Parse(data []byte) (*Manifest, error) {
 	return &m, nil
 }
 
-// Expired reports whether the manifest is past its expiry; an unparseable
+// Expired reports whether the manifest is past its expiry; an unparsable
 // expiry counts as expired (fail closed), an empty one never expires.
 func (m *Manifest) Expired(now time.Time) bool {
 	if m.Expires == "" {

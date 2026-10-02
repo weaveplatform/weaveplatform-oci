@@ -168,11 +168,11 @@ func TestSignatureDiscoveryFailures(t *testing.T) {
 	layer := content.NewDescriptorFromBytes(sign.BundleMediaType, []byte("{}"))
 	good, _ := json.Marshal(ocispec.Manifest{Layers: []ocispec.Descriptor{layer}})
 	twoLayers, _ := json.Marshal(ocispec.Manifest{Layers: []ocispec.Descriptor{layer, layer}})
-	gd, td, nd := digest.FromBytes(good), digest.FromBytes(twoLayers), digest.FromString("notjson")
+	gd, td, notJSONDesc := digest.FromBytes(good), digest.FromBytes(twoLayers), digest.FromString("notjson")
 	src := fakeSource{
-		refs: []ocispec.Descriptor{{Digest: nd}, {Digest: td}, {Digest: gd}},
+		refs: []ocispec.Descriptor{{Digest: notJSONDesc}, {Digest: td}, {Digest: gd}},
 		blobs: map[digest.Digest][]byte{
-			nd:           []byte("not json"),
+			notJSONDesc:           []byte("not json"),
 			td:           twoLayers,
 			gd:           good,
 			layer.Digest: []byte("{}"),
@@ -187,7 +187,7 @@ func TestSignatureDiscoveryFailures(t *testing.T) {
 		t.Fatalf("garbage bundle verified: %v", err)
 	}
 	failRef := src
-	failRef.fetchErr = map[digest.Digest]error{nd: errBoom}
+	failRef.fetchErr = map[digest.Digest]error{notJSONDesc: errBoom}
 	if _, err := verify.Signature(ctx, base, failRef, subj); !errors.Is(err, errBoom) {
 		t.Fatal(err)
 	}
