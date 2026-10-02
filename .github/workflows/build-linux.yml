@@ -1,0 +1,213 @@
+name: images | Build Linux image (reusable)
+
+# Decision 0005 and 0007. Builds one Linux image definition from
+# images/linux/<name>/ through the cloud-image path:
+#
+#   resolve serial -> weaveoci source fetch (signed checksums, pinned key)
+#   -> qemu-img convert to raw -> weaveoci bundle init (one per arch)
+#
+# Without publish it packs to a local layout, runs the strict deep
+# conformance check, unpacks linux/amd64 again and boot-tests that.
+#
+# With publish (github profile) it runs weaveoci publish to
+# ghcr.io/weaveplatform/weave-images/<name> (pack, push, deep self-check,
+# promotion entry), attests the index with actions/attest, pulls it back on a
+# clean cache verifying the attestation, boot-tests what it pulled, and
+# dispatches image-published to weaveplatform-channels, whose promote
+# workflow re-resolves the digests and opens the promotion PR.
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: Image definition under images/, e.g. linux/ubuntu-24.04
+        type: string
+        required: true
+      publish:
+        description: Push, attest and dispatch the promotion
+        type: boolean
+        default: false
+      serial:
+        description: Pin an upstream serial (rebuild a tag) instead of the newest
+        type: string
+        default: ''
+      revision:
+        description: Build revision, the r<N> in the tag
+        type: string
+        default: '1'
+
+permissions:
+  contents: read
+
+env:
+  GOWORK: 'off'
+  IMAGES_REGISTRY: ghcr.io
+  IMAGES_NAMESPACE: weaveplatform/weave-images
+
+jobs:
+  build:
+    name: 'Build ${{ inputs.image }}'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    env:
+      WORK: ${{ github.workspace }}/../work
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Check Out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Tools (qemu, OVMF, cloud-localds) and KVM access
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends qemu-utils qemu-system-x86 ovmf cloud-image-utils
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          mkdir -p "$WORK"
+
+      - name: Build weaveoci
+        run: |
+          go build -trimpath -o "$WORK/weaveoci" ./cmd/weaveoci
+          echo "WEAVEOCI=$WORK/weaveoci" >> "$GITHUB_ENV"
+
+      - name: Fetch, verify, convert and bundle
+        id: bundles
+        env:
+          IMAGE: ${{ inputs.image }}
+          SERIAL: ${{ inputs.serial }}
+          REVISION: ${{ inputs.revision }}
+          REVISION_SHA: ${{ github.sha }}
+          SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          case "$IMAGE" in linux/*) ;; *) echo "::error::not a linux image definition: $IMAGE"; exit 1 ;; esac
+          [[ "$REVISION" =~ ^[0-9]+$ ]] || { echo "::error::revision must be a number"; exit 1; }
+          TMPDIR="$WORK" scripts/linux/build-cloud-image.sh "images/$IMAGE" "$WORK/bundles"
+          df -h "$WORK"
+
+      # ---- pull requests and dry runs ---------------------------------------
+
+      - name: Pack, check, unpack linux/amd64
+        if: ${{ !inputs.publish }}
+        env:
+          TAG: ${{ steps.bundles.outputs.tag }}
+        run: |
+          set -euo pipefail
+          "$WEAVEOCI" pack "$WORK"/bundles/* --out "$WORK/layout" --tag "$TAG" --concurrency 4
+          "$WEAVEOCI" inspect "$WORK/layout" --strict --deep
+          rm -rf "$WORK/bundles"
+          "$WEAVEOCI" unpack "$WORK/layout" "$WORK/boot" --platform linux/amd64
+
+      # ---- publish -----------------------------------------------------------
+
+      - name: Log in to GHCR
+        if: ${{ inputs.publish }}
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      # The github profile: GHCR, signed by GitHub's attestation of this
+      # reusable workflow, verified against the public-good Sigstore root
+      # (the first line of gh attestation trusted-root).
+      - name: github profile
+        if: ${{ inputs.publish }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh attestation trusted-root | head -n1 > "$WORK/trusted_root.json"
+          cat > "$WORK/profiles.yaml" <<YAML
+          schemaVersion: 1
+          profiles:
+            - name: github
+              kind: github
+              registry: {host: $IMAGES_REGISTRY, namespace: $IMAGES_NAMESPACE}
+              signing: {provider: github-attestation}
+              verify:
+                mode: signature
+                identity:
+                  issuer: https://token.actions.githubusercontent.com
+                  subjectRegexp: '^https://github\.com/weaveplatform/weaveplatform-oci/\.github/workflows/build-linux\.yml@'
+                  trustedRoot: $WORK/trusted_root.json
+          YAML
+          {
+            echo "WEAVEOCI_PROFILES=$WORK/profiles.yaml"
+            echo "WEAVEOCI_CACHE=$WORK/cache"
+          } >> "$GITHUB_ENV"
+          "$WEAVEOCI" profile validate
+
+      - name: Publish
+        id: publish
+        if: ${{ inputs.publish }}
+        env:
+          TAG: ${{ steps.bundles.outputs.tag }}
+          REPOSITORY: ${{ steps.bundles.outputs.repository }}
+        run: |
+          set -euo pipefail
+          "$WEAVEOCI" publish "$WORK"/bundles/* --repository "$REPOSITORY" --tag "$TAG" \
+            --concurrency 4 --promotion-out "$WORK/promotion.json"
+          rm -rf "$WORK/bundles" "$WORK/cache"
+          jq . "$WORK/promotion.json"
+          echo "digest=$(jq -r .digest "$WORK/promotion.json")" >> "$GITHUB_OUTPUT"
+          echo "name=$IMAGES_REGISTRY/$IMAGES_NAMESPACE/$REPOSITORY" >> "$GITHUB_OUTPUT"
+
+      - name: Attest the index
+        if: ${{ inputs.publish }}
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ steps.publish.outputs.name }}
+          subject-digest: ${{ steps.publish.outputs.digest }}
+          push-to-registry: true
+
+      - name: Pull on a clean cache, verifying the attestation
+        if: ${{ inputs.publish }}
+        env:
+          TAG: ${{ steps.bundles.outputs.tag }}
+          REPOSITORY: ${{ steps.bundles.outputs.repository }}
+        run: |
+          set -euo pipefail
+          "$WEAVEOCI" pull "$REPOSITORY:$TAG" --verify signature --platform linux/amd64 --to "$WORK/boot"
+
+      # ---- both --------------------------------------------------------------
+
+      - name: Boot test (linux/amd64, QEMU + OVMF + NoCloud)
+        run: scripts/linux/boot-test.sh "$WORK/boot" 900
+
+      - name: Dispatch the promotion to weaveplatform-channels
+        if: ${{ inputs.publish }}
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ vars.RP_APP_ID }}
+          private-key: ${{ secrets.RP_APP_PRIVATE_KEY }}
+          owner: weaveplatform
+          repositories: weaveplatform-channels
+
+      - name: Send image-published
+        if: ${{ inputs.publish }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          jq -n --slurpfile e "$WORK/promotion.json" --arg registry "$IMAGES_REGISTRY" \
+            '{event_type: "image-published", client_payload: {image: $e[0], registry: $registry}}' \
+            | gh api repos/weaveplatform/weaveplatform-channels/dispatches --input -
+          echo "dispatched image-published for $(jq -r '.repository + ":" + .tag' "$WORK/promotion.json")"

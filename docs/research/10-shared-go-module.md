@@ -47,6 +47,7 @@ Public packages (importable by hostweave and the guestweave CLIs) live under `pk
 | `sign` | Signing providers behind one interface. `cosign-key` builds a Sigstore bundle with a file, `env://` or KMS key and no transparency log, and pushes it as an OCI 1.1 referrer (artifactType `application/vnd.dev.sigstore.bundle.v0.3+json`) that cosign v3 verifies with `--key --insecure-ignore-tlog`. `github-attestation` only checks that the workflow produced one, because `actions/attest` does the signing | sigstore, client |
 | `publish` | The publish pipeline as a library: refuse an existing build tag, pack, validate, push all blobs then manifests then index, sign through the profile's provider, verify the signature, re-pull and compare digests, emit the promotion request (`repository_dispatch` payload or a channel-entry file) | pack, client, sign, verify, profile |
 | `channel` | Channel manifests (phase 2): byte-compatible key, signature and manifest files with the weavemanifest and agent-core formats; chain verification (root endorses signing key, signing key signs the exact manifest bytes); expiry and anti-rollback; the `images` section; `Promote`, `New`, `Sign`, `Endorse`, `GenerateKey`; loading the four files from a path or URL ([05-supply-chain.md](05-supply-chain.md)) | go-digest |
+| `source` | Upstream build media (phase 3): download a cloud image, ISO or IPSW and refuse it unless a checksum file names its hash and an OpenPGP key pinned by fingerprint signed that file, detached (Ubuntu, AlmaLinux) or clearsigned (Fedora). GNU and BSD checksum formats, SHA-256 and SHA-512; unsigned checksum files (Debian) only when explicitly allowed, recorded as `checksum-only`. The result is the `build.sourceMedia` entry | ProtonMail/go-crypto |
 | `cmd/weaveoci` | Reference CLI over the packages | all |
 | `.github/workflows/` | Reusable build and publish workflows | — |
 
@@ -379,6 +380,8 @@ built without a registry profile behaves exactly as today.
 | `publish <bundle> <repo> --tag <build-tag> [--profile <name>]` | Runs the whole publish pipeline from the `publish` package on any CI system; the GitHub workflows are thin wrappers around it |
 | `sign <ref@digest> [--key <ref>]` | Signs an existing image with the profile's provider; cosign-compatible bundle as a referrer |
 | `profile show\|validate [--file <path>]` | Prints the resolved profile or validates a profile file |
+| `source fetch <url> --checksums <url> (--signature <url>\|--clearsigned\|--allow-unsigned) --keyring <file> --fingerprint <fpr> --out <file> [--record <json>]` | Verified download of upstream media; the record feeds `bundle init --source` |
+| `bundle init <dir> --disk <raw>… --os … --arch … --os-version … --os-build … --template … --template-ref … --image-version … --revision … --source-url … [--source <record>…]` | Writes `bundle.json` for raw disks (moved into the directory, keeping them sparse) with the verified source media and the annotations the contract requires |
 | `healthcheck [--url http://127.0.0.1:5000/readyz]` | Exits 0 when the URL returns 200; copied into the distroless `weave-zot` image as its `HEALTHCHECK`, because that image has no shell, curl or wget |
 
 The CLI is the reference consumer the conformance suite runs; the guestweave CLIs do
@@ -388,7 +391,7 @@ not shell out to it.
 
 | Workflow | Runs on | Inputs | Secrets / permissions | Produces |
 |---|---|---|---|---|
-| `build-linux.yml` | `ubuntu-latest` (KVM) | `distro`, `version`, `arch` matrix, `source: cloud-image\|bootc`, `agent_version` | `packages: write`, `id-token: write`, `attestations: write`, `artifact-metadata: write` | raw disk → bundle → `publish.yml` |
+| `build-linux.yml` | `ubuntu-latest` (KVM) | `image` (a definition under `images/linux/`), `publish`, `serial`, `revision` | `packages: write`, `id-token: write`, `attestations: write`, `artifact-metadata: write`; the org App for the dispatch | Implemented (phase 3) for the cloud-image path: verified fetch → raw → `bundle init` → `weaveoci publish` → `actions/attest` → clean-cache pull verifying the attestation → QEMU boot test → `image-published` dispatch. Without `publish`: pack, deep conformance, unpack and boot test. The bootc path is still to come |
 | `build-windows.yml` | `ubuntu-latest` (QEMU/KVM) or self-hosted | `edition`, `release`, `arch`, `agent_version` | as above + Windows media source credentials if any | bundle |
 | `build-macos.yml` | self-hosted Apple-silicon bare metal, `max-parallel: 1` | `version`, `variant`, `agent_version` | as above | bundle |
 | `publish.yml` | `ubuntu-latest` | `bundle` artifact or layout, `repository`, `tags` | `packages: write`, attestation permissions, `RELEASE_PLEASE_PAT` for the cross-repo dispatch | `weaveoci pack`, `push`, `actions/attest push-to-registry`, `weaveoci verify` self-check, `repository_dispatch image-published` to weaveplatform-manifest |

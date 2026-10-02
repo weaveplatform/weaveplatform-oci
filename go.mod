@@ -3,6 +3,7 @@ module github.com/weaveplatform/weaveplatform-oci
 go 1.27.0
 
 require (
+	github.com/ProtonMail/go-crypto v1.5.2
 	github.com/cucumber/godog v0.16.0
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/google/go-containerregistry v0.22.1
@@ -72,6 +73,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect

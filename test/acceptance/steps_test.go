@@ -38,6 +38,7 @@ type world struct {
 	stderr  string
 	reg     *registry
 	mirror  *registry
+	cloud   *cloudServer
 	copyErr error
 }
 
@@ -58,6 +59,10 @@ func (w *world) register(sc *godog.ScenarioContext) {
 	})
 	sc.After(func(ctx context.Context, _ *godog.Scenario, err error) (context.Context, error) {
 		_ = os.RemoveAll(w.root)
+		if w.cloud != nil {
+			w.cloud.srv.Close()
+			w.cloud = nil
+		}
 		return ctx, err
 	})
 	sc.Step(
@@ -104,6 +109,12 @@ func (w *world) register(sc *godog.ScenarioContext) {
 	)
 	sc.Step(`^a request to "([^"]+)" as "([^"]+)" succeeds$`, w.authenticatedSucceeds)
 	sc.Step(`^a weave-zot mirror of the registry is running$`, w.mirrorRunning)
+	sc.Step(
+		`^a cloud image server publishes "([^"]+)" signed by key "([^"]+)"$`,
+		w.signedCloudImage,
+	)
+	sc.Step(`^another signing key "([^"]+)"$`, w.anotherKey)
+	sc.Step(`^the server's "([^"]+)" is altered after signing$`, w.alterServedImage)
 	sc.Step(
 		`^I copy "([^"]+)" from the mirror as "([^"]+)" into layout "([^"]+)"$`,
 		w.copyDownMirror,
