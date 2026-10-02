@@ -258,13 +258,16 @@ func Parse(data []byte) (*Manifest, error) {
 }
 
 // Expired reports whether the manifest is past its expiry; an unparsable
-// expiry counts as expired (fail closed), an empty one never expires.
+// expiry counts as expired (fail closed), an empty one never expires. The
+// expiry instant itself is still valid: this is agent-core's
+// ChannelManifest.Expired rule, and a device and a broker reading the same
+// manifest at the same instant must not disagree on it.
 func (m *Manifest) Expired(now time.Time) bool {
 	if m.Expires == "" {
 		return false
 	}
 	t, err := time.Parse(time.RFC3339, m.Expires)
-	return err != nil || !now.Before(t)
+	return err != nil || now.After(t)
 }
 
 // Image returns the entry promoting index digest d in repository (the

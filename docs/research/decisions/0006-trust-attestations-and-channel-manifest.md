@@ -126,9 +126,14 @@ Alternatives considered:
   images.
 - Whether `gh attestation verify --bundle-from-oci` resolves the fallback tag for an
   artifact with a custom config media type is untested.
-- The channel-manifest schema is owned by `weaveplatform-api`; the `images` section is a
-  schema change there, and the verifier must be extracted from
-  `weaveplatform-agent/internal/manifestverify` before the shared module can import it.
+- The channel-manifest schema is owned by `weaveplatform-agent-core` (which absorbed
+  weaveplatform-api); the `images` section is a schema change there
+  ([weaveplatform-agent-core#56](https://github.com/weaveplatform/weaveplatform-agent-core/pull/56)).
+  The shared module re-implements the chain check byte-compatibly instead of importing
+  core's internal verifier, and a contract test validates its output against core's
+  schema, so drift between the two fails here rather than on a device.
+- Modules and images share one channel document, so a pinned channel stays one file
+  and one signature.
 - The predicate contents are controlled by the workflow; only the certificate identity
   and the verified timestamps are trustworthy on their own.
 - Sigstore rotates its trusted root a few times a year; devices that verify offline must

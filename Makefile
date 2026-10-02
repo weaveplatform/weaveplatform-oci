@@ -80,7 +80,14 @@ image-zot:
 fixtures:
 	$(GO) test ./pkg/spec -run TestFixtures -update
 
+## channel-schema: refresh pkg/channel's copy of agent-core's channel manifest schema (the contract test reads it)
+channel-schema:
+	gh api -H 'Accept: application/vnd.github.raw' \
+		repos/weaveplatform/weaveplatform-agent-core/contents/schema/channel-manifest.schema.json \
+		> pkg/channel/testdata/channel-manifest.schema.json
+	$(GO) test ./pkg/channel -run TestContract
+
 ## gate: everything CI runs, in order
 gate: vet lint test accept cover vuln
 
-.PHONY: help fmt lint vet test accept cover vuln build image-zot fixtures gate
+.PHONY: help fmt lint vet test accept cover vuln build image-zot fixtures channel-schema gate
