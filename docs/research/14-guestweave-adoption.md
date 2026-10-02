@@ -168,9 +168,10 @@ Both CLIs add:
 
 - **`weave capabilities`**, printing the document hostweave's guestweave
   driver reads (`hostweave/agent/runtime/guestweave/capabilities.go`):
-  `version`, `host_os`, `host_arch`, `cli_version`, `exec_argv`,
-  `exec_stdin`, `registry_auth`, `guest_platforms[]`, `verify_modes[]` and
-  `image_formats: ["weave-guest-v1"]`. A standalone build reports an empty
+  `version: 1` (hostweave refuses any other version), `host_os`,
+  `host_arch`, `cli_version`, `exec_argv`, `exec_stdin`, `registry_auth`,
+  `guest_platforms[]` and `image_formats: ["weave-guest-v1"]`, plus
+  `verify_modes[]` and `registry_auth_sources[]`, which hostweave ignores. A standalone build reports an empty
   `image_formats` and no registry auth, so hostweave never schedules VM jobs
   that need images on it.
 - **`GUESTWEAVE_REGISTRY_ENV_ONLY`.** When set, credentials come only from

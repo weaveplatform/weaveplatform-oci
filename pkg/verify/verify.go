@@ -200,6 +200,12 @@ func Signature(
 		}
 		errs = append(errs, err)
 	}
+	// With no bundles at all there is nothing to join; wrapping the nil
+	// result printed "%!w(<nil>)" at the end of the message.
+	if len(errs) == 0 {
+		return nil, fmt.Errorf("%w: no valid %s signature on %s: it carries no signature bundles",
+			ErrUnverified, p.Provider, subject.Digest)
+	}
 	return nil, fmt.Errorf("%w: no valid %s signature on %s among %d bundle(s): %w",
 		ErrUnverified, p.Provider, subject.Digest, len(bs), errors.Join(errs...))
 }
