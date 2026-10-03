@@ -23,7 +23,7 @@ profiles:
         issuer: https://token.actions.githubusercontent.com
         subjectRegexp: '^https://github.com/weaveplatform/weaveplatform-oci/\.github/workflows/publish\.yml@refs/.*$'
     channel:
-      manifest: https://raw.githubusercontent.com/weaveplatform/weaveplatform-channels/main/channels/stable.json
+      manifest: https://raw.githubusercontent.com/weaveplatform/weaveplatform-release-channels/main/channels/stable.json
       anchors: [{name: weaveplatform, publicKey: keys/root.pub}]
   - name: private
     kind: private

@@ -26,13 +26,13 @@ authenticity (key-based bundles) and ecosystem interoperability. The channel man
 gives an air-gap-capable promotion gate that already exists for agent modules. The
 platform's own trust-chain document rules out depending on Sigstore infrastructure
 for the gate: "no Fulcio, no Rekor, no CA"
-(`weaveplatform/weaveplatform-channels@main` `docs/trust-chain.md`).
+(`weaveplatform/weaveplatform-release-channels@main` `docs/trust-chain.md`).
 
 ## 1. Why both
 
 - **The gate must work offline.** An air-gapped deployment verifies the channel
   manifest with the root public key baked into core
-  (`weaveplatform/weaveplatform-channels@main` `README.md`, "Trust model").
+  (`weaveplatform/weaveplatform-release-channels@main` `README.md`, "Trust model").
   Sigstore verification needs a current trusted root that includes timestamp
   authority material, because Rekor v2 entries require a signed timestamp
   ([cosign CHANGELOG, v3.0.5](https://raw.githubusercontent.com/sigstore/cosign/main/CHANGELOG.md)),
@@ -174,7 +174,7 @@ second. Full table in [04-registries-and-github.md §3](04-registries-and-github
 
 ## 4. The channel manifest chain
 
-Reproduced from `weaveplatform/weaveplatform-channels@main` `docs/trust-chain.md`:
+Reproduced from `weaveplatform/weaveplatform-release-channels@main` `docs/trust-chain.md`:
 
 ```mermaid
 flowchart TD
@@ -214,7 +214,7 @@ What images need, and what phase 2 implemented (2026-10-02):
    `weaveplatform` GitHub organisation: weaveplatform-api, -sdk and -agent were merged
    into `weaveplatform/weaveplatform-agent-core` (format types in its public
    `sdk/manifest` module, verifier still in `internal/manifestverify`), and
-   weaveplatform-manifest is now `weaveplatform/weaveplatform-channels`. Several old
+   weaveplatform-manifest is now `weaveplatform/weaveplatform-release-channels`. Several old
    `deploymenttheory/*` remotes no longer resolve, so the local sibling checkouts are
    stale ([12-open-questions.md](12-open-questions.md) Q26).
 2. **A byte-compatible re-implementation, not an import.** `pkg/channel` in this
@@ -256,7 +256,7 @@ What images need, and what phase 2 implemented (2026-10-02):
    entry, re-resolves the tag from the registry and refuses a payload whose index or
    platform digests differ, then adds or replaces the entry by repository and tag as
    `channel.Promote` does
-   ([weaveplatform-channels#14](https://github.com/weaveplatform/weaveplatform-channels/pull/14)).
+   ([weaveplatform-release-channels#14](https://github.com/weaveplatform/weaveplatform-release-channels/pull/14)).
    `pkg/channel` validates everything it writes against a byte-for-byte copy of
    agent-core's schema (`make channel-schema` refreshes it), and uses core's expiry
    rule: the `expires` instant itself is still valid.
@@ -437,7 +437,7 @@ fallback-tag referrers; the SBOM strategy for APFS and NTFS guests.
 
 ## References
 
-- `weaveplatform/weaveplatform-channels@main`: `docs/trust-chain.md`, `README.md`
+- `weaveplatform/weaveplatform-release-channels@main`: `docs/trust-chain.md`, `README.md`
 - `deploymenttheory/weaveplatform-api@main`: `schema/channel-manifest.schema.json`
 - `deploymenttheory/weaveplatform-agent-modules@main`: `docs/release-pipeline.md`, `.github/workflows/module-release.yml`
 - `weaveplatform/hostweave@main`: `pkg/types/image.go`, `pkg/images/registry.go`

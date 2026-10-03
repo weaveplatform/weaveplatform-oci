@@ -226,7 +226,7 @@ Steps and the facts behind them:
 6. **Dispatch.** `repository_dispatch` with `event_type=image-published` and
    `{repository, tag, digest, platforms}` to weaveplatform-manifest, which opens a promotion PR
    that adds the digest to `channels/stable.json` and re-signs it; merging promotes
-   ([trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md)).
+   ([trust chain](https://github.com/weaveplatform/weaveplatform-release-channels/blob/main/docs/trust-chain.md)).
    The modules pipeline uses a `RELEASE_PLEASE_PAT` for this cross-repository call because
    `GITHUB_TOKEN` cannot dispatch to another repository
    (`weaveplatform-agent-modules@main docs/release-pipeline.md`).
@@ -306,7 +306,7 @@ image under testcontainers to check `/readyz` before pushing. Sources:
 | Push to GHCR from the pipeline | `GITHUB_TOKEN`, `permissions: packages: write`; package "Manage Actions access" set to Write for the publishing repository | Downloads with `GITHUB_TOKEN` inside Actions do not count toward transfer ([billing](https://docs.github.com/en/billing/concepts/product-billing/github-packages)) |
 | Attestations | `id-token: write`, `attestations: write`, `artifact-metadata: write` | Private repos: GHEC ([attestations docs](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)) |
 | Dispatch to weaveplatform-manifest | PAT with `repo` scope on that repository (`RELEASE_PLEASE_PAT` precedent) | `GITHUB_TOKEN` cannot cross repositories |
-| Channel signing key | Lives only in weaveplatform-manifest CI; the images pipeline never signs the channel | [trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md) |
+| Channel signing key | Lives only in weaveplatform-manifest CI; the images pipeline never signs the channel | [trust chain](https://github.com/weaveplatform/weaveplatform-release-channels/blob/main/docs/trust-chain.md) |
 | Fleet pulls of private images | A service account's classic PAT with `read:packages`; GitHub App installation tokens are not accepted by GHCR | [permissions](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages), [discussion #171423](https://github.com/orgs/community/discussions/171423) |
 | Apple signing identity (agent LaunchDaemon) | Developer ID + notarization on the self-hosted macOS runner | `weaveplatform-agent-modules@main handoff/macos-follow-on.md` |
 | Windows media | No secret; retail ISO from Microsoft's public download flow | VL media, if used, is an org secret and stays private |

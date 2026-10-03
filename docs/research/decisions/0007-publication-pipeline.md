@@ -128,5 +128,5 @@ Alternatives considered:
 - [07-build-pipelines.md](../07-build-pipelines.md), [06-large-artifacts.md](../06-large-artifacts.md)
 - GitHub-hosted runners: <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>, <https://docs.github.com/en/actions/reference/runners/larger-runners>; KVM on Linux runners: <https://github.blog/changelog/2024-04-02-github-actions-hardware-accelerated-android-virtualization-now-available/>; no nested virtualisation on Windows runners: <https://github.com/actions/runner-images/issues/183>; Apple on nested macOS guests: <https://developer.apple.com/forums/thread/827663>
 - `actions/attest`: <https://github.com/actions/attest>; `oras-project/setup-oras`: <https://github.com/oras-project/setup-oras>
-- `weaveplatform/weaveplatform-channels@main docs/trust-chain.md` (promotion)
+- `weaveplatform/weaveplatform-release-channels@main docs/trust-chain.md` (promotion)
 - `deploymenttheory/go-sdk-winmediafoundry@main` (Windows media acquisition)

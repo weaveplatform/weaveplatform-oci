@@ -172,5 +172,5 @@ Alternatives considered:
 - [0011](0011-deployment-profiles-and-reference-registry.md), [13-deployment-profiles.md](../13-deployment-profiles.md)
 - Sigstore: <https://blog.sigstore.dev/cosign-3-0-available/>, <https://github.com/sigstore/sigstore-go>, <https://raw.githubusercontent.com/sigstore/sigstore-go/main/docs/verification.md>, fallback tag behaviour <https://raw.githubusercontent.com/sigstore/sigstore-js/main/packages/oci/src/image.ts>
 - SLSA v1.2: <https://slsa.dev/spec/>
-- Channel manifest chain: `weaveplatform/weaveplatform-channels@main docs/trust-chain.md`, `README.md`; schema `weaveplatform/weaveplatform-agent-core@main schema/channel-manifest.schema.json`; verifier `weaveplatform/weaveplatform-agent-core@main internal/manifestverify`
+- Channel manifest chain: `weaveplatform/weaveplatform-release-channels@main docs/trust-chain.md`, `README.md`; schema `weaveplatform/weaveplatform-agent-core@main schema/channel-manifest.schema.json`; verifier `weaveplatform/weaveplatform-agent-core@main internal/manifestverify`
 - Module promotion precedent: `deploymenttheory/weaveplatform-agent-modules@main docs/release-pipeline.md`
