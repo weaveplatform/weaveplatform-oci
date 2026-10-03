@@ -104,13 +104,13 @@ On 2026-10-02 the weave repositories moved from the `deploymenttheory` to the `w
 | `deploymenttheory/hostweave`, `guestweave-cli-macos`, `guestweave-cli-windows`, `weaveplatform-oci` | same names under `weaveplatform/` |
 | `deploymenttheory/weaveplatform-agent` | `weaveplatform/weaveplatform-agent-core` |
 | `deploymenttheory/weaveplatform-api`, `weaveplatform-sdk` | merged into `weaveplatform/weaveplatform-agent-core` (`sdk/` module, `schema/`) |
-| `deploymenttheory/weaveplatform-manifest` | `weaveplatform/weaveplatform-channels` |
+| `deploymenttheory/weaveplatform-manifest` | `weaveplatform/weaveplatform-release-channels` |
 | `deploymenttheory/weaveplatform-agent-modules` | no longer published; the in-guest modules are `weaveplatform/guestweave-agent`. Citations describe the code as read at the research baseline |
 | `deploymenttheory/go-sdk-winmediafoundry` | unchanged; stays in `deploymenttheory` |
 
 ## Relationship to other repositories
 
 - hostweave: [decision 0029, image identities and builds](https://github.com/weaveplatform/hostweave/blob/main/docs/research/decisions/0029-image-identities-and-builds.md) and the [image lifecycle phase record](https://github.com/weaveplatform/hostweave/blob/main/docs/implementation/image-lifecycle.md) describe the image catalogue this work plugs into.
-- weaveplatform-channels (formerly weaveplatform-manifest): the [trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md) that promotion extends to images.
+- weaveplatform-release-channels (formerly weaveplatform-manifest): the [trust chain](https://github.com/weaveplatform/weaveplatform-release-channels/blob/main/docs/trust-chain.md) that promotion extends to images.
 - weaveplatform-agent-modules (no longer published): its release pipeline, an ORAS push plus a dispatch to the channel repository, is the pattern the image pipeline mirrors ([02-prior-art.md](02-prior-art.md)).
 - guestweave-cli-macos: `internal/docs/registries-and-image-formats.md` documents the registry profiles and codecs being replaced.

@@ -370,7 +370,7 @@ family of typed layer media types with explicit compression suffixes
 
 Sources: [`docs/release-pipeline.md`](https://github.com/deploymenttheory/weaveplatform-agent-modules/blob/main/docs/release-pipeline.md),
 [`.github/workflows/module-release.yml`](https://github.com/deploymenttheory/weaveplatform-agent-modules/blob/main/.github/workflows/module-release.yml),
-[weaveplatform-manifest trust chain](https://github.com/weaveplatform/weaveplatform-channels/blob/main/docs/trust-chain.md).
+[weaveplatform-manifest trust chain](https://github.com/weaveplatform/weaveplatform-release-channels/blob/main/docs/trust-chain.md).
 Local checkouts: `weaveplatform-agent-modules@main docs/release-pipeline.md`,
 `.github/workflows/module-release.yml:106-128`.
 

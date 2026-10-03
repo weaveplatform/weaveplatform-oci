@@ -18,7 +18,7 @@ revision listed; line numbers refer to that revision.
 | `weaveplatform/guestweave-cli-windows` (module `guestweave-windows`) | `93d230b85f8b` (`main`, via the GitHub contents API) | `internal/oci/oci.go`, `internal/oci/layer.go`, `internal/oci/cache/cache.go`, `internal/winmedia/retail.go`, `internal/vm/layout/layout.go`, `go.mod`, tree listing |
 | `deploymenttheory/go-sdk-winmediafoundry` | v0.8.0 (Windows pin), v0.7.0 (macOS pin) | README and package list via GitHub |
 | `deploymenttheory/weaveplatform-agent-modules` | `6ff07a7` (local checkout) | `docs/`, `handoff/`, `.github/workflows/module-release.yml` |
-| `weaveplatform/weaveplatform-channels` | `3af1c16` (local checkout) | `README.md`, `docs/trust-chain.md` |
+| `weaveplatform/weaveplatform-release-channels` | `3af1c16` (local checkout) | `README.md`, `docs/trust-chain.md` |
 
 Two companion branches referenced by hostweave's image phase were **not** merged at
 the time of reading: macOS `94ab635` and Windows `eae767a` on
@@ -403,4 +403,4 @@ flowchart LR
 - `deploymenttheory/go-sdk-winmediafoundry` v0.8.0: <https://github.com/deploymenttheory/go-sdk-winmediafoundry>
 - `deploymenttheory/weaveplatform-agent-modules@6ff07a7`:
   `.github/workflows/module-release.yml`, `docs/release-pipeline.md`, `handoff/linux-bring-up.md`
-- `weaveplatform/weaveplatform-channels@3af1c16`: `README.md`, `docs/trust-chain.md`
+- `weaveplatform/weaveplatform-release-channels@3af1c16`: `README.md`, `docs/trust-chain.md`

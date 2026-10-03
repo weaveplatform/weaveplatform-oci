@@ -13,7 +13,7 @@ name: images | Build Linux image (reusable)
 # ghcr.io/weaveplatform/weave-images/<name> (pack, push, deep self-check,
 # promotion entry), attests the index with actions/attest, pulls it back on a
 # clean cache verifying the attestation, boot-tests what it pulled, and
-# dispatches image-published to weaveplatform-channels, whose promote
+# dispatches image-published to weaveplatform-release-channels, whose promote
 # workflow re-resolves the digests and opens the promotion PR.
 on:
   workflow_call:
@@ -197,7 +197,7 @@ jobs:
       - name: Boot test (linux/amd64, QEMU + OVMF + NoCloud)
         run: scripts/linux/boot-test.sh "$WORK/boot" 900
 
-      - name: Dispatch the promotion to weaveplatform-channels
+      - name: Dispatch the promotion to weaveplatform-release-channels
         if: ${{ inputs.publish }}
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
@@ -205,7 +205,7 @@ jobs:
           app-id: ${{ vars.RP_APP_ID }}
           private-key: ${{ secrets.RP_APP_PRIVATE_KEY }}
           owner: weaveplatform
-          repositories: weaveplatform-channels
+          repositories: weaveplatform-release-channels
 
       - name: Send image-published
         if: ${{ inputs.publish }}
@@ -215,5 +215,5 @@ jobs:
           set -euo pipefail
           jq -n --slurpfile e "$WORK/promotion.json" --arg registry "$IMAGES_REGISTRY" \
             '{event_type: "image-published", client_payload: {image: $e[0], registry: $registry}}' \
-            | gh api repos/weaveplatform/weaveplatform-channels/dispatches --input -
+            | gh api repos/weaveplatform/weaveplatform-release-channels/dispatches --input -
           echo "dispatched image-published for $(jq -r '.repository + ":" + .tag' "$WORK/promotion.json")"

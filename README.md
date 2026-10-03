@@ -48,7 +48,7 @@ runs ephemeral VM workloads from these images, and
 and [guestweave-cli-windows](https://github.com/weaveplatform/guestweave-cli-windows),
 which pull, clone and push them and still build VMs from installation media
 without any registry. Promotion runs through
-[weaveplatform-channels](https://github.com/weaveplatform/weaveplatform-channels).
+[weaveplatform-release-channels](https://github.com/weaveplatform/weaveplatform-release-channels).
 
 ## Documentation
 
