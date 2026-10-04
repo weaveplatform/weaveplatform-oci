@@ -9,7 +9,7 @@ run:
   concurrency: 2  # Set to 2 to avoid overwhelming the CI server
 
 issues:
-  # Don’t cap lint errors per linter—report everything in new code.
+  # Don’t cap lint errors per linter—report everything in the module.
   max-issues-per-linter: 0
 
   # Don’t limit duplicates by text—if the same error crops up on multiple lines, show them all.
@@ -18,17 +18,11 @@ issues:
   # Don’t dedupe by line; every instance matters.
   uniq-by-line: false
 
-  # Only fail on new issues introduced by new PR's.
-  new: true
+  # Scan the whole module locally and in CI, without requiring Git history.
+  new: false
 
-  # Define the “base” for “new” issues as the merge-base against main.
-  new-from-merge-base: main
-
-  # Also catch anything in new or modified files, even outside the diff hunk.
-  whole-files: true
-
-  # Automatically apply any fixable issues (like gofmt/goimports).
-  fix: true
+  # Checks must not rewrite source files; use `make fmt` to apply formatting.
+  fix: false
 
 
 linters:

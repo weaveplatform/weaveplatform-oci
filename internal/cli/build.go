@@ -245,7 +245,12 @@ func newBundle(stdout io.Writer) *cobra.Command {
 		"cloud-init",
 		"how consumers gain access, e.g. cloud-init",
 	)
-	f.StringVar(&b.template, "template", "", "image definition, e.g. images/linux/ubuntu-24.04-base")
+	f.StringVar(
+		&b.template,
+		"template",
+		"",
+		"image definition, e.g. images/linux/ubuntu-24.04-base",
+	)
 	f.StringVar(&b.templateRef, "template-ref", "", "repository@commit of the image definition")
 	f.StringVar(&b.created, "created", "", "build time, RFC 3339 (default now)")
 	f.StringVar(&b.version, "image-version", "", "image version annotation, normally the build tag")
