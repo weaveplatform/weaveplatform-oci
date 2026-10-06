@@ -3,6 +3,7 @@ package imagebuild
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	mediaiso "github.com/deploymenttheory/go-sdk-winmediafoundry/pkg/iso"
 	"github.com/deploymenttheory/go-sdk-winmediafoundry/pkg/isoinspect"
+	"github.com/deploymenttheory/go-sdk-winmediafoundry/pkg/udf"
 
 	"github.com/weaveplatform/weaveplatform-oci/pkg/disk/vhd"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
@@ -241,11 +242,18 @@ func windowsSeed(out string, s WindowsSource, marker string) (string, error) {
 		}
 	}
 	iso := filepath.Join(out, "seed.iso")
-	if err := mediaiso.Build(
-		dir,
+	f, err := os.OpenFile(
 		iso,
-		mediaiso.Options{VolumeID: "WEAVE-SEED", Publisher: "weaveplatform"},
-	); err != nil {
+		os.O_CREATE|os.O_EXCL|os.O_RDWR,
+		0o600,
+	) //nolint:gosec // Build-owned seed output.
+	if err != nil {
+		return "", fmt.Errorf("create Windows seed ISO: %w", err)
+	}
+	// Use Media Foundry's UDF writer directly, as for Windows installation
+	// media. Its ISO9660 writer retains open staging handles, which leaves
+	// directory-entry sizes stale on Windows when finalizing the image.
+	if err := errors.Join(udf.Write(f, dir, "WEAVE-SEED"), f.Close()); err != nil {
 		return "", fmt.Errorf("build Windows seed ISO: %w", err)
 	}
 	return iso, nil

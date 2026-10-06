@@ -16,6 +16,7 @@ import (
 	"time"
 
 	mediaiso "github.com/deploymenttheory/go-sdk-winmediafoundry/pkg/iso"
+	"github.com/deploymenttheory/go-sdk-winmediafoundry/pkg/udf"
 	swconst "github.com/deploymenttheory/go-sdk-winmediafoundry/softwaredownload/constants"
 	"github.com/deploymenttheory/go-sdk-winmediafoundry/softwaredownload/shared/models"
 
@@ -198,6 +199,20 @@ func TestWindowsRecipeAndCompletion(t *testing.T) {
 	must(t, err)
 	if stat.Size() == 0 {
 		t.Fatal("empty seed")
+	}
+	f, err := os.Open(iso)
+	must(t, err)
+	defer f.Close()
+	volume, err := udf.Read(f)
+	must(t, err)
+	answer, script, err := windowsRecipe(s, marker)
+	must(t, err)
+	for name, want := range map[string]string{"autounattend.xml": answer, "seal.ps1": script} {
+		got, err := volume.ReadFile([]string{name})
+		must(t, err)
+		if string(got) != want {
+			t.Fatalf("seed file %s differs from recipe", name)
+		}
 	}
 }
 

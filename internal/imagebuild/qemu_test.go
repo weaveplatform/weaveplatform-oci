@@ -551,7 +551,7 @@ func TestAcceleratorHostPolicy(t *testing.T) {
 				t.Fatal(got, called)
 			}
 			if device != nil {
-				if _, err := device.Stat(); !errors.Is(err, os.ErrClosed) {
+				if _, err := device.Read(make([]byte, 1)); !errors.Is(err, os.ErrClosed) {
 					t.Fatal("KVM probe leaked handle", err)
 				}
 			}
