@@ -1,6 +1,7 @@
 package imagebuild
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -14,7 +15,7 @@ import (
 )
 
 func TestWindowsNativeLifecycle(t *testing.T) {
-	for _, mode := range []string{"success", "cancelled", "config-write", "disk", "state", "grant", "create", "observe", "start", "connect", "log", "no-receipt", "bad-receipt", "unsealed", "oversized-serial", "read-timeout", "shutdown-timeout"} {
+	for _, mode := range []string{"success", "cancelled", "config-write", "disk", "state", "grant", "create", "observe", "start", "connect", "log", "guest-error", "no-receipt", "bad-receipt", "unsealed", "oversized-serial", "read-timeout", "shutdown-timeout"} {
 		t.Run(mode, func(t *testing.T) {
 			dir := t.TempDir()
 			ctx, cancel := context.WithCancel(t.Context())
@@ -84,6 +85,9 @@ func TestWindowsNativeLifecycle(t *testing.T) {
 						if mode == "no-receipt" {
 							line = "setup failed\n"
 						}
+						if mode == "guest-error" {
+							line = "WEAVE-IMAGE-ERROR Sysprep failed: 1\n"
+						}
 						if mode == "oversized-serial" {
 							line = strings.Repeat("x", 128*1024)
 						}
@@ -97,12 +101,15 @@ func TestWindowsNativeLifecycle(t *testing.T) {
 					return client, nil
 				},
 			}
+			var live bytes.Buffer
 			result, err := installWindowsWith(
 				ctx,
 				WindowsInstallRequest{
 					Directory: dir,
 					Marker:    marker,
 					Timeout:   timeout,
+					Arch:      "amd64",
+					Log:       &live,
 				},
 				api,
 			)
@@ -121,8 +128,26 @@ func TestWindowsNativeLifecycle(t *testing.T) {
 				if slices.Contains(events, "terminate") {
 					t.Fatal("forced shutdown of completed guest")
 				}
+				for _, want := range []string{"install windows/amd64 (HCS)", "starting HCS virtual machine", "firmware log\n", "generalization receipt verified", "completed"} {
+					if !strings.Contains(live.String(), want) {
+						t.Fatal("missing native progress", want, live.String())
+					}
+				}
+				serial, err := os.ReadFile(filepath.Join(dir, "serial.log"))
+				must(t, err)
+				if !strings.HasPrefix(string(serial), "firmware log\n") ||
+					strings.Contains(string(serial), "elapsed=") {
+					t.Fatal("serial report contaminated", string(serial))
+				}
 			} else if err == nil {
 				t.Fatal("accepted failed install")
+			}
+			if err != nil && !strings.Contains(live.String(), "failed: ") {
+				t.Fatal("missing failure log", live.String())
+			}
+			if mode == "guest-error" &&
+				!strings.Contains(err.Error(), "Windows guest sealing failed: Sysprep failed: 1") {
+				t.Fatal("lost guest error", err)
 			}
 			created := slices.Contains(events, "create")
 			if created != slices.Contains(events, "close") {

@@ -147,6 +147,7 @@ func (p Packages) BuildMacOS(ctx context.Context, o MacOptions) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	p.Tools.progress("macOS: resolving Apple restore source for %s", o.Version)
 	source, raw, err := p.appleSource(ctx, o)
 	if err != nil {
 		return "", err
@@ -163,6 +164,12 @@ func (p Packages) BuildMacOS(ctx context.Context, o MacOptions) (string, error) 
 	if err != nil {
 		return "", fmt.Errorf("parse source URL: %w", err)
 	}
+	p.Tools.progress(
+		"macOS %s (%s): acquiring verified IPSW; candidate=%s",
+		source.Version,
+		source.Build,
+		out,
+	)
 	ipsw, err := p.Downloader.Download(
 		ctx,
 		Media{URI: source.URL, Size: source.Size, SHA256: source.SHA256},
@@ -171,6 +178,7 @@ func (p Packages) BuildMacOS(ctx context.Context, o MacOptions) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	p.Tools.progress("macOS: checking IPSW version and build manifest")
 	if err := p.Tools.verifyIPSW(ctx, ipsw, work, source); err != nil {
 		return "", err
 	}
@@ -196,12 +204,24 @@ func (p Packages) BuildMacOS(ctx context.Context, o MacOptions) (string, error) 
 	}
 	result, err := restore(
 		ctx,
-		MacRestoreRequest{IPSW: ipsw, Directory: bundle, DiskSize: o.DiskSize},
+		MacRestoreRequest{IPSW: ipsw, Directory: bundle, DiskSize: o.DiskSize, Log: p.Tools.Log},
 	)
 	if err != nil {
 		return "", err
 	}
-	return p.Tools.macBundle(ctx, bundle, result, source, strings.Split(o.Version, ".")[0], tag)
+	p.Tools.progress("macOS: restore completed; writing OCI bundle metadata")
+	path, err := p.Tools.macBundle(
+		ctx,
+		bundle,
+		result,
+		source,
+		strings.Split(o.Version, ".")[0],
+		tag,
+	)
+	if err == nil {
+		p.Tools.progress("macOS: candidate ready at %s", path)
+	}
+	return path, err
 }
 
 func (t Tools) macBundle(

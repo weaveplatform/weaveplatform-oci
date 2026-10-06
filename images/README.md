@@ -71,6 +71,16 @@ into pipeline stdout and labels each architecture and clone.
 TCG results are useful local checks but do not replace native KVM/Hyper-V
 consumer acceptance.
 
+Native macOS and Windows workflows also combine progress into pipeline stdout.
+macOS restore reports Apple’s actual completion percentage and the current stage.
+Windows HCS installation reports VM creation, serial connection, generalization
+and shutdown, with guest COM1 output also preserved in `serial.log`. The sealing
+script emits its stages and failures over COM1; Windows Setup can be silent
+before audit mode. Both native operations emit a heartbeat every 30 seconds with
+elapsed time and the remaining context deadline, when one is set. Windows does
+not estimate an installation percentage. CLI progress remains on stderr so final
+stdout JSON can still be consumed by other tools.
+
 The reusable `build-linux.yml` performs those clone checks for both platforms,
 including after a verified pull when publishing. `image-linux-catalogue.yml`
 runs 20.04 and 26.04 weekly and on relevant pull requests. Manual dispatch can

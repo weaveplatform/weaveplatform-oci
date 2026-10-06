@@ -3,12 +3,14 @@
 package imagebuild
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"errors"
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	vz "github.com/deploymenttheory/go-bindings-macosplatform/bindings/frameworks/virtualization"
@@ -86,14 +88,16 @@ func TestNativeMacRestoreLifecycle(t *testing.T) {
 						done <- nil
 					}
 					return macInstallSession{
-						done:   done,
-						cancel: func() { cancelled = true; done <- context.Canceled },
+						done:     done,
+						cancel:   func() { cancelled = true; done <- context.Canceled },
+						fraction: func() float64 { return 0.375 },
 					}
 				},
 			}
+			var live bytes.Buffer
 			result, err := restoreMacOSWith(
 				ctx,
-				MacRestoreRequest{IPSW: ipsw, Directory: dir, DiskSize: size},
+				MacRestoreRequest{IPSW: ipsw, Directory: dir, DiskSize: size, Log: &live},
 				api,
 			)
 			if mode == "success" {
@@ -101,8 +105,16 @@ func TestNativeMacRestoreLifecycle(t *testing.T) {
 				if result.HardwareModel == "" || !started {
 					t.Fatal(result)
 				}
+				for _, want := range []string{"loading Apple restore image", "restore=37.5%", "completed"} {
+					if !strings.Contains(live.String(), want) {
+						t.Fatal("missing restore progress", want, live.String())
+					}
+				}
 			} else if err == nil {
 				t.Fatal("ignored failure")
+			}
+			if err != nil && !strings.Contains(live.String(), "failed: ") {
+				t.Fatal("missing restore error", live.String())
 			}
 			if mode == "cancel" && (!cancelled || !errors.Is(err, context.Canceled)) {
 				t.Fatal("cancellation did not await native completion", err)

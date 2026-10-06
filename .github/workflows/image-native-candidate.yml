@@ -51,10 +51,15 @@ jobs:
           cache: false
       - name: Build signed native builder on KING
         run: |
+          set -euo pipefail
+          exec 2>&1
+          printf '[%s] Building signed native macOS builder\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           scripts/images/workspace.sh check 80
           scripts/images/workspace.sh run make image-builder BIN_DIR=/Volumes/KING/weave-images/work/cache/native-builder
       - name: Restore candidate through Virtualization.framework
         run: |
+          set -euo pipefail
+          exec 2>&1
           scripts/images/workspace.sh run /Volumes/KING/weave-images/work/cache/native-builder/weaveoci image build-macos \
             --version "$IMAGE_VERSION" --revision "$IMAGE_REVISION"
 
@@ -76,6 +81,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Write-Output "[$([DateTime]::UtcNow.ToString('o'))] Preparing native Windows builder for $env:IMAGE_ARCH"
           if (!$env:WEAVE_IMAGE_WORKSPACE -or !(Test-Path $env:WEAVE_IMAGE_WORKSPACE)) {
             throw 'Set WEAVE_IMAGE_WORKSPACE on the runner to its NTFS/ReFS image storage directory.'
           }
@@ -86,10 +92,10 @@ jobs:
           $env:TMP = $env:TEMP
           New-Item -ItemType Directory -Force $env:GOCACHE,$env:GOMODCACHE,$env:TEMP | Out-Null
           $binary = Join-Path $work 'cache/weaveoci.exe'
-          go build -o $binary ./cmd/weaveoci
+          go build -o $binary ./cmd/weaveoci 2>&1
           if ($LASTEXITCODE -ne 0) { throw 'Builder compilation failed' }
           $out = Join-Path $work "builds/native-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
           & $binary image build-windows --from-windows $env:IMAGE_VERSION --arch $env:IMAGE_ARCH `
             --language $env:IMAGE_LANGUAGE --revision $env:IMAGE_REVISION `
-            --cache (Join-Path $work 'media/windows') --out $out
+            --cache (Join-Path $work 'media/windows') --out $out 2>&1
           if ($LASTEXITCODE -ne 0) { throw 'Native Windows installation failed' }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,6 +32,8 @@ type (
 	WindowsInstallRequest struct {
 		Directory, ISO, Seed, Marker string
 		Timeout                      time.Duration
+		Arch                         string
+		Log                          io.Writer
 	}
 	// WindowsInstallResult is reported by the guest after successful generalization.
 	WindowsInstallResult struct {
@@ -67,6 +70,12 @@ func (p Packages) BuildWindows(ctx context.Context, o WindowsOptions) (string, e
 		return "", fmt.Errorf("%w: HCS build host and guest architectures must match", ErrInput)
 	}
 	var source WindowsSource
+	p.Tools.progress(
+		"Windows %s: resolving %s media (%s)",
+		o.Selection.Arch,
+		o.Selection.FromWindows,
+		o.Selection.Language,
+	)
 	var err error
 	if o.SourceLock != "" {
 		err = readJSON(o.SourceLock, &source)
@@ -82,6 +91,7 @@ func (p Packages) BuildWindows(ctx context.Context, o WindowsOptions) (string, e
 	if err := newDirectory(o.Out); err != nil {
 		return "", err
 	}
+	p.Tools.progress("Windows %s: downloading and verifying source media", o.Selection.Arch)
 	source, iso, err := p.AcquireWindows(ctx, source, o.Selection, o.Cache)
 	if err != nil {
 		return "", err
@@ -89,6 +99,7 @@ func (p Packages) BuildWindows(ctx context.Context, o WindowsOptions) (string, e
 	if err := writeJSON(filepath.Join(o.Out, "source-lock.json"), source); err != nil {
 		return "", err
 	}
+	p.Tools.progress("Windows %s: preparing unattended installation media", o.Selection.Arch)
 	installISO, err := p.prepareWindowsISO(ctx, source, iso, o.Out)
 	if err != nil {
 		return "", err
@@ -116,6 +127,8 @@ func (p Packages) BuildWindows(ctx context.Context, o WindowsOptions) (string, e
 			Seed:      seed,
 			Marker:    marker,
 			Timeout:   o.Timeout,
+			Arch:      o.Selection.Arch,
+			Log:       p.Tools.Log,
 		},
 	)
 	if err != nil {
@@ -138,7 +151,15 @@ func (p Packages) BuildWindows(ctx context.Context, o WindowsOptions) (string, e
 	if err := writeJSON(filepath.Join(o.Out, "install-result.json"), result); err != nil {
 		return "", err
 	}
-	return p.Tools.windowsBundle(ctx, o, source, result)
+	p.Tools.progress(
+		"Windows %s: verified generalized guest; exporting raw bundle",
+		o.Selection.Arch,
+	)
+	bundle, err := p.Tools.windowsBundle(ctx, o, source, result)
+	if err == nil {
+		p.Tools.progress("Windows %s: candidate ready at %s", o.Selection.Arch, bundle)
+	}
+	return bundle, err
 }
 
 func (t Tools) windowsBundle(

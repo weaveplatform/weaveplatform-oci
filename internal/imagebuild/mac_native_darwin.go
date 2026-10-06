@@ -34,9 +34,10 @@ type macNativeCalls struct {
 }
 
 type macInstallSession struct {
-	done   <-chan error
-	cancel func()
-	keep   []any
+	done     <-chan error
+	cancel   func()
+	fraction func() float64
+	keep     []any
 }
 
 func restoreMacOSNative(ctx context.Context, r MacRestoreRequest) (MacRestoreResult, error) {
@@ -58,11 +59,14 @@ func restoreMacOSWith(
 	ctx context.Context,
 	r MacRestoreRequest,
 	api macNativeCalls,
-) (MacRestoreResult, error) {
-	var result MacRestoreResult
+) (result MacRestoreResult, err error) {
+	progress := newNativeProgress(ctx, r.Log, "restore macos/arm64 (Virtualization.framework)")
+	finish := progress.start()
+	defer func() { finish(err) }()
 	if err := ctx.Err(); err != nil {
 		return result, fmt.Errorf("restore cancelled: %w", err)
 	}
+	progress.step("loading Apple restore image")
 	path, err := filepath.EvalSymlinks(r.IPSW)
 	if err != nil {
 		return result, fmt.Errorf("resolve IPSW: %w", err)
@@ -88,6 +92,7 @@ func restoreMacOSWith(
 	if r.DiskSize < 64<<30 {
 		return result, fmt.Errorf("%w: macOS restore disk must be at least 64 GiB", ErrInput)
 	}
+	progress.step("creating restore disk and Apple auxiliary storage")
 	disk := filepath.Join(r.Directory, "disk0.img")
 	f, err := os.OpenFile(disk, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0o600)
 	if err != nil {
@@ -109,18 +114,21 @@ func restoreMacOSWith(
 	if err != nil {
 		return result, fmt.Errorf("attach restore disk: %w", err)
 	}
+	progress.step("validating native restore VM configuration")
 	config, err := api.configure(result, hardware, aux, attachment)
 	if err != nil {
 		return result, fmt.Errorf("validate native restore VM: %w", err)
 	}
 	session := api.start(config, path)
 	defer runtime.KeepAlive(session.keep)
+	progress.restoreFraction(session.fraction)
 	select {
 	case err := <-session.done:
 		if err != nil {
 			return result, fmt.Errorf("native Apple restore: %w", err)
 		}
 	case <-ctx.Done():
+		progress.step("cancellation requested; awaiting Apple restore completion")
 		session.cancel()
 		<-session.done
 		return result, fmt.Errorf("native Apple restore cancelled: %w", ctx.Err())
@@ -184,6 +192,11 @@ func macNativeStart(config *vz.VirtualMachineConfiguration, path string) macInst
 	return macInstallSession{
 		done:   done,
 		cancel: func() { queue.Do(func() { foundation.ProgressFromID(obj.ID(installer.Progress())).Cancel() }) },
-		keep:   []any{vm, installer, config, queue},
+		fraction: func() float64 {
+			var fraction float64
+			queue.Do(func() { fraction = installer.Progress().FractionCompleted() })
+			return fraction
+		},
+		keep: []any{vm, installer, config, queue},
 	}
 }

@@ -61,11 +61,17 @@ func windowsRecipe(s WindowsSource, marker string) (string, string, error) {
 		command,
 	) + `</Path></RunSynchronousCommand></RunSynchronous></component></settings></unattend>`
 	script := `$ErrorActionPreference = 'Stop'
+$serial = New-Object System.IO.Ports.SerialPort 'COM1',115200,'None',8,'One'
+$serial.Open()
+function Write-BuildProgress([string]$message) { $serial.WriteLine("WEAVE-IMAGE-PROGRESS $([DateTime]::UtcNow.ToString('o')) $message") }
+try {
+Write-BuildProgress 'Audit mode reached; checking base-image state'
 $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
 if (Get-Service 'weave-agent' -ErrorAction SilentlyContinue) { throw 'Base image contains weave agent' }
 $volume = $null
 if (Get-Command Get-BitLockerVolume -ErrorAction SilentlyContinue) { $volume = Get-BitLockerVolume -MountPoint C: -ErrorAction SilentlyContinue }
 if ($volume -and $volume.VolumeStatus -ne 'FullyDecrypted') { throw 'Refusing encrypted image' }
+Write-BuildProgress 'Preparing EFI boot files for fresh firmware'
 mountvol.exe S: /S
 if ($LASTEXITCODE -ne 0) { throw 'EFI partition unavailable' }
 bcdboot.exe C:\Windows /s S: /f UEFI
@@ -77,17 +83,22 @@ foreach ($path in @("$env:WINDIR\Panther\unattend.xml", "$env:WINDIR\Panther\Una
 }
 $finalAnswer = "$env:WINDIR\Temp\weave-image-seal.xml"
 Set-Content -LiteralPath $finalAnswer -Encoding UTF8 -Value '<unattend xmlns="urn:schemas-microsoft-com:unattend" />'
+Write-BuildProgress 'Starting Sysprep generalization'
 $p = Start-Process "$env:WINDIR\System32\Sysprep\Sysprep.exe" -ArgumentList '/generalize','/oobe','/quit','/quiet',"/unattend:$finalAnswer" -PassThru -Wait
 if ($p.ExitCode -ne 0) { throw "Sysprep failed: $($p.ExitCode)" }
+Write-BuildProgress 'Sysprep completed; checking generalized image state'
 Remove-Item -LiteralPath $finalAnswer -Force
 $state = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State').ImageState
 if ($state -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { throw "Unexpected image state: $state" }
 $result = @{osVersion="10.0.$($cv.CurrentBuildNumber).$($cv.UBR)";build="$($cv.CurrentBuildNumber).$($cv.UBR)";edition=$cv.EditionID;release=$cv.DisplayVersion;generalized=$true} | ConvertTo-Json -Compress
-$serial = New-Object System.IO.Ports.SerialPort 'COM1',115200,'None',8,'One'
-$serial.Open()
 $serial.WriteLine("` + marker + ` " + $result)
-$serial.Close()
 shutdown.exe /s /t 0
+} catch {
+  $serial.WriteLine("WEAVE-IMAGE-ERROR $($_.Exception.Message)")
+  throw
+} finally {
+  $serial.Close()
+}
 `
 	return answer, script, nil
 }

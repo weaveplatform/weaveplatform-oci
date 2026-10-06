@@ -33,14 +33,17 @@ func installWindowsWith(
 	ctx context.Context,
 	r WindowsInstallRequest,
 	api windowsNativeCalls,
-) (WindowsInstallResult, error) {
+) (result WindowsInstallResult, err error) {
 	ctx, cancel := context.WithTimeout(ctx, r.Timeout)
 	defer cancel()
-	var result WindowsInstallResult
+	progress := newNativeProgress(ctx, r.Log, "install windows/"+r.Arch+" (HCS)")
+	finish := progress.start()
+	defer func() { finish(err) }()
 	if err := ctx.Err(); err != nil {
 		return result, fmt.Errorf("native Windows installation cancelled: %w", err)
 	}
 	id := uuid.NewString()
+	progress.step("creating disk and isolated firmware state")
 	disk, state := filepath.Join(r.Directory, "disk.vhd"), filepath.Join(r.Directory, "build.vmgs")
 	if err := api.createDisk(disk); err != nil {
 		return result, err
@@ -62,6 +65,7 @@ func installWindowsWith(
 	if err != nil {
 		return result, fmt.Errorf("encode HCS configuration: %w", err)
 	}
+	progress.step("creating HCS virtual machine")
 	system, err := api.create(id, string(raw))
 	if system != 0 {
 		defer api.close(system)
@@ -74,6 +78,7 @@ func installWindowsWith(
 	if err := api.observe(system, func() { once.Do(func() { close(exited) }) }); err != nil {
 		return result, fmt.Errorf("observe HCS lifecycle: %w", err)
 	}
+	progress.step("starting HCS virtual machine")
 	if err := api.start(system); err != nil {
 		return result, err
 	}
@@ -86,6 +91,7 @@ func installWindowsWith(
 	}()
 	// Connecting before setup reaches audit mode captures the receipt without a
 	// guest agent or a network connection. Closing the pipe interrupts reads.
+	progress.step("connecting COM1; Windows Setup may be silent until audit mode")
 	conn, err := api.connect(ctx, pipe, exited)
 	if err != nil {
 		return result, err
@@ -102,9 +108,13 @@ func installWindowsWith(
 		return result, fmt.Errorf("create serial log: %w", err)
 	}
 	defer log.Close()
-	scanner := bufio.NewScanner(io.TeeReader(conn, log))
+	progress.step("waiting for installation and generalization receipt; streaming COM1")
+	scanner := bufio.NewScanner(io.TeeReader(conn, io.MultiWriter(log, progress)))
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
+		if message, ok := strings.CutPrefix(line, "WEAVE-IMAGE-ERROR "); ok {
+			return result, fmt.Errorf("%w: Windows guest sealing failed: %s", ErrInput, message)
+		}
 		if !strings.HasPrefix(line, r.Marker+" ") {
 			continue
 		}
@@ -126,6 +136,7 @@ func installWindowsWith(
 			ErrInput,
 		)
 	}
+	progress.step("generalization receipt verified; waiting for guest shutdown")
 	select {
 	case <-exited:
 		return result, nil
