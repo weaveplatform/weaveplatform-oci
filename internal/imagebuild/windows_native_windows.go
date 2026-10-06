@@ -128,8 +128,19 @@ func connectWindowsSerial(
 	pipe string,
 	exited <-chan struct{},
 ) (net.Conn, error) {
+	// DialPipeContext retries a busy pipe internally. A VM exit must interrupt
+	// that wait as well as the retry delay between missing-pipe attempts.
+	dialCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		select {
+		case <-exited:
+			cancel()
+		case <-dialCtx.Done():
+		}
+	}()
 	for {
-		conn, err := winio.DialPipeContext(ctx, pipe)
+		conn, err := winio.DialPipeContext(dialCtx, pipe)
 		if err == nil {
 			return conn, nil
 		}

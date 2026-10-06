@@ -5,6 +5,7 @@ package imagebuild
 import (
 	"context"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,24 +58,44 @@ func TestNativeWindowsDiskAndCancellation(t *testing.T) {
 }
 
 func TestNativeWindowsSerialConnection(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
 	pipe := `\\.\pipe\weaveoci-test-` + time.Now().Format("150405.000000000")
 	listener, err := winio.ListenPipe(pipe, nil)
 	must(t, err)
 	defer listener.Close()
-	done := make(chan struct{})
+	stopClose := context.AfterFunc(ctx, func() { _ = listener.Close() })
+	defer stopClose()
+	done := make(chan error, 1)
 	go func() {
-		defer close(done)
 		conn, err := listener.Accept()
 		if err == nil {
-			conn.Close()
+			defer conn.Close()
+			_ = conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+			_, err = io.WriteString(conn, "ready")
 		}
+		done <- err
 	}()
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
 	conn, err := connectWindowsSerial(ctx, pipe, make(chan struct{}))
 	must(t, err)
+	defer conn.Close()
+	must(t, conn.SetReadDeadline(time.Now().Add(5*time.Second)))
+	// Closing immediately after Dial can race Accept's ConnectNamedPipe call:
+	// go-winio discards that connection and waits for another client. Exchange
+	// bytes first so both endpoints have established the connection.
+	ready := make([]byte, len("ready"))
+	_, err = io.ReadFull(conn, ready)
+	must(t, err)
+	if string(ready) != "ready" {
+		t.Fatal("serial payload differs", string(ready))
+	}
+	select {
+	case err := <-done:
+		must(t, err)
+	case <-ctx.Done():
+		t.Fatal("named-pipe server did not finish", ctx.Err())
+	}
 	must(t, conn.Close())
-	<-done
 	cancel()
 	if _, err := connectWindowsSerial(ctx, pipe+"-absent", make(chan struct{})); err == nil {
 		t.Fatal("cancelled connection succeeded")
@@ -83,6 +104,28 @@ func TestNativeWindowsSerialConnection(t *testing.T) {
 	close(exited)
 	if _, err := connectWindowsSerial(t.Context(), pipe+"-absent", exited); err == nil {
 		t.Fatal("connected to exited VM")
+	}
+}
+
+func TestNativeWindowsSerialExitInterruptsBusyPipe(t *testing.T) {
+	pipe := `\\.\pipe\weaveoci-busy-` + time.Now().Format("150405.000000000")
+	// Without Accept, go-winio holds a disconnected first instance. Dial must
+	// wait inside the library, not just in our missing-pipe retry loop.
+	listener, err := winio.ListenPipe(pipe, nil)
+	must(t, err)
+	defer listener.Close()
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+	exited := make(chan struct{})
+	timer := time.AfterFunc(50*time.Millisecond, func() { close(exited) })
+	defer timer.Stop()
+	conn, err := connectWindowsSerial(ctx, pipe, exited)
+	if conn != nil {
+		conn.Close()
+		t.Fatal("connected without an accepting server")
+	}
+	if !errors.Is(err, ErrInput) || ctx.Err() != nil {
+		t.Fatal("VM exit did not interrupt the pending dial", err, ctx.Err())
 	}
 }
 
