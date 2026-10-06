@@ -7,7 +7,7 @@ name: images | Build Linux image (reusable)
 #   -> qemu-img convert to raw -> weaveoci bundle init (one per arch)
 #
 # Without publish it packs to a local layout, runs the strict deep
-# conformance check, unpacks linux/amd64 again and boot-tests that.
+# conformance check, unpacks both architectures and boot-tests fresh clones.
 #
 # With publish (github profile) it runs weaveoci publish to
 # ghcr.io/weaveplatform/weave-images/<name> (pack, push, deep self-check,
@@ -47,6 +47,7 @@ jobs:
   build:
     name: 'Build ${{ inputs.image }}'
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     permissions:
       contents: read
       packages: write
@@ -75,7 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends qemu-utils qemu-system-x86 ovmf cloud-image-utils
+          sudo apt-get install -y -qq --no-install-recommends qemu-utils qemu-system-x86 qemu-system-arm ovmf qemu-efi-aarch64 cloud-image-utils genisoimage
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
@@ -103,7 +104,7 @@ jobs:
 
       # ---- pull requests and dry runs ---------------------------------------
 
-      - name: Pack, check, unpack linux/amd64
+      - name: Pack, check, unpack both architectures
         if: ${{ !inputs.publish }}
         env:
           TAG: ${{ steps.bundles.outputs.tag }}
@@ -112,7 +113,9 @@ jobs:
           "$WEAVEOCI" pack "$WORK"/bundles/* --out "$WORK/layout" --tag "$TAG" --concurrency 4
           "$WEAVEOCI" inspect "$WORK/layout" --strict --deep
           rm -rf "$WORK/bundles"
-          "$WEAVEOCI" unpack "$WORK/layout" "$WORK/boot" --platform linux/amd64
+          for arch in amd64 arm64; do
+            "$WEAVEOCI" unpack "$WORK/layout" "$WORK/boot-$arch" --platform "linux/$arch"
+          done
 
       # ---- publish -----------------------------------------------------------
 
@@ -190,12 +193,33 @@ jobs:
           REPOSITORY: ${{ steps.bundles.outputs.repository }}
         run: |
           set -euo pipefail
-          "$WEAVEOCI" pull "$REPOSITORY:$TAG" --verify signature --platform linux/amd64 --to "$WORK/boot"
+          for arch in amd64 arm64; do
+            "$WEAVEOCI" pull "$REPOSITORY:$TAG" --verify signature --platform "linux/$arch" --to "$WORK/boot-$arch"
+          done
 
       # ---- both --------------------------------------------------------------
 
-      - name: Boot test (linux/amd64, QEMU + OVMF + NoCloud)
-        run: scripts/linux/boot-test.sh "$WORK/boot" 900
+      - name: Boot two fresh clones per architecture
+        run: |
+          set -euo pipefail
+          for arch in amd64 arm64; do
+            for clone in 1 2; do
+              TMPDIR="$WORK" "$WEAVEOCI" image boot-linux "$WORK/boot-$arch" \
+                --report "$WORK/reports/$arch-$clone" --timeout 1200
+            done
+            first=$(jq -r .machineID "$WORK/reports/$arch-1/result.json")
+            second=$(jq -r .machineID "$WORK/reports/$arch-2/result.json")
+            [ "$first" != "$second" ] || { echo "::error::$arch clones reused a machine-id"; exit 1; }
+          done
+
+      - name: Preserve boot reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: boot-reports-${{ inputs.image }}
+          path: ${{ env.WORK }}/reports
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Dispatch the promotion to weaveplatform-release-channels
         if: ${{ inputs.publish }}

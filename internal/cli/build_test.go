@@ -282,3 +282,53 @@ func TestBundleInitUsage(t *testing.T) {
 		t.Fatalf("derived bundle lost its lineage: %+v %v", d.File.Build, err)
 	}
 }
+
+func TestBundleInitAgentAndAppleState(t *testing.T) {
+	dir := t.TempDir()
+	disk, aux := filepath.Join(dir, "raw"), filepath.Join(dir, "nvram")
+	if err := os.WriteFile(disk, make([]byte, 4096), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(aux, []byte("auxiliary storage"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	args := []string{"bundle", "init", filepath.Join(dir, "bundle"), "--disk", disk,
+		"--os", "darwin", "--arch", "arm64", "--os-version", "27.0", "--os-build", "26A1",
+		"--firmware", "apple", "--hardware-model", "aHc=", "--min-host-os", "27.0",
+		"--auxstorage", aux, "--variant", "agent", "--base", "macos-27-base@sha256:" + strings.Repeat("a", 64),
+		"--weaveagent-name", "weave-agent", "--weaveagent-version", "0.9.11", "--credential-hint", "set-at-first-boot",
+		"--template", "macos-27-agent", "--template-ref", "repo@commit",
+		"--image-version", "27.0-26A1-r1", "--revision", "commit", "--source-url", "https://example.test/repo"}
+	if code, out, errOut := run(t, args...); code != cli.ExitOK {
+		t.Fatalf("init: %d %s %s", code, out, errOut)
+	}
+	b, err := pack.LoadBundle(filepath.Join(dir, "bundle"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.File.Provisioning.Agent == nil || b.File.Provisioning.Agent.Version != "0.9.11" ||
+		len(b.File.State) != 1 || b.File.State[0].Name != "auxstorage" || !b.File.State[0].Required {
+		t.Fatalf("lost agent or firmware metadata: %+v", b.File)
+	}
+	layout := filepath.Join(dir, "layout")
+	if code, out, errOut := run(t, "pack", b.Dir, "--out", layout, "--tag", "test"); code != cli.ExitOK {
+		t.Fatalf("pack: %d %s %s", code, out, errOut)
+	}
+	if code, out, errOut := run(t, "inspect", layout, "--strict", "--deep"); code != cli.ExitOK {
+		t.Fatalf("inspect: %d %s %s", code, out, errOut)
+	}
+}
+
+func TestBundleInitRefusesPartialAgent(t *testing.T) {
+	for _, extra := range [][]string{
+		{"--weaveagent-name", "weave-agent"},
+		{"--weaveagent-version", "0.9.11"},
+		{"--weaveagent-name", "weave-agent", "--weaveagent-version", "0.9.11", "--variant", "base"},
+		{"--os", "linux", "--auxstorage", "unused"},
+	} {
+		args := append([]string{"bundle", "init", t.TempDir(), "--disk", "unused"}, extra...)
+		if code, out, errOut := run(t, args...); code != cli.ExitUsage {
+			t.Fatalf("expected usage refusal: %d %s %s", code, out, errOut)
+		}
+	}
+}

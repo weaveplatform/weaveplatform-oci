@@ -20,7 +20,7 @@ Images are published in tiers, each in its own repository
 | Tier | Contents | Built from |
 |---|---|---|
 | `base` | the vendor operating system, unmodified; no weave software | vendor media, verified against the vendor's signatures |
-| `agent` | base + weave-agent core + the full `guestweave-<os>-*` module set + osquery | a base image, by digest |
+| `agent` | base + weave-agent core + the full `weave-<os>-*` module set | a base image, by digest |
 | a named layer (`xcode-26`, `runner`) | agent + workload tooling | an agent image or another layer, by digest |
 
 The contract records the tier in `guest.variant` and the parent in `build.base`
@@ -34,6 +34,18 @@ A derived image is built by pulling its parent by digest, booting it with a prov
 recipe, powering it off, scrubbing per-instance identity (cloud-init state, SSH host
 keys, machine-id) and publishing the result. Publishing a parent triggers rebuilds of its
 children; promotion refuses a child whose parent digest is not itself promoted.
+
+The initial agent set is presence, exec, power, time, metrics, clipboard, session
+and display, pinned independently by platform in `images/packages.lock.json`.
+The macOS module prefix is `weave-macos-`; Linux and Windows use `weave-linux-`
+and `weave-windows-`. osquery is deferred to a later layer. Linux images remain
+headless; session-dependent capabilities can wait for a graphical session.
+
+Sealing also removes the agent's `store.db` (including WAL/SHM files),
+`store.key` and host-specific `channel.pub`. The platform provisioning the VM
+supplies its own host trust and accounts. Installed software and the accepted
+manifest sequence remain in the image; a builder must not disable trust checks
+to make an image boot.
 
 ## Rationale
 

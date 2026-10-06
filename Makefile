@@ -44,7 +44,7 @@ accept:
 	@rm -rf $(COVER_DIR)/accept && mkdir -p $(COVER_DIR)/accept
 	cd test/acceptance && WEAVEOCI_GOCOVERDIR=$(PWD)/$(COVER_DIR)/accept $(GO) test -count=1 -timeout 30m .
 
-## cover: merge every cover/* directory and enforce the gate in .testcoverage.yml (>=95% total, >=90% per package)
+## cover: merge cover/* and enforce >=95% total/imagebuild, >=90% for other packages
 cover:
 	@dirs=$$(find $(COVER_DIR) -mindepth 1 -maxdepth 1 -type d ! -name '.merged' | paste -sd, -); \
 	if [ -z "$$dirs" ]; then echo "no coverage data; run make test and make accept first"; exit 1; fi; \
@@ -89,3 +89,11 @@ channel-schema:
 gate: vet lint test accept cover vuln
 
 .PHONY: help fmt lint vet test accept cover vuln build image-zot fixtures channel-schema gate
+
+## image-builder: build the local image CLI, signing the Apple virtualization entitlement on macOS
+image-builder:
+	@mkdir -p $(BIN_DIR)
+	$(GO) build -o $(BIN_DIR)/weaveoci ./cmd/weaveoci
+	@if [ "$$(uname -s)" = Darwin ]; then codesign --force --sign - --entitlements scripts/images/entitlements.plist $(BIN_DIR)/weaveoci; fi
+
+.PHONY: image-builder

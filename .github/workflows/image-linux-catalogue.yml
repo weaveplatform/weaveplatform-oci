@@ -1,0 +1,54 @@
+name: images | Linux catalogue
+
+on:
+  pull_request:
+    paths:
+      - 'images/linux/ubuntu-20.04-base/**'
+      - 'images/linux/ubuntu-26.04-base/**'
+      - 'scripts/images/**'
+      - 'scripts/linux/**'
+      - 'internal/imagebuild/**'
+      - 'internal/cli/image.go'
+      - '.github/workflows/build-linux.yml'
+      - '.github/workflows/image-linux-catalogue.yml'
+  schedule:
+    - cron: '23 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish immutable candidates to GHCR and request channel promotion
+        type: boolean
+        default: false
+      revision:
+        description: Build revision; increment when rebuilding the same vendor serial
+        type: string
+        default: '1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-linux-catalogue-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  base:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        image: [ubuntu-20.04-base, ubuntu-26.04-base]
+    uses: ./.github/workflows/build-linux.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    secrets: inherit
+    with:
+      image: linux/${{ matrix.image }}
+      # Weekly runs prove current media. Publishing stays explicit until
+      # the runner fleet and signed channel promotion are configured.
+      publish: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+      revision: ${{ inputs.revision || '1' }}

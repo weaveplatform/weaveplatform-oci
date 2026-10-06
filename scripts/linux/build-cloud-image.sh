@@ -35,6 +35,7 @@ if [ -z "$serial" ]; then
 fi
 [[ "$serial" =~ ^[0-9]{8}(\.[0-9]+)?$ ]] || { echo "unexpected serial '$serial'" >&2; exit 1; }
 revision=${REVISION:-1}
+[[ "$revision" =~ ^[1-9][0-9]*$ ]] || { echo 'REVISION must be a positive integer' >&2; exit 2; }
 tag="$(val OS_VERSION)-${serial}-r${revision}"
 sha=${REVISION_SHA:-$(git -C "$image_dir" rev-parse HEAD)}
 source_url=${SOURCE_URL:-https://github.com/weaveplatform/weaveplatform-oci}
@@ -43,9 +44,20 @@ repo_slug=${source_url#https://github.com/}
 fingerprints=()
 for f in $(val FINGERPRINTS); do fingerprints+=(--fingerprint "$f"); done
 
-work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+for arch in ${ARCHES:-$(val ARCHES)}; do
+  [ ! -e "$out/$arch" ] || { echo "$out/$arch already exists; choose a new candidate directory" >&2; exit 2; }
+done
+
 mkdir -p "$out"
+# Keep conversion on the output volume: bundle init renames sparse disks,
+# and a cross-volume copy would both fail and exhaust the system disk.
+work=$(mktemp -d "$out/.build.XXXXXX")
+trap 'rm -rf "$work"' EXIT
+media="$work"
+if [ -n "${WEAVE_IMAGE_WORKSPACE:-}" ]; then
+  media="$WEAVE_IMAGE_WORKSPACE/media/$(val REPOSITORY)/$serial"
+  mkdir -p "$media"
+fi
 
 for arch in ${ARCHES:-$(val ARCHES)}; do
   medium=$(val MEDIUM); medium=${medium//\{arch\}/$arch}
@@ -54,12 +66,11 @@ for arch in ${ARCHES:-$(val ARCHES)}; do
     --checksums "$base/$serial/$(val CHECKSUMS)" \
     --signature "$base/$serial/$(val SIGNATURE)" \
     --keyring "$image_dir/$(val KEYRING)" "${fingerprints[@]}" \
-    --kind cloud-image --out "$work/$arch.img" --record "$work/$arch.source.json"
+    --kind cloud-image --out "$media/$arch.img" --record "$media/$arch.source.json"
   # Cloud images are qcow2; the contract carries raw guest LBAs. qemu-img
   # writes holes for zero runs, so the raw file stays sparse.
-  qemu-img convert -p -O raw "$work/$arch.img" "$work/$arch.raw"
-  rm -f "$work/$arch.img"
-  "$weaveoci" bundle init "$out/$arch" --disk "$work/$arch.raw" --source "$work/$arch.source.json" \
+  qemu-img convert -O raw "$media/$arch.img" "$work/$arch.raw"
+  "$weaveoci" bundle init "$out/$arch" --disk "$work/$arch.raw" --source "$media/$arch.source.json" \
     --os linux --arch "$arch" --os-version "$(val OS_VERSION)" --os-build "$serial" --distro "$(val DISTRO)" \
     --variant "$(val VARIANT)" \
     --firmware uefi --cpu-min "$(val CPU_MIN)" --cpu "$(val CPU)" \
