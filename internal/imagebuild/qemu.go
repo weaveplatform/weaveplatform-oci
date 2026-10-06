@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -264,6 +265,12 @@ func (t Tools) BootLinux(ctx context.Context, o BootOptions) (BootResult, error)
 		return result, fmt.Errorf("create boot workspace: %w", err)
 	}
 	defer os.RemoveAll(work)
+	t.progress(
+		"boot linux/%s: preparing fresh disk overlay, firmware and cloud-init seed; bundle=%s report=%s",
+		arch,
+		o.Bundle,
+		o.Report,
+	)
 	overlay := filepath.Join(work, "overlay.qcow2")
 	if err := t.run(
 		ctx,
@@ -317,11 +324,13 @@ func (t Tools) BootLinux(ctx context.Context, o BootOptions) (BootResult, error)
 		return result, err
 	}
 	if o.OutputDisk != "" {
+		t.progress("boot linux/%s: exporting provisioned disk to %s", arch, o.OutputDisk)
 		if err := t.run(
 			ctx,
 			nil,
 			"qemu-img",
 			"convert",
+			"-p",
 			"-O",
 			"raw",
 			overlay,
@@ -354,14 +363,42 @@ func (t Tools) runGuest(
 		return fmt.Errorf("create QEMU log: %w", err)
 	}
 	defer log.Close()
+	serialLog, err := os.Create(filepath.Join(o.Report, "serial.log"))
+	if err != nil {
+		return fmt.Errorf("create serial log: %w", err)
+	}
+	defer serialLog.Close()
 	bootCtx, cancel := context.WithTimeout(ctx, o.Timeout)
 	defer cancel()
 	started := time.Now()
+	live := t.Log
+	if live == nil {
+		live = io.Discard
+	}
+	progress := &bootProgress{
+		out:         live,
+		started:     started,
+		platform:    "linux/" + arch,
+		accelerator: result.Accelerator,
+		timeout:     o.Timeout,
+	}
+	t.progress(
+		"boot linux/%s: starting %s; timeout=%s serial=%s diagnostics=%s",
+		arch,
+		executable,
+		o.Timeout,
+		serialLog.Name(),
+		log.Name(),
+	)
+	progress.status(started, "starting QEMU")
+	ticks := time.NewTicker(30 * time.Second)
+	stop, stopped := make(chan struct{}), make(chan struct{})
+	go func() { defer close(stopped); progress.watch(ticks.C, stop) }()
 	runner := t
-	runner.Log = log
+	runner.Log = io.MultiWriter(log, bootStream{progress: progress})
 	err = runner.run(
 		bootCtx,
-		log,
+		io.MultiWriter(serialLog, bootStream{progress: progress, serial: true}),
 		executable,
 		"-machine",
 		machine+",accel="+result.Accelerator,
@@ -384,24 +421,39 @@ func (t Tools) runGuest(
 		"-display",
 		"none",
 		"-serial",
-		"file:"+filepath.Join(o.Report, "serial.log"),
+		"stdio",
+		"-monitor",
+		"none",
 		"-no-reboot",
 	)
+	ticks.Stop()
+	close(stop)
+	<-stopped
 	result.ElapsedSeconds = time.Since(started).Seconds()
 	if err != nil {
+		if bootCtx.Err() != nil {
+			err = fmt.Errorf("%w: %w", bootCtx.Err(), err)
+		}
+		progress.status(time.Now(), "failed: "+err.Error())
 		result.Error = err.Error()
 		return fmt.Errorf("boot failed; see %s: %w", o.Report, err)
 	}
 	serial, err := os.ReadFile(filepath.Join(o.Report, "serial.log"))
 	if err != nil {
+		t.progress("boot linux/%s: cannot read serial log: %v", arch, err)
 		return fmt.Errorf("read serial log: %w", err)
 	}
 	result.MachineID, err = bootIdentity(string(serial), result.Marker)
 	result.Passed = err == nil
 	if err != nil {
+		progress.status(time.Now(), "failed: "+err.Error())
 		result.Error = err.Error()
 		return fmt.Errorf("boot failed; see %s: %w", o.Report, err)
 	}
+	progress.status(
+		time.Now(),
+		"passed: guest shut down and boot identity verified; machine-id="+result.MachineID,
+	)
 	return nil
 }
 

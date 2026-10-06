@@ -83,11 +83,11 @@ func (f *fakeQEMU) run(_ context.Context, w, _ io.Writer, name string, args ...s
 		if f.missingMarker {
 			text = "kernel panic"
 		}
-		for _, arg := range args {
-			if strings.HasPrefix(arg, "file:") {
-				return os.WriteFile(strings.TrimPrefix(arg, "file:"), []byte(text), 0o600)
-			}
+		if !strings.Contains(strings.Join(args, " "), "-serial stdio -monitor none") {
+			f.t.Fatal("QEMU must stream serial output without a monitor", args)
 		}
+		_, err := io.WriteString(w, text)
+		return err
 	case "git":
 		_, err := fmt.Fprint(w, "abcdef\n")
 		return err

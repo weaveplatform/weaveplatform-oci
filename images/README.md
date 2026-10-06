@@ -61,6 +61,13 @@ and boots two fresh clones per platform. It requires the expected OS version,
 no installed agent in a base image, orderly power-off and distinct machine IDs.
 `acceptance.json` records the index digest, platform results and accelerators;
 each boot preserves serial and QEMU logs. Temporary test disks are removed.
+Guest serial output and QEMU diagnostics stream live. Every 30 seconds a boot
+status line reports the platform, accelerator, elapsed/remaining time, serial
+byte count and time since the last guest output. This distinguishes a running
+emulator from a guest that has stopped producing output; success is reported
+only after shutdown and boot-identity validation. The CLI keeps progress on
+stderr and its final JSON on stdout; the Linux workflow combines both streams
+into pipeline stdout and labels each architecture and clone.
 TCG results are useful local checks but do not replace native KVM/Hyper-V
 consumer acceptance.
 

@@ -109,7 +109,7 @@ func TestDownloadClosedHandles(t *testing.T) {
 
 func TestBootFilesystemFailures(t *testing.T) {
 	fakeFirmware(t)
-	for _, mode := range []string{"disk-escape", "workspace", "firmware-copy", "result-write", "log-write"} {
+	for _, mode := range []string{"disk-escape", "workspace", "firmware-copy", "result-write", "log-write", "serial-write"} {
 		t.Run(mode, func(t *testing.T) {
 			bundle := bootBundle(t, "arm64")
 			out := filepath.Join(t.TempDir(), "report")
@@ -137,6 +137,9 @@ func TestBootFilesystemFailures(t *testing.T) {
 					}
 					if name == "qemu-img" && args[0] == "resize" && mode == "log-write" {
 						must(t, os.Mkdir(filepath.Join(out, "qemu.log"), 0o700))
+					}
+					if name == "qemu-img" && args[0] == "resize" && mode == "serial-write" {
+						must(t, os.Mkdir(filepath.Join(out, "serial.log"), 0o700))
 					}
 					return fake.run(ctx, w, e, name, args...)
 				},

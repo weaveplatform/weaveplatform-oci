@@ -54,8 +54,6 @@ jobs:
       id-token: write
       attestations: write
       artifact-metadata: write
-    env:
-      WORK: ${{ github.workspace }}/../work
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -80,7 +78,8 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-          mkdir -p "$WORK"
+          mkdir -p "$RUNNER_TEMP/weave-images"
+          echo "WORK=$RUNNER_TEMP/weave-images" >> "$GITHUB_ENV"
 
       - name: Build weaveoci
         run: |
@@ -100,7 +99,7 @@ jobs:
           case "$IMAGE" in linux/*) ;; *) echo "::error::not a linux image definition: $IMAGE"; exit 1 ;; esac
           [[ "$REVISION" =~ ^[0-9]+$ ]] || { echo "::error::revision must be a number"; exit 1; }
           echo "report-name=boot-reports-${IMAGE//\//-}" >> "$GITHUB_OUTPUT"
-          TMPDIR="$WORK" scripts/linux/build-cloud-image.sh "images/$IMAGE" "$WORK/bundles"
+          TMPDIR="$WORK" scripts/linux/build-cloud-image.sh "images/$IMAGE" "$WORK/bundles" 2>&1
           df -h "$WORK"
 
       # ---- pull requests and dry runs ---------------------------------------
@@ -111,11 +110,18 @@ jobs:
           TAG: ${{ steps.bundles.outputs.tag }}
         run: |
           set -euo pipefail
+          exec 2>&1
+          log() { printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
+          log "Packing both architectures: tag=$TAG"
           "$WEAVEOCI" pack "$WORK"/bundles/* --out "$WORK/layout" --tag "$TAG" --concurrency 4
+          log "Pack complete; starting strict deep integrity check"
           "$WEAVEOCI" inspect "$WORK/layout" --strict --deep
+          log "Deep integrity check passed; removing staging bundles"
           rm -rf "$WORK/bundles"
           for arch in amd64 arm64; do
+            log "Unpacking linux/$arch for clone boot validation"
             "$WEAVEOCI" unpack "$WORK/layout" "$WORK/boot-$arch" --platform "linux/$arch"
+            log "Unpacked linux/$arch"
           done
 
       # ---- publish -----------------------------------------------------------
@@ -203,15 +209,22 @@ jobs:
       - name: Boot two fresh clones per architecture
         run: |
           set -euo pipefail
+          exec 2>&1
+          log() { printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
+          trap 'status=$?; if [ "$status" -ne 0 ]; then log "Boot validation failed: linux/$arch clone=$clone exit=$status reports=$WORK/reports"; fi' EXIT
           for arch in amd64 arm64; do
             for clone in 1 2; do
+              log "Starting linux/$arch clone $clone/2 (timeout=1200s)"
               TMPDIR="$WORK" "$WEAVEOCI" image boot-linux "$WORK/boot-$arch" \
                 --report "$WORK/reports/$arch-$clone" --timeout 1200
+              log "Passed linux/$arch clone $clone/2"
             done
             first=$(jq -r .machineID "$WORK/reports/$arch-1/result.json")
             second=$(jq -r .machineID "$WORK/reports/$arch-2/result.json")
             [ "$first" != "$second" ] || { echo "::error::$arch clones reused a machine-id"; exit 1; }
+            log "linux/$arch: both clones passed with distinct machine IDs ($first, $second)"
           done
+          log "All four Linux clone boots passed"
 
       - name: Preserve boot reports
         if: always()

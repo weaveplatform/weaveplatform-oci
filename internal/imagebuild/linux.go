@@ -94,6 +94,7 @@ func (t Tools) ValidateLinux(
 	var children []ocispec.Descriptor
 	var configs []pack.BundleFile
 	for _, b := range bundles {
+		t.progress("validate linux/%s: packing bundle %s", b.File.Guest.Arch, b.Dir)
 		desc, err := pack.Manifest(ctx, b, store, chunk.Options{TempDir: o.Out})
 		if err != nil {
 			return result, fmt.Errorf("pack candidate: %w", err)
@@ -108,6 +109,7 @@ func (t Tools) ValidateLinux(
 	if err := store.Tag(ctx, root, tag); err != nil {
 		return result, fmt.Errorf("tag index: %w", err)
 	}
+	t.progress("validate: packed index %s; starting strict deep integrity check", root.Digest)
 	report, err := deepCheck(ctx, store, root)
 	if err != nil {
 		return result, err
@@ -133,6 +135,10 @@ func (t Tools) ValidateLinux(
 		}
 	}
 	result.Passed = true
+	t.progress(
+		"validate: all requested Linux architectures passed two fresh clone boots; index=%s",
+		root.Digest,
+	)
 	return result, nil
 }
 
@@ -149,11 +155,13 @@ func (t Tools) validateClones(
 	}
 	defer os.RemoveAll(tmp)
 	bundle := filepath.Join(tmp, "bundle")
+	t.progress("validate linux/%s: unpacking candidate %s", arch, desc.Digest)
 	if _, err := pack.Unpack(ctx, store, desc, bundle, chunk.AssembleOptions{}); err != nil {
 		return nil, fmt.Errorf("unpack candidate: %w", err)
 	}
 	var clones []BootResult
 	for n := 1; n <= 2; n++ {
+		t.progress("validate linux/%s: starting clone %d/2", arch, n)
 		result, err := t.BootLinux(
 			ctx,
 			BootOptions{
@@ -170,6 +178,12 @@ func (t Tools) validateClones(
 	if clones[0].MachineID == clones[1].MachineID {
 		return clones, fmt.Errorf("%w: fresh %s clones reused a machine-id", ErrInput, arch)
 	}
+	t.progress(
+		"validate linux/%s: both clones passed with distinct machine IDs (%s, %s)",
+		arch,
+		clones[0].MachineID,
+		clones[1].MachineID,
+	)
 	return clones, nil
 }
 
