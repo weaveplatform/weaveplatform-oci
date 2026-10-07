@@ -16,18 +16,13 @@ import (
 
 	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/conformance"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
 // Acceptance records validation of the actual packed and unpacked bytes.
-type Acceptance struct {
-	SchemaVersion int                     `json:"schemaVersion"`
-	IndexDigest   string                  `json:"indexDigest"`
-	Tag           string                  `json:"tag"`
-	Passed        bool                    `json:"passed"`
-	Platforms     map[string][]BootResult `json:"platforms"`
-}
+type Acceptance = imagecheck.Report
 
 // ValidateOptions selects the bundles and required architectures for a candidate.
 type ValidateOptions struct {

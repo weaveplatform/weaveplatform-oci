@@ -9,7 +9,7 @@ from media on a laptop, prepares it, and pushes it from the CLI. There is no rec
 no provenance and no promotion. The agent-modules repository shows the shape the
 organisation already trusts: release-please tags, a build matrix from a manifest, a
 sidecar digest manifest, an ORAS push to GHCR and a `repository_dispatch` that opens a
-promotion pull request in `weaveplatform-manifest`. Building VM images adds hard
+promotion pull request in `weaveplatform-release-channels`. Building VM images adds hard
 runner constraints: GitHub-hosted macOS runners cannot run macOS guests, hosted Windows
 runners have no nested virtualisation, and hosted Ubuntu runners have KVM inside about
 14 GB of disk.
@@ -27,8 +27,8 @@ runner labels and channels.
 
 | Guest | Runner | Build method |
 |---|---|---|
-| macOS | self-hosted, Apple silicon, bare metal, `max-parallel: 1` | Apple restore image resolved through Virtualization.framework, installed by guestweave-cli-macos, unattended setup, agent baked, shut down, packed from the raw disk and `nvram.bin` |
-| Windows | hosted `ubuntu-*` with KVM, or self-hosted Linux or Windows | ISO acquired with go-sdk-winmediafoundry, `autounattend.xml` plus virtio drivers, installed under QEMU, agent baked, sysprep-equivalent stripping, packed from the raw disk |
+| macOS | self-hosted Apple silicon, `max-parallel: 1` | Apple restore and VM lifecycle through go-bindings-macosplatform directly in weaveplatform-oci; carry hardware model and auxiliary storage, regenerate instance identity |
+| Windows | native Windows host matching the guest architecture | Microsoft media through go-sdk-winmediafoundry; HCS and virtdisk through go-bindings-win32; VHDX working disk, real Sysprep generalization, raw-sector OCI export |
 | Linux | hosted `ubuntu-*` with KVM | bootc image built and pushed, raw disk derived with `image-builder --type raw`; or cloud image verified, converted to raw, booted once with a NoCloud seed, packed |
 
 **All stages live in `weaveoci publish`.** Every stage below is implemented once in the
@@ -43,10 +43,13 @@ written as a file or a pull request against the organisation's own channel repos
 so publication needs no GitHub service.
 
 **Stages of `publish.yml`.** Resolve the build tag and refuse if it already exists;
-pack with `weaveoci pack` and run the conformance validator; push with `weaveoci push`
+pack and deeply validate the candidate, boot two clones, and record digest-bound
+acceptance; publish that exact layout with `weaveoci publish --layout …
+--layout-ref … --expected-digest … --acceptance …`. Never repack accepted bytes.
+Native and agent images require their stronger acceptance checks. Push
 (HEAD skip, mount, retry); run `actions/attest` with `push-to-registry: true`; verify the
 attestation with `gh attestation verify --bundle-from-oci`; pull the index back on a
-clean cache and compare digests; dispatch `image-published` to `weaveplatform-manifest`
+clean cache and compare digests; dispatch `image-published` to `weaveplatform-release-channels`
 with repository, tag, index digest and per-platform digests. Channel tags are never
 written by the build workflow; promotion writes them.
 
@@ -87,9 +90,8 @@ Alternatives considered:
   recorded as prior art.
 - **Hosted macOS runners.** Not possible for macOS guests; usable only for packing an
   already-built disk, which gains nothing.
-- **Build Windows on a self-hosted Windows host under HCS.** Possible and closest to
-  production, but it needs elevation for the first run and a dedicated Windows machine.
-  Kept as an alternative runner label, not the default.
+- **Build Windows under QEMU by default.** Superseded by the native HCS path so
+  construction and Windows-host acceptance use the production runtime APIs.
 
 ## Constraints
 
@@ -104,7 +106,7 @@ Alternatives considered:
   well inside it on any reasonable uplink, but a runner with a slow uplink can still
   fail and must rely on retry and HEAD skip.
 - Attestations for private repositories need GitHub Enterprise Cloud.
-- Promotion remains a human merge in `weaveplatform-manifest`; the pipeline cannot
+- Promotion remains a human merge in `weaveplatform-release-channels`; the pipeline cannot
   bypass it.
 
 ## Verification

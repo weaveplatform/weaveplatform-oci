@@ -24,6 +24,7 @@ import (
 	"github.com/weaveplatform/weaveplatform-oci/pkg/chunk"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/client"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/conformance"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/profile"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/sign"
@@ -45,6 +46,15 @@ var ChannelTags = map[string]bool{"stable": true, "edge": true, "latest": true}
 type Request struct {
 	Client  *client.Client
 	Bundles []string // bundle directories, one per platform
+	// Layout publishes an already validated OCI index without repacking it.
+	// LayoutRef selects the local tag/digest; ExpectedDigest pins the accepted
+	// bytes. These inputs are mutually exclusive with Bundles.
+	Layout         string
+	LayoutRef      string
+	ExpectedDigest string
+	// Acceptance is the locally trusted validator's JSON report. Required for
+	// layout publication; the workflow separately signs this evidence.
+	Acceptance []byte
 	// Repository is relative to the profile namespace or fully qualified.
 	Repository string
 	Tag        string       // the immutable build tag, e.g. 24.04-20260915-r1
@@ -65,9 +75,17 @@ type Result struct {
 
 // Run publishes r.
 func Run(ctx context.Context, r Request) (Result, error) {
-	if r.Client == nil || len(r.Bundles) == 0 || r.Repository == "" || r.Tag == "" {
+	if r.Client == nil || (len(r.Bundles) == 0 && r.Layout == "") || r.Repository == "" ||
+		r.Tag == "" {
 		return Result{}, fmt.Errorf(
-			"%w: client, bundles, repository and tag are required",
+			"%w: client, bundles or layout, repository and tag are required",
+			ErrRequest,
+		)
+	}
+	if (r.Layout != "" && (len(r.Bundles) != 0 || r.LayoutRef == "" || r.ExpectedDigest == "" || len(r.Acceptance) == 0)) ||
+		(r.Layout == "" && (r.LayoutRef != "" || r.ExpectedDigest != "" || len(r.Acceptance) != 0)) {
+		return Result{}, fmt.Errorf(
+			"%w: layout requires a reference and expected digest, without bundles",
 			ErrRequest,
 		)
 	}
@@ -100,28 +118,37 @@ func Run(ctx context.Context, r Request) (Result, error) {
 		}
 		defer func() { _ = os.RemoveAll(work) }()
 	}
-	store, err := oci.NewWithContext(ctx, filepath.Join(work, "layout"))
-	if err != nil {
-		return Result{}, fmt.Errorf("publish: %w", err)
-	}
 	res := Result{Reference: ref}
-	if res.Index, res.Children, err = packAll(ctx, store, r.Bundles, r.Chunk); err != nil {
+	store, index, children, err := prepare(ctx, r, work)
+	if err != nil {
 		return res, err
 	}
-	const local = "publish"
-	if err := store.Tag(ctx, res.Index, local); err != nil {
-		return res, fmt.Errorf("publish: %w", err)
-	}
-	if rep, err := conformance.Check(
+	res.Index, res.Children = index, children
+	rep, err := conformance.Check(
 		ctx,
 		store,
 		res.Index,
-		conformance.Options{},
-	); err != nil ||
+		conformance.Options{Deep: r.Layout != ""},
+	)
+	if err != nil ||
 		!rep.OK() {
 		return res, fmt.Errorf("%w: conformance: %v %v", ErrSelfCheck, err, rep.Problems())
 	}
-	if _, err := r.Client.Push(ctx, store, local, ref, client.PushOptions{}); err != nil {
+	if r.Layout != "" {
+		if err := imagecheck.Check(r.Acceptance, rep, r.Tag); err != nil {
+			return res, fmt.Errorf("publish: %w", err)
+		}
+	}
+	if err := checkParents(ctx, r, rep); err != nil {
+		return res, err
+	}
+	if _, err := r.Client.Push(
+		ctx,
+		store,
+		res.Index.Digest.String(),
+		ref,
+		client.PushOptions{},
+	); err != nil {
 		return res, err //nolint:wrapcheck // client errors name the reference
 	}
 	if prov == profile.SigningCosignKey {

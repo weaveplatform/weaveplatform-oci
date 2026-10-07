@@ -10,6 +10,41 @@ GHCR is the distribution destination: `ghcr.io/weaveplatform/weave-images`.
 KING holds local source media, build disks, caches, OCI layouts and reports.
 Local layouts are not automatically published or promoted to a release channel.
 
+Target disk preparation is separate from acceptance. Windows builds use VHDX;
+OCI still stores raw guest sectors. See [decision 0015](../docs/research/decisions/0015-target-image-delivery.md).
+
+```sh
+weaveoci image export /path/to/layout --expected-digest sha256:... \
+  --platform windows/amd64 --target guestweave-windows --out /path/to/new-output
+```
+
+Targets are `guestweave-windows`, `guestweave-macos`, `azure`, `aws`, `gcp`,
+`openstack` and `vsphere`. The command produces disk files and `export.json`,
+binding hashes to the source index and platform manifest. It marks acceptance
+pending. Cloud registration, provider guest preparation and native boot evidence
+are additional requirements; VMDK export alone does not produce an OVA.
+Windows uses virtdisk for VHDX export; other hosts use `qemu-img` for container
+conversion. Raw, fixed VHD and Google tar.gz output are produced directly in Go.
+
+Publish accepted bytes without repacking:
+
+```sh
+weaveoci publish --layout /path/to/candidate/layout --layout-ref BUILD_TAG \
+  --expected-digest sha256:... --acceptance /path/to/candidate/acceptance.json \
+  --repository IMAGE_REPOSITORY --tag BUILD_TAG --promotion-out promotion.json
+```
+
+Derived-image publication requires the parent platform digest in the signed
+channel configured in the selected profile. Report validation does not itself
+authenticate a report: trusted publication must attest the report, and promotion
+must verify that attestation. The legacy bundle publication path remains for
+base-image compatibility; derived images require accepted layouts.
+
+Native Windows and cloud acceptance execution is deferred at the owner's
+request: [#38](https://github.com/weaveplatform/weaveplatform-oci/issues/38) and
+[#39](https://github.com/weaveplatform/weaveplatform-oci/issues/39). This does not
+waive unit tests, the 95% coverage requirement, or promotion gates.
+
 Image orchestration is implemented in Go under `internal/imagebuild` and exposed
 through `weaveoci image`. It uses the existing OCI pack, unpack and conformance
 packages. Python is not required. Native tools provide virtualization, restore,

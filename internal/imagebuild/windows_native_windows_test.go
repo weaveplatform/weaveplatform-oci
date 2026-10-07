@@ -19,8 +19,6 @@ import (
 	"github.com/deploymenttheory/go-bindings-win32/bindings/win32/security"
 	hcs "github.com/deploymenttheory/go-bindings-win32/bindings/win32/system/hostcomputesystem"
 	"golang.org/x/sys/windows"
-
-	"github.com/weaveplatform/weaveplatform-oci/pkg/disk/vhd"
 )
 
 func TestNativeWindowsDiskAndCancellation(t *testing.T) {
@@ -33,13 +31,16 @@ func TestNativeWindowsDiskAndCancellation(t *testing.T) {
 		t.Fatal("cancelled installer ran")
 	}
 	root := t.TempDir()
-	disk := filepath.Join(root, "disk.vhd")
+	disk := filepath.Join(root, "disk.vhdx")
 	must(t, createWindowsDisk(disk))
-	_, f, size, err := vhd.Raw(disk)
+	f, err := os.Open(disk)
+	must(t, err)
+	header := make([]byte, 8)
+	_, err = io.ReadFull(f, header)
 	must(t, err)
 	must(t, f.Close())
-	if size != 80<<30 {
-		t.Fatal(size)
+	if string(header) != "vhdxfile" {
+		t.Fatal("build disk is not VHDX", string(header))
 	}
 	if err := createWindowsDisk(disk); err == nil {
 		t.Fatal("replaced existing disk")

@@ -101,6 +101,7 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 		newImageIPSW(packages, emit),
 		newImageWindowsSource(packages, emit),
 		newImageWindows(packages, emit),
+		newImageExport(tools, emit),
 	)
 	return root
 }

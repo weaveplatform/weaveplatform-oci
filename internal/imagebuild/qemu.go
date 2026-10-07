@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 )
 
@@ -24,16 +25,7 @@ type BootOptions struct {
 }
 
 // BootResult records the guest's observed boot identity.
-type BootResult struct {
-	Platform       string  `json:"platform"`
-	OSVersion      string  `json:"osVersion"`
-	Accelerator    string  `json:"accelerator"`
-	Passed         bool    `json:"passed"`
-	Marker         string  `json:"marker"`
-	MachineID      string  `json:"machineID,omitempty"` //nolint:tagliatelle // Existing acceptance report contract.
-	Error          string  `json:"error,omitempty"`
-	ElapsedSeconds float64 `json:"elapsedSeconds"`
-}
+type BootResult = imagecheck.Boot
 
 func firmware(arch string) (string, string, error) {
 	pairs := [][2]string{{os.Getenv("WEAVE_FIRMWARE_CODE"), os.Getenv("WEAVE_FIRMWARE_VARS")}}

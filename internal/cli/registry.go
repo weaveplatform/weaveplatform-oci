@@ -317,23 +317,42 @@ func newKeygen(stdout io.Writer) *cobra.Command {
 
 func newPublish(stdout io.Writer, g *globals) *cobra.Command {
 	var repo, tag, key, out string
+	var layout, layoutRef, expectedDigest, acceptancePath string
 	var o chunk.Options
 	cmd := &cobra.Command{
 		Use:   "publish <bundle-dir>... --repository <repo> --tag <build-tag>",
 		Short: "Pack, push, sign, self-verify and emit the channel promotion entry",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 0 || repo == "" || tag == "" {
+			if (len(args) == 0 && layout == "") || repo == "" || tag == "" {
 				return fmt.Errorf(
-					"%w: publish needs bundle directories, --repository and --tag",
+					"%w: publish needs bundle directories or --layout, --repository and --tag",
 					errUsage,
 				)
 			}
 			ctx := cmd.Context()
+			var acceptance []byte
+			if acceptancePath != "" {
+				var err error
+				acceptance, err = os.ReadFile(acceptancePath)
+				if err != nil {
+					return fmt.Errorf("read acceptance: %w", err)
+				}
+			}
 			c, p, err := g.client()
 			if err != nil {
 				return err
 			}
-			req := publish.Request{Client: c, Bundles: args, Repository: repo, Tag: tag, Chunk: o}
+			req := publish.Request{
+				Client:         c,
+				Bundles:        args,
+				Layout:         layout,
+				LayoutRef:      layoutRef,
+				ExpectedDigest: expectedDigest,
+				Acceptance:     acceptance,
+				Repository:     repo,
+				Tag:            tag,
+				Chunk:          o,
+			}
 			if p.Signing.Provider == profile.SigningCosignKey {
 				if key == "" {
 					key = p.Signing.Key
@@ -374,6 +393,12 @@ func newPublish(stdout io.Writer, g *globals) *cobra.Command {
 	cmd.Flags().
 		StringVar(&out, "promotion-out", "", "write the channel promotion entry (JSON) here")
 	cmd.Flags().IntVar(&o.Concurrency, "concurrency", 2, "chunks compressed in parallel")
+	cmd.Flags().StringVar(&layout, "layout", "", "Publish a validated OCI layout without repacking")
+	cmd.Flags().StringVar(&layoutRef, "layout-ref", "", "Tag or digest in the validated layout")
+	cmd.Flags().
+		StringVar(&expectedDigest, "expected-digest", "", "Accepted index digest; required with --layout")
+	cmd.Flags().
+		StringVar(&acceptancePath, "acceptance", "", "Passed acceptance report; required with --layout")
 	return cmd
 }
 

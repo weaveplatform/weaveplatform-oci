@@ -44,7 +44,7 @@ func installWindowsWith(
 	}
 	id := uuid.NewString()
 	progress.step("creating disk and isolated firmware state")
-	disk, state := filepath.Join(r.Directory, "disk.vhd"), filepath.Join(r.Directory, "build.vmgs")
+	disk, state := filepath.Join(r.Directory, "disk.vhdx"), filepath.Join(r.Directory, "build.vmgs")
 	if err := api.createDisk(disk); err != nil {
 		return result, err
 	}
