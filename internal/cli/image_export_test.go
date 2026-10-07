@@ -65,3 +65,35 @@ func TestImageExportCLI(t *testing.T) {
 		t.Fatal(code, stderr)
 	}
 }
+
+func TestPrepareAgentUsageAndLockFailures(t *testing.T) {
+	if code, _, stderr := run(t, "image", "prepare-agent"); code != 2 {
+		t.Fatal(code, stderr)
+	}
+	args := []string{
+		"image",
+		"prepare-agent",
+		"--platform",
+		"linux/arm64",
+		"--cache",
+		t.TempDir(),
+		"--out",
+		filepath.Join(t.TempDir(), "payload"),
+	}
+	if code, _, _ := run(t, args...); code == 0 {
+		t.Fatal("accepted missing default catalogue")
+	}
+	args = append(
+		args,
+		"--catalogue",
+		"../../images/catalogue.json",
+		"--lock",
+		"../../images/packages.lock.json",
+	)
+	if code, _, stderr := run(
+		t,
+		args...); code == 0 ||
+		!strings.Contains(stderr, "installer missing") {
+		t.Fatal(code, stderr)
+	}
+}

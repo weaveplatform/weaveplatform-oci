@@ -277,3 +277,23 @@ servicing revision through the filename and media digest. Use that lock with
 `build-windows --source-lock` on a matching Windows host. Available releases
 come from Microsoft's catalogue; `latest` means newest matching media returned
 by that catalogue.
+
+Prepare pinned native agent installers with:
+
+```sh
+weaveoci image prepare-agent --platform windows/amd64 \
+  --cache "$WORK/cache/packages" --out "$WORK/payload-windows"
+weaveoci image prepare-agent --platform darwin/arm64 \
+  --cache "$WORK/cache/packages" --out "$WORK/payload-macos"
+```
+
+Preparation authenticates the core and module releases before creating the
+payload. Module installers, manifests and binaries must all be covered by the
+release's signed checksums; an older lock without this evidence fails preflight.
+macOS core packages use their own Sigstore bundle. The generated
+`install-agent.ps1` or `install-agent.sh` is for execution **inside the guest**,
+with the payload directory as its argument. It checks installed versions and
+binary hashes, stops the agent and removes its machine-bound store and channel
+trust while preserving `manifest.sequence`. The builder still has to remove its
+temporary login account and generalize the OS; payload preparation alone does
+not produce or validate an agent image.
