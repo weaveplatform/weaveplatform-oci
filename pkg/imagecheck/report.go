@@ -46,8 +46,9 @@ type Boot struct {
 }
 
 var (
-	markerPattern = regexp.MustCompile(`^WEAVE-BOOT-OK-[a-f0-9]{24}$`)
-	linuxIdentity = regexp.MustCompile(`^[a-f0-9]{32}$`)
+	markerPattern    = regexp.MustCompile(`^WEAVE-BOOT-OK-[a-f0-9]{24}$`)
+	linuxIdentity    = regexp.MustCompile(`^[a-f0-9]{32}$`)
+	keyDigestPattern = regexp.MustCompile(`^sha256:[a-f0-9]{64}$`)
 )
 
 // Check refuses partial, stale or failed evidence. A valid report alone is not
@@ -123,8 +124,19 @@ func checkClones(clones []Boot, cfg spec.Config, schema int) error {
 		return fmt.Errorf("%w: clones reused an identity or boot challenge", ErrEvidence)
 	}
 	if schema == 2 {
-		for _, name := range requiredIdentities(cfg.Guest.OS) {
+		identities := requiredIdentities(cfg.Guest.OS)
+		if cfg.Provisioning.Agent != nil {
+			identities = append(identities, "agentStoreKeyDigest")
+		}
+		for _, name := range identities {
 			a, b := clones[0].Identities[name], clones[1].Identities[name]
+			if name == "agentStoreKeyDigest" &&
+				(!keyDigestPattern.MatchString(a) || !keyDigestPattern.MatchString(b)) {
+				return fmt.Errorf(
+					"%w: agent clones require store-key SHA-256 evidence",
+					ErrEvidence,
+				)
+			}
 			if strings.TrimSpace(a) == "" || strings.TrimSpace(b) == "" || strings.EqualFold(a, b) {
 				return fmt.Errorf("%w: clones need distinct %s", ErrEvidence, name)
 			}

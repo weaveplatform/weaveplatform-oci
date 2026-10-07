@@ -56,6 +56,9 @@ func fixture(os string, agent bool) (Report, conformance.Report) {
 		for _, key := range requiredIdentities(os) {
 			c.Identities[key] = id + "-" + key
 		}
+		if agent {
+			c.Identities["agentStoreKeyDigest"] = "sha256:" + strings.Repeat(id, 64)
+		}
 		for _, key := range requiredChecks(cfg) {
 			c.Checks[key] = true
 		}
@@ -150,6 +153,16 @@ func TestReportRejectsPartialStaleAndFailedEvidence(t *testing.T) {
 	_, i := fixture("linux", false)
 	if err := Check([]byte("invalid"), i, "r1"); !errors.Is(err, ErrEvidence) {
 		t.Fatal(err)
+	}
+}
+
+func TestAgentReportRequiresIndependentStoreKeys(t *testing.T) {
+	for _, key := range []string{"", "secret", "sha256:" + strings.Repeat("a", 64)} {
+		r, i := fixture("windows", true)
+		r.Platforms["windows/arm64"][1].Identities["agentStoreKeyDigest"] = key
+		if err := Check(encoded(t, r), i, "r1"); !errors.Is(err, ErrEvidence) {
+			t.Fatal("accepted missing, invalid or reused agent store key", err)
+		}
 	}
 }
 
