@@ -258,6 +258,51 @@ func TestSeedUsesJSON(t *testing.T) {
 	must(t, err)
 	var cloud map[string]any
 	must(t, json.Unmarshal(raw[len("#cloud-config\n"):], &cloud))
+	power, ok := cloud["power_state"].(map[string]any)
+	if !ok || power["mode"] != "poweroff" || power["delay"] != "now" ||
+		power["timeout"] != float64(120) {
+		t.Fatalf("shutdown must wait for cloud-final: %s", raw)
+	}
+	condition, err := json.Marshal(power["condition"])
+	must(t, err)
+	if string(condition) != `["test","-f","/run/marker"]` ||
+		!strings.HasSuffix(script, "\ntouch '/run/marker'\n") ||
+		strings.Contains(script, "systemctl poweroff") {
+		t.Fatalf("shutdown must follow successful checks without interrupting cloud-init: %s", raw)
+	}
+}
+
+func TestGuestCPUCompatibility(t *testing.T) {
+	for _, tc := range []struct{ arch, accelerator, cpu string }{
+		{"arm64", "tcg", "cortex-a72"},
+		{"amd64", "tcg", "max"},
+		{"arm64", "hvf", "host"},
+		{"arm64", "kvm", "host"},
+		{"amd64", "kvm", "host"},
+	} {
+		t.Run(tc.arch+"/"+tc.accelerator, func(t *testing.T) {
+			fake := &fakeQEMU{t: t, marker: "MARKER"}
+			tools := Tools{
+				Run: func(ctx context.Context, stdout, stderr io.Writer, name string, args ...string) error {
+					command := strings.Join(args, " ")
+					if !strings.Contains(command, "-cpu "+tc.cpu+" ") ||
+						!strings.Contains(command, ",accel="+tc.accelerator+" ") {
+						t.Fatalf("unexpected CPU/accelerator: %s", command)
+					}
+					return fake.run(ctx, stdout, stderr, name, args...)
+				},
+			}
+			result := BootResult{Accelerator: tc.accelerator, Marker: fake.marker}
+			must(
+				t,
+				tools.runGuest(t.Context(), BootOptions{Report: t.TempDir(), Timeout: time.Second},
+					t.TempDir(), "code.fd", tc.arch, &result),
+			)
+			if !result.Passed {
+				t.Fatal(result)
+			}
+		})
+	}
 }
 
 func TestAgentCandidatePreservesParentManifest(t *testing.T) {

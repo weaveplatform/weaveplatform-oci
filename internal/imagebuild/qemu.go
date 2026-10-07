@@ -145,7 +145,10 @@ func bootScript(b pack.Bundle, marker, script string) string {
 	}
 	// The serial login prompt may not end with a newline. Start our marker on
 	// its own line so console timing cannot hide a successful boot.
-	return check + script + "\nprintf '\\n" + marker + " machine-id=%s\\n' \"$weave_machine_id\" > " + console + "\nsystemctl poweroff\n"
+	return check + script + "\nprintf '\\n" + marker + " machine-id=%s\\n' \"$weave_machine_id\" > " + console +
+		"\ntouch " + shellQuote(
+		"/run/"+marker,
+	) + "\n"
 }
 
 func (t Tools) seed(ctx context.Context, work, check, marker, payload string) error {
@@ -154,7 +157,16 @@ func (t Tools) seed(ctx context.Context, work, check, marker, payload string) er
 		return fmt.Errorf("create seed: %w", err)
 	}
 	user, err := json.Marshal(
-		map[string]any{"ssh_pwauth": false, "runcmd": [][]string{{"sh", "-c", check}}},
+		map[string]any{
+			"ssh_pwauth": false,
+			"runcmd":     [][]string{{"sh", "-c", check}},
+			// Let cloud-final exit before shutdown; powering off from runcmd
+			// interrupts later modules and produces a misleading failure.
+			"power_state": map[string]any{
+				"mode": "poweroff", "delay": "now", "timeout": 120,
+				"condition": []string{"test", "-f", "/run/" + marker},
+			},
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("encode seed: %w", err)
@@ -355,6 +367,11 @@ func (t Tools) runGuest(
 		executable, machine = "qemu-system-aarch64", "virt"
 	}
 	cpu := "max"
+	if arch == "arm64" {
+		// A fixed ARMv8 CPU also boots older kernels (including Ubuntu
+		// 20.04); the evolving feature set of "max" can stall before init.
+		cpu = "cortex-a72"
+	}
 	if result.Accelerator != "tcg" {
 		cpu = "host"
 	}
@@ -383,9 +400,10 @@ func (t Tools) runGuest(
 		timeout:     o.Timeout,
 	}
 	t.progress(
-		"boot linux/%s: starting %s; timeout=%s serial=%s diagnostics=%s",
+		"boot linux/%s: starting %s; cpu=%s timeout=%s serial=%s diagnostics=%s",
 		arch,
 		executable,
+		cpu,
 		o.Timeout,
 		serialLog.Name(),
 		log.Name(),
