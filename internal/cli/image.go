@@ -94,6 +94,9 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 	resolve.Flags().StringVar(&out, "out", "", "New dependency lock path")
 	root.AddCommand(
 		check,
+		newImageAdmission(emit),
+		newImageRebuild(emit),
+		newImageAgentValidate(tools, load, emit, stderr),
 		resolve,
 		newImageBoot(tools, emit),
 		newImageValidate(tools, emit),

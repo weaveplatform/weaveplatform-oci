@@ -1,0 +1,55 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Tue Sep 29 11:14PM",
+      "X": 1742,
+      "Y": 18,
+      "Width": 264,
+      "Height": 24
+    },
+    {
+      "Value": "Find information and get things done, simply by asking.",
+      "X": 363,
+      "Y": 801,
+      "Width": 833,
+      "Height": 32
+    },
+    {
+      "Value": "Apple stores transcripts of your interactions with Siri and may review a subset of these transcripts. Siri may also send",
+      "X": 361,
+      "Y": 1147,
+      "Width": 1228,
+      "Height": 21
+    },
+    {
+      "Value": "information like your audio, Siri setup, contacts, and location to Apple to process your request. Data is not associated with",
+      "X": 361,
+      "Y": 1175,
+      "Width": 1277,
+      "Height": 21
+    },
+    {
+      "Value": "your Apple Account. About Siri, Dictation \u0026 Privacy...",
+      "X": 361,
+      "Y": 1203,
+      "Width": 547,
+      "Height": 21
+    },
+    {
+      "Value": "Continue",
+      "X": 1603,
+      "Y": 1282,
+      "Width": 107,
+      "Height": 21
+    },
+    {
+      "Value": "Set Up Later",
+      "X": 317,
+      "Y": 1283,
+      "Width": 151,
+      "Height": 24
+    }
+  ]
+}

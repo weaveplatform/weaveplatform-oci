@@ -1,0 +1,76 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Tue Sep 29 11:51 PM",
+      "X": 1742,
+      "Y": 18,
+      "Width": 264,
+      "Height": 24
+    },
+    {
+      "Value": "Liquid Glass",
+      "X": 577,
+      "Y": 300,
+      "Width": 194,
+      "Height": 33
+    },
+    {
+      "Value": "Slide from clear to tinted to reveal content beneath or add",
+      "X": 576,
+      "Y": 342,
+      "Width": 873,
+      "Height": 27
+    },
+    {
+      "Value": "more opacity.",
+      "X": 576,
+      "Y": 385,
+      "Width": 202,
+      "Height": 32
+    },
+    {
+      "Value": "Search",
+      "X": 887,
+      "Y": 513,
+      "Width": 84,
+      "Height": 19
+    },
+    {
+      "Value": "Welcome to Apple Park",
+      "X": 590,
+      "Y": 907,
+      "Width": 460,
+      "Height": 40
+    },
+    {
+      "Value": "Cupertino, California",
+      "X": 591,
+      "Y": 966,
+      "Width": 383,
+      "Height": 41
+    },
+    {
+      "Value": "Learn about the design and history of Apple Park, and discover its",
+      "X": 591,
+      "Y": 1039,
+      "Width": 793,
+      "Height": 25
+    },
+    {
+      "Value": "Accessibility",
+      "X": 317,
+      "Y": 1282,
+      "Width": 150,
+      "Height": 25
+    },
+    {
+      "Value": "Continue",
+      "X": 1603,
+      "Y": 1282,
+      "Width": 107,
+      "Height": 21
+    }
+  ]
+}

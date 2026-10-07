@@ -37,8 +37,8 @@ through native libraries. All local image artifacts and build caches stay under
 ## Work and evidence tracker
 
 - [ ] Signed module installer releases and refreshed package lock.
-- [ ] Schema-3 acceptance profiles and explicit operation outcomes.
-- [ ] Authenticated admission and current-parent checks.
+- [x] Schema-3 acceptance profiles and explicit operation outcomes.
+- [x] Authenticated admission and current-parent checks (library and CLI).
 - [ ] Linux QEMU agent lifecycle acceptance.
 - [ ] Locked Xfce desktop construction and real GUI acceptance.
 - [ ] Shared macOS onboarding and native agent builder.
@@ -54,3 +54,46 @@ tests. Record real VM acceptance separately from unit coverage.
 The checklist records completed and verified work only. Package preparation,
 successful restore, mocked VM responses and disk conversion do not establish
 image or consumer acceptance.
+
+## Implementation checkpoint
+
+`image verify-acceptance` takes an exact local layout, a reviewed policy, and
+separate build and acceptance Sigstore bundles. It verifies both signatures,
+workflow identities, predicate types and index subjects before evaluating the
+acceptance payload. New promotion requires schema 3; historical inspection
+continues to read earlier reports. Current parent tags come from reviewed policy,
+and must resolve to the recorded parent platform manifests in the signed channel.
+
+`image rebuild-plan` fingerprints parent/source, packages, recipe and builder
+digests. Package ordering and repeated events do not produce extra builds.
+Only previously authenticated acceptance records may suppress a rebuild. Event
+dispatch and periodic reconciliation still need to be connected to this planner.
+
+`image validate-agent-linux` validates a packed index through two separately
+unpacked QEMU clones. It supplies independent host keys, reads the OS release,
+Ubuntu build serial, machine identity, boot identity, store-key digest and
+manifest sequence from authenticated guest exec, and observes guest RESET and
+SHUTDOWN events through QMP. Cloud-init receives public trust material only.
+The guest echoes a unique clone challenge; a process exit or power RPC reply
+alone cannot pass acceptance. The adapter waits for healthy modules on each
+boot, then runs all capability checks. Desktop profiles additionally require
+active-console, clipboard and display round trips.
+
+The QMP event barrier follows the
+[QEMU protocol specification](https://www.qemu.org/docs/master/interop/qmp-spec.html).
+The Ubuntu serial is read from `/etc/cloud/build.info`, as documented by
+[Canonical](https://canonical.com/blog/integrating-the-ubuntu-snapshot-service-into-systems-management-and-update-tools).
+
+`pkg/macsetup` contains the shared Setup Assistant planner, image fixtures and
+native-readiness rules extracted from Guestweave. Native VM/UI orchestration and
+the Guestweave dependency migration remain pending.
+
+Signed module installer publication is tracked in
+[agent-modules PR #33](https://github.com/weaveplatform/weaveplatform-agent-modules/pull/33).
+Its packager race tests pass at 98.4% coverage and actionlint passes. The image
+lock cannot be refreshed to installers until new immutable releases are available.
+
+The initial full OCI race/shuffle run passed at 95.9% aggregate statement coverage.
+The following adapter run passed with imagebuild 95.8%, agentcheck 98.9%, and
+imagecheck 99.2%. Shared macOS setup measured 97.4%. These are unit and protocol
+checks; no new live agent or native VM acceptance has passed in this checkpoint.

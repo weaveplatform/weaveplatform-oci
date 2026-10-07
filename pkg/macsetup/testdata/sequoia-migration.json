@@ -1,0 +1,76 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Transfer Your Data to This Mac",
+      "X": 656,
+      "Y": 535,
+      "Width": 735,
+      "Height": 39
+    },
+    {
+      "Value": "You can transfer your data from another Mac or Windows PC. If you don't want to transfer from a",
+      "X": 441,
+      "Y": 624,
+      "Width": 1165,
+      "Height": 25
+    },
+    {
+      "Value": "computer, you can use a backup or startup disk, or set up this Mac without transferring any data.",
+      "X": 440,
+      "Y": 655,
+      "Width": 1167,
+      "Height": 26
+    },
+    {
+      "Value": "How do you want to transfer your information?",
+      "X": 746,
+      "Y": 800,
+      "Width": 557,
+      "Height": 25
+    },
+    {
+      "Value": "From a Mac, Time Machine, or startup disk",
+      "X": 782,
+      "Y": 872,
+      "Width": 513,
+      "Height": 25
+    },
+    {
+      "Value": "o From a Windows PC",
+      "X": 740,
+      "Y": 920,
+      "Width": 281,
+      "Height": 24
+    },
+    {
+      "Value": "O Set up with iPhone or iPad",
+      "X": 740,
+      "Y": 964,
+      "Width": 356,
+      "Height": 29
+    },
+    {
+      "Value": "O Set up as new",
+      "X": 740,
+      "Y": 1012,
+      "Width": 209,
+      "Height": 29
+    },
+    {
+      "Value": "Back",
+      "X": 1526,
+      "Y": 1299,
+      "Width": 57,
+      "Height": 20
+    },
+    {
+      "Value": "Continue",
+      "X": 1664,
+      "Y": 1299,
+      "Width": 106,
+      "Height": 21
+    }
+  ]
+}

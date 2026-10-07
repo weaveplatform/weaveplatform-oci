@@ -21,3 +21,5 @@ override:
     threshold: 95
   - path: ^pkg/agentcheck$
     threshold: 95
+  - path: ^pkg/macsetup$
+    threshold: 95

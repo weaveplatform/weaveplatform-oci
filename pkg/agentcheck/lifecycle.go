@@ -9,6 +9,7 @@ import (
 	"regexp"
 
 	"github.com/weaveplatform/weaveplatform-agent-modules/sdk/weaveclient"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 )
 
 // Snapshot is guest evidence collected independently of the expected image
@@ -30,7 +31,10 @@ type Snapshot struct {
 // subscriptions even when the request fails. Inspect must read the running
 // guest, rather than construct a Snapshot from expected metadata.
 type Lifecycle struct {
-	Dial     func(context.Context) (io.ReadWriteCloser, error)
+	Dial func(context.Context) (io.ReadWriteCloser, error)
+	// Ready may wait for asynchronous service startup after authentication.
+	// It never substitutes for the complete Probe performed on both boots.
+	Ready    func(context.Context, *weaveclient.Client) error
 	Inspect  func(context.Context, *weaveclient.Client) (Snapshot, error)
 	ArmPower func(context.Context, bool) (wait func(context.Context) error, close func(), err error)
 }
@@ -39,7 +43,8 @@ type Lifecycle struct {
 // First.StoreKeyDigest across clones remains the two-clone validator's job.
 type LifecycleResult struct {
 	Result
-	First, Rebooted Snapshot
+	First, Rebooted  Snapshot
+	RebootOperations map[string]imagecheck.Outcome
 }
 
 // ProbeLifecycle authenticates, exercises every module, reboots, verifies the
@@ -62,6 +67,11 @@ func ProbeLifecycle(
 		return r, err
 	}
 	defer c.Close()
+	if vm.Ready != nil {
+		if err := vm.Ready(ctx, c); err != nil {
+			return r, fmt.Errorf("agent readiness: %w", err)
+		}
+	}
 	r.Result, err = Probe(ctx, c, expected)
 	if err != nil {
 		return r, err
@@ -83,11 +93,18 @@ func ProbeLifecycle(
 		return r, fmt.Errorf("trust after reboot: %w", err)
 	}
 	defer c.Close()
+	if vm.Ready != nil {
+		if err := vm.Ready(ctx, c); err != nil {
+			return r, fmt.Errorf("agent readiness after reboot: %w", err)
+		}
+	}
 	// A second full probe catches services that only worked in the installer
 	// session, modules not enabled at boot, and transient module start failures.
-	if _, err := Probe(ctx, c, expected); err != nil {
+	reboot, err := Probe(ctx, c, expected)
+	if err != nil {
 		return r, fmt.Errorf("agent after reboot: %w", err)
 	}
+	r.RebootOperations = reboot.Operations
 	r.Rebooted, err = vm.Inspect(ctx, c)
 	if err != nil {
 		return r, fmt.Errorf("inspect reboot: %w", err)

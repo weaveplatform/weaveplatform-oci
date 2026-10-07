@@ -1,0 +1,83 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "U.S. ffl Tue Sep 29 5:20AM",
+      "X": 1641,
+      "Y": 18,
+      "Width": 365,
+      "Height": 24
+    },
+    {
+      "Value": "Siri",
+      "X": 985,
+      "Y": 532,
+      "Width": 76,
+      "Height": 41
+    },
+    {
+      "Value": "Siri helps you get things done just by asking. Siri can also make suggestions before you ask in apps,",
+      "X": 422,
+      "Y": 622,
+      "Width": 1203,
+      "Height": 24
+    },
+    {
+      "Value": "search, and keyboards.",
+      "X": 884,
+      "Y": 654,
+      "Width": 279,
+      "Height": 25
+    },
+    {
+      "Value": "Enable Ask Siri",
+      "X": 952,
+      "Y": 757,
+      "Width": 175,
+      "Height": 22
+    },
+    {
+      "Value": "Apple stores transcripts of your interactions with Siri and may review a subset of these transcripts. Siri may also send",
+      "X": 409,
+      "Y": 1129,
+      "Width": 1229,
+      "Height": 21
+    },
+    {
+      "Value": "information like your audio, Siri setup, contacts, and location to Apple to process your request. Data is not associated",
+      "X": 410,
+      "Y": 1157,
+      "Width": 1227,
+      "Height": 21
+    },
+    {
+      "Value": "with your Apple Account.",
+      "X": 893,
+      "Y": 1185,
+      "Width": 260,
+      "Height": 21
+    },
+    {
+      "Value": "About Siri, Dictation \u0026 Privacy...",
+      "X": 858,
+      "Y": 1213,
+      "Width": 330,
+      "Height": 21
+    },
+    {
+      "Value": "Back",
+      "X": 1526,
+      "Y": 1299,
+      "Width": 57,
+      "Height": 20
+    },
+    {
+      "Value": "Continue",
+      "X": 1664,
+      "Y": 1299,
+      "Width": 106,
+      "Height": 21
+    }
+  ]
+}
