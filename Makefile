@@ -37,12 +37,12 @@ vet:
 ## test: unit tests (race, shuffle); coverage to cover/unit
 test:
 	@rm -rf $(COVER_DIR)/unit && mkdir -p $(COVER_DIR)/unit
-	$(GO) test -race -shuffle=on -count=1 -cover -coverpkg=$(MODULE)/... $(UNIT_PKGS) -args -test.gocoverdir=$(PWD)/$(COVER_DIR)/unit
+	$(GO) test -race -shuffle=on -count=1 -cover -coverpkg=$(MODULE)/... $(UNIT_PKGS) -args -test.gocoverdir=$(abspath $(COVER_DIR))/unit
 
 ## accept: godog features against the coverage-instrumented weaveoci and real registries (Docker)
 accept:
 	@rm -rf $(COVER_DIR)/accept && mkdir -p $(COVER_DIR)/accept
-	cd test/acceptance && WEAVEOCI_GOCOVERDIR=$(PWD)/$(COVER_DIR)/accept $(GO) test -count=1 -timeout 30m .
+	cd test/acceptance && WEAVEOCI_GOCOVERDIR=$(abspath $(COVER_DIR))/accept $(GO) test -count=1 -timeout 30m .
 
 ## cover: merge cover/* and enforce >=95% total/imagebuild, >=90% for other packages
 cover:

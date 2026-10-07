@@ -6,15 +6,9 @@ name: images | Build Linux image (reusable)
 #   resolve serial -> weaveoci source fetch (signed checksums, pinned key)
 #   -> qemu-img convert to raw -> weaveoci bundle init (one per arch)
 #
-# Without publish it packs to a local layout, runs the strict deep
-# conformance check, unpacks both architectures and boot-tests fresh clones.
-#
-# With publish (github profile) it runs weaveoci publish to
-# ghcr.io/weaveplatform/weave-images/<name> (pack, push, deep self-check,
-# promotion entry), attests the index with actions/attest, pulls it back on a
-# clean cache verifying the attestation, boot-tests what it pulled, and
-# dispatches image-published to weaveplatform-release-channels, whose promote
-# workflow re-resolves the digests and opens the promotion PR.
+# Both dry runs and publication pack, deeply verify and boot two fresh clones
+# per architecture before publication. Publication reuses that exact index,
+# attests the build and acceptance report, then verifies a clean pull.
 on:
   workflow_call:
     inputs:
@@ -102,27 +96,13 @@ jobs:
           TMPDIR="$WORK" scripts/linux/build-cloud-image.sh "images/$IMAGE" "$WORK/bundles" 2>&1
           df -h "$WORK"
 
-      # ---- pull requests and dry runs ---------------------------------------
-
-      - name: Pack, check, unpack both architectures
-        if: ${{ !inputs.publish }}
-        env:
-          TAG: ${{ steps.bundles.outputs.tag }}
+      - name: Pack, verify and boot two fresh clones per architecture
         run: |
           set -euo pipefail
           exec 2>&1
-          log() { printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
-          log "Packing both architectures: tag=$TAG"
-          "$WEAVEOCI" pack "$WORK"/bundles/* --out "$WORK/layout" --tag "$TAG" --concurrency 4
-          log "Pack complete; starting strict deep integrity check"
-          "$WEAVEOCI" inspect "$WORK/layout" --strict --deep
-          log "Deep integrity check passed; removing staging bundles"
+          TMPDIR="$WORK" "$WEAVEOCI" image validate-linux "$WORK"/bundles/* \
+            --out "$WORK/candidate" --arches amd64,arm64 --timeout 1200
           rm -rf "$WORK/bundles"
-          for arch in amd64 arm64; do
-            log "Unpacking linux/$arch for clone boot validation"
-            "$WEAVEOCI" unpack "$WORK/layout" "$WORK/boot-$arch" --platform "linux/$arch"
-            log "Unpacked linux/$arch"
-          done
 
       # ---- publish -----------------------------------------------------------
 
@@ -178,7 +158,9 @@ jobs:
           REPOSITORY: ${{ steps.bundles.outputs.repository }}
         run: |
           set -euo pipefail
-          "$WEAVEOCI" publish "$WORK"/bundles/* --repository "$REPOSITORY" --tag "$TAG" \
+          "$WEAVEOCI" publish --layout "$WORK/candidate/layout" --layout-ref "$TAG" \
+            --expected-digest "$(jq -r .indexDigest "$WORK/candidate/acceptance.json")" \
+            --acceptance "$WORK/candidate/acceptance.json" --repository "$REPOSITORY" --tag "$TAG" \
             --concurrency 4 --promotion-out "$WORK/promotion.json"
           rm -rf "$WORK/bundles" "$WORK/cache"
           jq . "$WORK/promotion.json"
@@ -204,34 +186,25 @@ jobs:
             "$WEAVEOCI" pull "$REPOSITORY:$TAG" --verify signature --platform "linux/$arch" --to "$WORK/boot-$arch"
           done
 
-      # ---- both --------------------------------------------------------------
-
-      - name: Boot two fresh clones per architecture
-        run: |
-          set -euo pipefail
-          exec 2>&1
-          log() { printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
-          trap 'status=$?; if [ "$status" -ne 0 ]; then log "Boot validation failed: linux/$arch clone=$clone exit=$status reports=$WORK/reports"; fi' EXIT
-          for arch in amd64 arm64; do
-            for clone in 1 2; do
-              log "Starting linux/$arch clone $clone/2 (timeout=1200s)"
-              TMPDIR="$WORK" "$WEAVEOCI" image boot-linux "$WORK/boot-$arch" \
-                --report "$WORK/reports/$arch-$clone" --timeout 1200
-              log "Passed linux/$arch clone $clone/2"
-            done
-            first=$(jq -r .machineID "$WORK/reports/$arch-1/result.json")
-            second=$(jq -r .machineID "$WORK/reports/$arch-2/result.json")
-            [ "$first" != "$second" ] || { echo "::error::$arch clones reused a machine-id"; exit 1; }
-            log "linux/$arch: both clones passed with distinct machine IDs ($first, $second)"
-          done
-          log "All four Linux clone boots passed"
+      - name: Attest acceptance of the published index
+        if: ${{ inputs.publish }}
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ steps.publish.outputs.name }}
+          subject-digest: ${{ steps.publish.outputs.digest }}
+          predicate-type: https://weaveplatform.io/attestations/image-acceptance/v1
+          predicate-path: ${{ env.WORK }}/candidate/acceptance.json
+          push-to-registry: true
 
       - name: Preserve boot reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.bundles.outputs.report-name || 'boot-reports' }}
-          path: ${{ env.WORK }}/reports
+          path: |
+            ${{ env.WORK }}/candidate/reports
+            ${{ env.WORK }}/candidate/acceptance.json
+            ${{ env.WORK }}/candidate/inspection.json
           if-no-files-found: warn
           retention-days: 14
 

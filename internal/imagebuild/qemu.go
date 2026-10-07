@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/pack"
 )
 
@@ -24,16 +25,7 @@ type BootOptions struct {
 }
 
 // BootResult records the guest's observed boot identity.
-type BootResult struct {
-	Platform       string  `json:"platform"`
-	OSVersion      string  `json:"osVersion"`
-	Accelerator    string  `json:"accelerator"`
-	Passed         bool    `json:"passed"`
-	Marker         string  `json:"marker"`
-	MachineID      string  `json:"machineID,omitempty"` //nolint:tagliatelle // Existing acceptance report contract.
-	Error          string  `json:"error,omitempty"`
-	ElapsedSeconds float64 `json:"elapsedSeconds"`
-}
+type BootResult = imagecheck.Boot
 
 func firmware(arch string) (string, string, error) {
 	pairs := [][2]string{{os.Getenv("WEAVE_FIRMWARE_CODE"), os.Getenv("WEAVE_FIRMWARE_VARS")}}
@@ -185,7 +177,7 @@ func (t Tools) seed(ctx context.Context, work, check, marker, payload string) er
 		return err
 	}
 	if payload != "" {
-		if err := copyTree(payload, filepath.Join(dir, "packages")); err != nil {
+		if err := copyTreeContext(ctx, payload, filepath.Join(dir, "packages")); err != nil {
 			return err
 		}
 	}
@@ -220,6 +212,10 @@ func (t Tools) seed(ctx context.Context, work, check, marker, payload string) er
 }
 
 func copyTree(src, dst string) error {
+	return copyTreeContext(context.Background(), src, dst)
+}
+
+func copyTreeContext(ctx context.Context, src, dst string) error {
 	err := filepath.WalkDir(src, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -234,7 +230,7 @@ func copyTree(src, dst string) error {
 		if !entry.Type().IsRegular() {
 			return fmt.Errorf("%w: payload contains non-regular file", ErrInput)
 		}
-		return copyFile(path, filepath.Join(dst, rel))
+		return copyFileContext(ctx, path, filepath.Join(dst, rel))
 	})
 	if err != nil {
 		return fmt.Errorf("copy payload: %w", err)
@@ -315,7 +311,7 @@ func (t Tools) BootLinux(ctx context.Context, o BootOptions) (BootResult, error)
 			return result, err
 		}
 	}
-	if err := copyFile(variables, filepath.Join(work, "vars.fd")); err != nil {
+	if err := copyFileContext(ctx, variables, filepath.Join(work, "vars.fd")); err != nil {
 		return result, err
 	}
 	marker := fmt.Sprintf("WEAVE-BOOT-OK-%x", randomMarker())

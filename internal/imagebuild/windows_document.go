@@ -4,6 +4,13 @@ package imagebuild
 // Build-only firmware/TPM state is discarded after generalization. It must never
 // be shipped as reusable VM identity.
 func windowsDocument(disk, installer, seed, state, pipe string) map[string]any {
+	attachments := map[string]any{
+		"0": map[string]string{"Type": "VirtualDisk", "Path": disk},
+		"2": map[string]string{"Type": "Iso", "Path": seed},
+	}
+	if installer != "" {
+		attachments["1"] = map[string]string{"Type": "Iso", "Path": installer}
+	}
 	return map[string]any{
 		"Owner": "weaveoci", "SchemaVersion": map[string]int{"Major": 2, "Minor": 5},
 		"ShouldTerminateOnLastHandleClosed": true,
@@ -33,11 +40,7 @@ func windowsDocument(disk, installer, seed, state, pipe string) map[string]any {
 				"Timesync":  map[string]any{},
 			},
 			"Devices": map[string]any{
-				"Scsi": map[string]any{"0": map[string]any{"Attachments": map[string]any{
-					"0": map[string]string{"Type": "VirtualDisk", "Path": disk},
-					"1": map[string]string{"Type": "Iso", "Path": installer},
-					"2": map[string]string{"Type": "Iso", "Path": seed},
-				}}},
+				"Scsi":     map[string]any{"0": map[string]any{"Attachments": attachments}},
 				"ComPorts": map[string]any{"0": map[string]string{"NamedPipe": pipe}},
 				"Keyboard": map[string]any{}, "Mouse": map[string]any{},
 			},

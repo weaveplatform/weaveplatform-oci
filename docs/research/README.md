@@ -4,7 +4,9 @@ Research baseline: **2026-10-02**. This set of documents records what was resear
 exists today in hostweave, guestweave-cli-macos and guestweave-cli-windows, and the design
 that follows from both. It is the foundation for `weaveplatform-oci`: the artifact
 specification, the shared Go module and the publication workflows that all three projects
-will adopt. Nothing here is implemented yet; the decision records are Proposed.
+will adopt. The numbered research reports retain that baseline; decision records
+and the [image delivery implementation tracker](15-image-delivery-implementation.md)
+record subsequent implementation and outstanding validation.
 
 ## Purpose
 

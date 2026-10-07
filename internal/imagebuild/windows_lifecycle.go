@@ -44,7 +44,7 @@ func installWindowsWith(
 	}
 	id := uuid.NewString()
 	progress.step("creating disk and isolated firmware state")
-	disk, state := filepath.Join(r.Directory, "disk.vhd"), filepath.Join(r.Directory, "build.vmgs")
+	disk, state := filepath.Join(r.Directory, "disk.vhdx"), filepath.Join(r.Directory, "build.vmgs")
 	if err := api.createDisk(disk); err != nil {
 		return result, err
 	}
@@ -52,6 +52,9 @@ func installWindowsWith(
 		return result, fmt.Errorf("create build firmware state (elevation required): %w", err)
 	}
 	for _, path := range []string{disk, state, r.ISO, r.Seed} {
+		if path == "" {
+			continue
+		}
 		if err := api.grant(id, path); err != nil {
 			return result, fmt.Errorf("grant VM media access: %w", err)
 		}

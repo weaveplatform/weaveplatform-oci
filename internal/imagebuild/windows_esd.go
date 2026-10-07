@@ -221,7 +221,7 @@ func (p Packages) prepareWindowsISO(
 	}
 	dest := filepath.Join(out, "install.iso")
 	if s.Kind != "esd" {
-		return dest, copyFile(media, dest)
+		return dest, copyFileContext(ctx, media, dest)
 	}
 	source, err := wim.Open(media)
 	if err != nil {

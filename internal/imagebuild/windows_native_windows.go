@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os"
+	"path/filepath"
 	"syscall"
 	"time"
 	"unsafe"
@@ -17,21 +17,41 @@ import (
 	hcs "github.com/deploymenttheory/go-bindings-win32/bindings/win32/system/hostcomputesystem"
 	"golang.org/x/sys/windows"
 
-	"github.com/weaveplatform/weaveplatform-oci/pkg/disk/vhd"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/disk/virtualdisk"
 )
 
 func installWindowsNative(
 	ctx context.Context,
 	r WindowsInstallRequest,
 ) (WindowsInstallResult, error) {
-	return installWindowsWith(ctx, r, windowsNativeAPI(hcsSystemCalls{
+	api := windowsNativeAPI(hcsSystemCalls{
 		operation: hcsOperation,
 		create:    hcs.HcsCreateComputeSystem,
 		observe:   hcs.HcsSetComputeSystemCallback,
 		start:     hcs.HcsStartComputeSystem,
 		terminate: hcs.HcsTerminateComputeSystem,
 		close:     hcs.HcsCloseComputeSystem,
-	}))
+	})
+	if r.BaseDisk != "" {
+		api.createDisk = func(path string) error {
+			return cloneWindowsDisk(ctx, r.BaseDisk, path, virtualdisk.Convert)
+		}
+	}
+	result, err := installWindowsWith(ctx, r, api)
+	if err != nil {
+		return result, err
+	}
+	progress := newNativeProgress(ctx, r.Log, "export windows/"+r.Arch)
+	finish := progress.start()
+	progress.step("flattening stopped VHDX into raw OCI export bridge")
+	err = virtualdisk.Convert(
+		ctx,
+		filepath.Join(r.Directory, "disk.vhdx"),
+		filepath.Join(r.Directory, "disk.vhd"),
+		virtualdisk.FixedVHD,
+	)
+	finish(err)
+	return result, err
 }
 
 // These signatures preserve the SDK's handle and callback types at the OS
@@ -90,37 +110,7 @@ func windowsNativeAPI(api hcsSystemCalls) windowsNativeCalls {
 }
 
 func createWindowsDisk(path string) error {
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0o600)
-	if err != nil {
-		return fmt.Errorf("create fixed VHD: %w", err)
-	}
-	var returned uint32
-	// FSCTL_SET_SPARSE keeps the empty fixed VHD from allocating 80 GiB up front.
-	if err := windows.DeviceIoControl(
-		windows.Handle(f.Fd()),
-		windows.FSCTL_SET_SPARSE,
-		nil,
-		0,
-		nil,
-		0,
-		&returned,
-		nil,
-	); err != nil {
-		_ = f.Close()
-		return fmt.Errorf("mark build disk sparse (NTFS/ReFS required): %w", err)
-	}
-	err = f.Truncate(80 << 30)
-	closeErr := f.Close()
-	if err != nil {
-		return fmt.Errorf("size fixed VHD: %w", err)
-	}
-	if closeErr != nil {
-		return fmt.Errorf("close fixed VHD: %w", closeErr)
-	}
-	if err := vhd.Append(path, time.Now()); err != nil {
-		return fmt.Errorf("write VHD footer: %w", err)
-	}
-	return nil
+	return virtualdisk.Create(context.Background(), path, 80<<30)
 }
 
 func connectWindowsSerial(

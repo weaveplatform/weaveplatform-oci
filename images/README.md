@@ -10,6 +10,41 @@ GHCR is the distribution destination: `ghcr.io/weaveplatform/weave-images`.
 KING holds local source media, build disks, caches, OCI layouts and reports.
 Local layouts are not automatically published or promoted to a release channel.
 
+Target disk preparation is separate from acceptance. Windows builds use VHDX;
+OCI still stores raw guest sectors. See [decision 0015](../docs/research/decisions/0015-target-image-delivery.md).
+
+```sh
+weaveoci image export /path/to/layout --expected-digest sha256:... \
+  --platform windows/amd64 --target guestweave-windows --out /path/to/new-output
+```
+
+Targets are `guestweave-windows`, `guestweave-macos`, `azure`, `aws`, `gcp`,
+`openstack` and `vsphere`. The command produces disk files and `export.json`,
+binding hashes to the source index and platform manifest. It marks acceptance
+pending. Cloud registration, provider guest preparation and native boot evidence
+are additional requirements; VMDK export alone does not produce an OVA.
+Windows uses virtdisk for VHDX export; other hosts use `qemu-img` for container
+conversion. Raw, fixed VHD and Google tar.gz output are produced directly in Go.
+
+Publish accepted bytes without repacking:
+
+```sh
+weaveoci publish --layout /path/to/candidate/layout --layout-ref BUILD_TAG \
+  --expected-digest sha256:... --acceptance /path/to/candidate/acceptance.json \
+  --repository IMAGE_REPOSITORY --tag BUILD_TAG --promotion-out promotion.json
+```
+
+Derived-image publication requires the parent platform digest in the signed
+channel configured in the selected profile. Report validation does not itself
+authenticate a report: trusted publication must attest the report, and promotion
+must verify that attestation. The legacy bundle publication path remains for
+base-image compatibility; derived images require accepted layouts.
+
+Native Windows and cloud acceptance execution is deferred at the owner's
+request: [#38](https://github.com/weaveplatform/weaveplatform-oci/issues/38) and
+[#39](https://github.com/weaveplatform/weaveplatform-oci/issues/39). This does not
+waive unit tests, the 95% coverage requirement, or promotion gates.
+
 Image orchestration is implemented in Go under `internal/imagebuild` and exposed
 through `weaveoci image`. It uses the existing OCI pack, unpack and conformance
 packages. Python is not required. Native tools provide virtualization, restore,
@@ -217,7 +252,7 @@ Windows; normal licensing applies.
 
 These native builders produce candidates. Windows installation has not yet
 been exercised on shocone, and neither native builder yet supplies the two-clone
-consumer acceptance gate or a macOS/Windows agent tier. Native fleet acceptance
+consumer acceptance gate or a macOS agent builder. Native fleet acceptance
 and signed channel lineage checks remain required before promotion. Catalogue
 entries are not evidence of successful builds.
 
@@ -242,3 +277,51 @@ servicing revision through the filename and media digest. Use that lock with
 `build-windows --source-lock` on a matching Windows host. Available releases
 come from Microsoft's catalogue; `latest` means newest matching media returned
 by that catalogue.
+
+Prepare pinned native agent installers with:
+
+```sh
+weaveoci image prepare-agent --platform windows/amd64 \
+  --cache "$WORK/cache/packages" --out "$WORK/payload-windows"
+weaveoci image prepare-agent --platform darwin/arm64 \
+  --cache "$WORK/cache/packages" --out "$WORK/payload-macos"
+```
+
+Preparation authenticates the core and module releases before creating the
+payload. Module installers, manifests and binaries must all be covered by the
+release's signed checksums; an older lock without this evidence fails preflight.
+macOS core packages use their own Sigstore bundle. The generated
+`install-agent.ps1` or `install-agent.sh` is for execution **inside the guest**,
+with the payload directory as its argument. It checks installed versions and
+binary hashes, stops the agent and removes its machine-bound store and channel
+trust while preserving `manifest.sequence`. The builder still has to remove its
+temporary login account and generalize the OS; payload preparation alone does
+not produce or validate an agent image.
+
+On a matching Windows HCS host, build a Windows agent candidate from a packed
+base with:
+
+```powershell
+weaveoci image build-windows-agent --base "$env:WEAVE_IMAGE_WORKSPACE\base-layout" `
+  --base-name windows-enterprise-base --arch amd64 `
+  --cache "$env:WEAVE_IMAGE_WORKSPACE\cache\packages" `
+  --out "$env:WEAVE_IMAGE_WORKSPACE\windows-agent-r1"
+```
+
+The builder independently unpacks the parent, imports its raw sectors into a
+new VHDX, installs the authenticated payload through an offline audit-mode seed,
+and requires a Sysprep generalization receipt plus shutdown before export. It
+does not attach installation media or repartition the parent. The bundle records
+the exact parent platform digest and all package inputs. Its inventory remains
+`pending` until acceptance passes. Native Windows execution is deferred under
+[incident #38](https://github.com/weaveplatform/weaveplatform-oci/issues/38).
+
+`pkg/imagecheck.Validate` supplies shared two-clone orchestration for native and
+provider boot adapters: strict deep verification, independent unpacking, fresh
+challenges/keys, bounded runs and schema-2 admission. `pkg/agentcheck.ProbeLifecycle`
+uses the shared SDK to test module operations, foreign-key refusal, actual
+observed restart/shutdown, persistent identities/store keys and trust after
+reboot. These libraries require concrete guest inspection and power observers;
+they do not infer VM acceptance from unit tests or installer success. The
+[implementation tracker](../docs/research/15-image-delivery-implementation.md)
+distinguishes completed components from remaining adapters and live runs.

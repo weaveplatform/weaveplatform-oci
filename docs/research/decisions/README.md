@@ -4,7 +4,7 @@ These records set out the intended design of the weave image platform: how VM an
 container images are packaged, published, verified, distributed and consumed across
 hostweave, guestweave-cli-macos and guestweave-cli-windows. Each record gives the
 context, contracts, rationale, constraints and the evidence that will verify it. Every
-record currently carries status `Proposed`; the research reports in the parent directory
+record carries its own status; the research reports in the parent directory
 are the evidence they rest on, and acceptance follows the first implementation phase
 that exercises the record.
 
@@ -34,6 +34,7 @@ decisions borrow from or deliberately avoid.
 | 0012 | [Container images published by weaveplatform-oci](0012-container-images.md) |
 | 0013 | [Quality gates: coverage and acceptance per phase](0013-quality-gates.md) |
 | 0014 | [Image tiers: base images and derived images](0014-image-tiers.md) |
+| 0015 | [One image release with target-specific delivery](0015-target-image-delivery.md) |
 
 Fixed decisions taken by the project owner on 2026-10-02, which these records elaborate
 and do not reopen:

@@ -15,3 +15,9 @@ exclude:
 override:
   - path: ^internal/imagebuild$
     threshold: 95
+  - path: ^pkg/imagecheck$
+    threshold: 95
+  - path: ^pkg/disk/virtualdisk$
+    threshold: 95
+  - path: ^pkg/agentcheck$
+    threshold: 95

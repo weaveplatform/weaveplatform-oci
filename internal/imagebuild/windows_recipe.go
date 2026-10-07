@@ -60,14 +60,22 @@ func windowsRecipe(s WindowsSource, marker string) (string, string, error) {
 	) + `<RunSynchronous><RunSynchronousCommand wcm:action="add"><Order>1</Order><Path>` + escape(
 		command,
 	) + `</Path></RunSynchronousCommand></RunSynchronous></component></settings></unattend>`
-	script := `$ErrorActionPreference = 'Stop'
+	return answer, windowsSealScript(marker, ""), nil
+}
+
+func windowsSealScript(marker, provision string) string {
+	check := `if (Get-Service 'WeaveAgent' -ErrorAction SilentlyContinue) { throw 'Base image contains weave agent' }`
+	if provision != "" {
+		check = provision
+	}
+	return `$ErrorActionPreference = 'Stop'
 $serial = New-Object System.IO.Ports.SerialPort 'COM1',115200,'None',8,'One'
 $serial.Open()
 function Write-BuildProgress([string]$message) { $serial.WriteLine("WEAVE-IMAGE-PROGRESS $([DateTime]::UtcNow.ToString('o')) $message") }
 try {
-Write-BuildProgress 'Audit mode reached; checking base-image state'
+Write-BuildProgress 'Audit mode reached; checking image state'
 $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
-if (Get-Service 'weave-agent' -ErrorAction SilentlyContinue) { throw 'Base image contains weave agent' }
+` + check + `
 $volume = $null
 if (Get-Command Get-BitLockerVolume -ErrorAction SilentlyContinue) { $volume = Get-BitLockerVolume -MountPoint C: -ErrorAction SilentlyContinue }
 if ($volume -and $volume.VolumeStatus -ne 'FullyDecrypted') { throw 'Refusing encrypted image' }
@@ -100,5 +108,4 @@ shutdown.exe /s /t 0
   $serial.Close()
 }
 `
-	return answer, script, nil
 }

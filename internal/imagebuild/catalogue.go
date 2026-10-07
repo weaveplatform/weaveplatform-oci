@@ -23,6 +23,7 @@ var (
 	versionPattern   = regexp.MustCompile(`^v?([0-9]+)\.([0-9]+)\.([0-9]+)$`)
 	namePattern      = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 	imageNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9.-]*$`)
+	parentName       = regexp.MustCompile(`^[a-z0-9][a-z0-9./_-]*$`)
 )
 
 // Catalogue describes the requested image matrix.
@@ -233,14 +234,12 @@ func (l Lock) RequirePackages(platform string) (PlatformInputs, error) {
 		if m.Package == nil {
 			return entry, fmt.Errorf("%w: released installer missing for %s", ErrInput, m.ID)
 		}
-		if strings.HasPrefix(platform, "linux/") {
-			names := map[string]bool{}
-			for _, a := range m.PackageEvidence {
-				names[a.Name] = true
-			}
-			if len(names) != 2 || !names["checksums.txt"] || !names["checksums.txt.sigstore.json"] {
-				return entry, fmt.Errorf("%w: signed checksums missing for %s", ErrInput, m.ID)
-			}
+		names := map[string]bool{}
+		for _, a := range m.PackageEvidence {
+			names[a.Name] = true
+		}
+		if len(names) != 2 || !names["checksums.txt"] || !names["checksums.txt.sigstore.json"] {
+			return entry, fmt.Errorf("%w: signed checksums missing for %s", ErrInput, m.ID)
 		}
 	}
 	return entry, nil

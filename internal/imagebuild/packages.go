@@ -42,6 +42,17 @@ func (p Packages) signedChecksums(
 	if sums == "" || files[sums+".sigstore.json"] == "" {
 		return fmt.Errorf("%w: checksum file and Sigstore bundle required", ErrInput)
 	}
+	if err := p.verifyBlob(ctx, files[sums], files[sums+".sigstore.json"], repo, refs); err != nil {
+		return err
+	}
+	raw, err := os.ReadFile(files[sums])
+	if err != nil {
+		return fmt.Errorf("read signed checksums: %w", err)
+	}
+	return checkSums(string(raw), artifacts)
+}
+
+func (p Packages) verifyBlob(ctx context.Context, file, bundle, repo string, refs []string) error {
 	workflow := "module-release"
 	if repo == coreRepository {
 		workflow = "release"
@@ -60,26 +71,19 @@ func (p Packages) signedChecksums(
 	if cosign == "" {
 		cosign = "cosign"
 	}
-	if err := p.Tools.run(
+	return p.Tools.run(
 		ctx,
 		nil,
 		cosign,
 		"verify-blob",
 		"--bundle",
-		files[sums+".sigstore.json"],
+		bundle,
 		"--certificate-identity-regexp",
 		identity,
 		"--certificate-oidc-issuer",
 		"https://token.actions.githubusercontent.com",
-		files[sums],
-	); err != nil {
-		return err
-	}
-	raw, err := os.ReadFile(files[sums])
-	if err != nil {
-		return fmt.Errorf("read signed checksums: %w", err)
-	}
-	return checkSums(string(raw), artifacts)
+		file,
+	)
 }
 
 func checkSums(raw string, artifacts []Asset) error {
@@ -101,6 +105,10 @@ func checkSums(raw string, artifacts []Asset) error {
 }
 
 func (p Packages) module(ctx context.Context, m ModuleInput, arch, cache string) error {
+	return p.moduleFor(ctx, m, "linux", arch, cache)
+}
+
+func (p Packages) moduleFor(ctx context.Context, m ModuleInput, osName, arch, cache string) error {
 	if err := p.signedChecksums(
 		ctx,
 		m.PackageEvidence,
@@ -133,7 +141,7 @@ func (p Packages) module(ctx context.Context, m ModuleInput, arch, cache string)
 	}
 	matches := 0
 	for _, a := range manifest.Artifacts {
-		if a.OS == "linux" && a.Arch == arch {
+		if a.OS == osName && a.Arch == arch {
 			matches++
 			if a.Digest != m.Binary.Digest || a.Size != m.Binary.Size {
 				return fmt.Errorf("%w: manifest binary differs from lock", ErrInput)
@@ -152,26 +160,42 @@ func (p Packages) PrepareLinux(
 	l Lock,
 	arch, cache, out string,
 ) ([]Asset, error) {
-	entry, err := l.RequirePackages("linux/" + arch)
+	return p.Prepare(ctx, l, "linux/"+arch, cache, out)
+}
+
+// Prepare authenticates all installers before creating an offline payload.
+// Linux and Windows releases authenticate their checksum files; the macOS core
+// publishes a Sigstore bundle over the notarized package itself.
+func (p Packages) Prepare(
+	ctx context.Context,
+	l Lock,
+	platform, cache, out string,
+) ([]Asset, error) {
+	osName, arch, ok := strings.Cut(platform, "/")
+	if !ok || (osName != "linux" && osName != "darwin" && osName != "windows") ||
+		(arch != "amd64" && arch != "arm64") || (osName == "darwin" && arch != "arm64") {
+		return nil, fmt.Errorf("%w: unsupported package platform %s", ErrInput, platform)
+	}
+	entry, err := l.RequirePackages(platform)
 	if err != nil {
 		return nil, err
+	}
+	var recipe string
+	if osName != "linux" {
+		recipe, err = NativeAgentRecipe(l, platform)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if _, err := os.Lstat(out); !os.IsNotExist(err) {
 		return nil, fmt.Errorf("%w: payload output already exists or is inaccessible", ErrInput)
 	}
-	if err := p.signedChecksums(
-		ctx,
-		entry.CoreEvidence,
-		[]Asset{entry.Core},
-		coreRepository,
-		[]string{"refs/tags/v" + l.CoreVersion},
-		cache,
-	); err != nil {
+	if err := p.coreEvidence(ctx, entry, l.CoreVersion, osName, cache); err != nil {
 		return nil, err
 	}
 	sources := []Asset{entry.Core}
 	for _, m := range entry.Modules {
-		if err := p.module(ctx, m, arch, cache); err != nil {
+		if err := p.moduleFor(ctx, m, osName, arch, cache); err != nil {
 			return nil, err
 		}
 		sources = append(sources, *m.Package)
@@ -188,11 +212,51 @@ func (p Packages) PrepareLinux(
 		return nil, err
 	}
 	for i, a := range sources {
-		if err := copyFile(paths[i], filepath.Join(out, a.Name)); err != nil {
+		if err := copyFileContext(ctx, paths[i], filepath.Join(out, a.Name)); err != nil {
 			return nil, err
 		}
 	}
+	if recipe != "" {
+		name := "install-agent.sh"
+		if osName == "windows" {
+			name = "install-agent.ps1"
+		}
+		if err := os.WriteFile(filepath.Join(out, name), []byte(recipe), 0o600); err != nil {
+			return nil, fmt.Errorf("write native agent recipe: %w", err)
+		}
+	}
 	return sources, writeJSON(filepath.Join(out, "packages.lock.json"), l)
+}
+
+func (p Packages) coreEvidence(
+	ctx context.Context,
+	entry PlatformInputs,
+	version, osName, cache string,
+) error {
+	refs := []string{"refs/tags/v" + version}
+	if osName != "darwin" {
+		return p.signedChecksums(
+			ctx,
+			entry.CoreEvidence,
+			[]Asset{entry.Core},
+			coreRepository,
+			refs,
+			cache,
+		)
+	}
+	if len(entry.CoreEvidence) != 1 ||
+		entry.CoreEvidence[0].Name != entry.Core.Name+".sigstore.json" {
+		return fmt.Errorf("%w: macOS core package requires its Sigstore bundle", ErrInput)
+	}
+	pkg, err := p.Downloader.Asset(ctx, entry.Core, cache)
+	if err != nil {
+		return err
+	}
+	bundle, err := p.Downloader.Asset(ctx, entry.CoreEvidence[0], cache)
+	if err != nil {
+		return err
+	}
+	return p.verifyBlob(ctx, pkg, bundle, coreRepository, refs)
 }
 
 // LinuxRecipe installs pinned packages and removes machine-specific identities.

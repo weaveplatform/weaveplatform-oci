@@ -30,4 +30,19 @@ if ($parseErrors.Count -gt 0) { $parseErrors | ForEach-Object { Write-Output $_ 
 	if err != nil {
 		t.Fatalf("generated sealing script is invalid: %v\n%s", err, output)
 	}
+	payload := t.TempDir()
+	build := t.TempDir()
+	_, err = windowsAgentSeed(
+		t.Context(),
+		build,
+		payload,
+		"arm64",
+		"WEAVE-IMAGE-READY-0123456789abcdef01234567",
+	)
+	must(t, err)
+	output, err = exec.CommandContext(t.Context(), pwsh, "-NoProfile", "-NonInteractive", "-File", check, "-Path", filepath.Join(build, "seed", "seal.ps1")).
+		CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated agent sealing script is invalid: %v\n%s", err, output)
+	}
 }
