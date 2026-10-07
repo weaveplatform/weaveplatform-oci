@@ -39,9 +39,16 @@ func native(r request) error {
 	p := (*parametersV2)(unsafe.Pointer(&params.Anonymous))
 	p.MaximumSize, p.SectorSize = r.Size, 512
 	if r.Source != "" {
+		format, err := sourceFormat(r.Source)
+		if err != nil {
+			return err
+		}
 		p.Source = win32.UTF16Ptr(r.Source)
-		// Let virtdisk inspect the source container rather than its extension.
 		p.SourceType.VendorId = vhd.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
+		p.SourceType.DeviceId = vhd.VIRTUAL_STORAGE_TYPE_DEVICE_VHD
+		if format == VHDX {
+			p.SourceType.DeviceId = vhd.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
+		}
 	}
 	var handle foundation.HANDLE
 	code := vhd.CreateVirtualDisk(
