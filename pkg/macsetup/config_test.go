@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -49,7 +50,7 @@ func TestLoadAndPrivateAtomicState(t *testing.T) {
 		t.Fatal(err)
 	}
 	info, err := os.Stat(state)
-	if err != nil || info.Mode().Perm() != 0o600 {
+	if err != nil || (runtime.GOOS != "windows" && info.Mode().Perm() != 0o600) {
 		t.Fatalf("checkpoint is not private: %v", err)
 	}
 	if err = Save(state, State{Status: "ready"}); err != nil {

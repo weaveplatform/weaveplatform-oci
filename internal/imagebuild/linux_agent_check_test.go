@@ -146,7 +146,10 @@ func TestLinuxAgentCloneOwnsDisposableQEMUAndObservedIdentity(t *testing.T) {
 			case "disk":
 				os.Remove(filepath.Join(c.Bundle, "disk0.img"))
 			case "temp":
-				t.Setenv("TMPDIR", filepath.Join(t.TempDir(), "missing"))
+				missing := filepath.Join(t.TempDir(), "missing")
+				t.Setenv("TMPDIR", missing)
+				t.Setenv("TMP", missing)
+				t.Setenv("TEMP", missing)
 			case "log":
 				os.Mkdir(filepath.Join(c.Report, "qemu.log"), 0o700)
 			case "serial":
@@ -282,10 +285,17 @@ func TestLinuxAgentInputAndQEMUChoices(t *testing.T) {
 				t.Fatal(name, args)
 			}
 			c.Config.Guest.Arch = arch
-			if !strings.Contains(linuxAgentSeed(c), "agent-ready") {
+			if !strings.Contains(linuxAgentSeed(c, ""), "agent-ready") {
 				t.Fatal("missing readiness")
 			}
 		}
+	}
+	c.Config.Guest.Variant = "desktop"
+	if _, err := linuxAgentExpectations(c, lock, ""); err == nil {
+		t.Fatal("desktop without console user accepted")
+	}
+	if !strings.Contains(linuxAgentSeed(c, "weavecheck"), "autologin-user=weavecheck") {
+		t.Fatal("missing disposable desktop session")
 	}
 }
 

@@ -27,7 +27,7 @@ test -s /var/lib/weave/store.key
 sha256sum /var/lib/weave/store.key | awk '{print "sha256:" $1}'
 if test -e /var/lib/weave/manifest.sequence; then cat /var/lib/weave/manifest.sequence; printf '\n'; else printf '0\n'; fi
 if getent passwd weavebuild >/dev/null || getent passwd _weavebuild >/dev/null ||
-   test -e /etc/sudoers.d/weave-build || test -e /root/.ssh/authorized_keys; then
+   test -e /etc/sudoers.d/weave-build || test -s /root/.ssh/authorized_keys; then
   printf 'build-credentials\n'
 else
   printf 'sealed\n'

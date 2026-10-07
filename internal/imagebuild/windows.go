@@ -226,9 +226,10 @@ func (t Tools) windowsBundle(
 			},
 		},
 		Annotations: map[string]string{
-			spec.AnnotationVersion:  tag,
-			spec.AnnotationRevision: strings.TrimSpace(string(commit)),
-			spec.AnnotationSource:   "https://github.com/weaveplatform/weaveplatform-oci",
+			"io.weave.image.windows.release": r.Release,
+			spec.AnnotationVersion:           tag,
+			spec.AnnotationRevision:          strings.TrimSpace(string(commit)),
+			spec.AnnotationSource:            "https://github.com/weaveplatform/weaveplatform-oci",
 		},
 	}
 	if err := pack.WriteBundleFile(bundle, bf); err != nil {

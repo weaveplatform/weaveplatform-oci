@@ -48,7 +48,7 @@ func fakeAsset(repo, name string) Asset {
 
 func TestCatalogueLock(t *testing.T) {
 	c, l := repoInputs(t)
-	if len(c.Matrix()) != 16 || len(l.Platforms) != 5 {
+	if len(c.Matrix()) != 20 || len(l.Platforms) != 5 {
 		t.Fatalf("matrix/platforms %d/%d", len(c.Matrix()), len(l.Platforms))
 	}
 	out := filepath.Join(t.TempDir(), "lock.json")

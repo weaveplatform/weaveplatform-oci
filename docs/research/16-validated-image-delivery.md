@@ -86,7 +86,34 @@ The Ubuntu serial is read from `/etc/cloud/build.info`, as documented by
 
 `pkg/macsetup` contains the shared Setup Assistant planner, image fixtures and
 native-readiness rules extracted from Guestweave. Native VM/UI orchestration and
-the Guestweave dependency migration remain pending.
+the macOS agent builder remain pending. The Guestweave dependency migration is
+implemented in its companion worktree and under verification.
+
+`image build-linux-desktop` derives Xfce/X11 from one exact agent platform
+manifest. `--desktop-lock` supplies schema version 1, Ubuntu `osVersion`, `arch`,
+`parentDigest`, a dated Ubuntu `snapshot` (`YYYYMMDDTHHMMSSZ`), and the complete
+package closure (`name`, `version`, `arch`, `sha256`). The parent must record the
+same core and module package assets as `--lock`. Canonical's archive keyring
+authenticates the snapshot metadata, and every downloaded archive must match the
+lock before installation. Extra, duplicate, missing and corrupted archives fail.
+The build also checks that the inherited Weave package inventory is unchanged.
+
+The recipe follows [APT's authenticated metadata chain](https://manpages.debian.org/testing/apt/apt-secure.8.en.html)
+and the [Ubuntu snapshot service](https://snapshot.ubuntu.com/). Historical
+snapshot expiry is disabled only for the dated source; signature and checksum
+verification remain required. Resolving and reviewing a real dependency closure
+still requires the released agent parent. No desktop lock or live acceptance
+result is fabricated while module installers are unavailable.
+
+Desktop acceptance uses `image validate-agent-linux` with
+`--console-user weavecheck`. The disposable clone receives its own locked
+console account and Xfce autologin configuration; those credentials/configuration
+are absent from the exported desktop image. The normal first-boot and reboot
+checks include observed console, clipboard and display operations.
+
+Windows bundles record the observed marketing release in
+`io.weave.image.windows.release`; `guest.variant` remains the image tier. The
+Guestweave migration preserves historical release tokens on import.
 
 Signed module installer publication is tracked in
 [agent-modules PR #33](https://github.com/weaveplatform/weaveplatform-agent-modules/pull/33).
@@ -97,3 +124,10 @@ The initial full OCI race/shuffle run passed at 95.9% aggregate statement covera
 The following adapter run passed with imagebuild 95.8%, agentcheck 98.9%, and
 imagecheck 99.2%. Shared macOS setup measured 97.4%. These are unit and protocol
 checks; no new live agent or native VM acceptance has passed in this checkpoint.
+
+The desktop checkpoint's full OCI race/shuffle suite and configured coverage
+checks pass at **96.0% aggregate**. The focused builder run measured **95.8%**;
+agentcheck measured **99.0%**. Lint passes. Two Windows CI test assumptions
+(`TMPDIR` versus `TMP`/`TEMP`, and POSIX mode bits) are corrected; their runner
+rerun remains separate evidence. The Ubuntu 20.04/26.04 base pipelines passed
+on the preceding checkpoint.

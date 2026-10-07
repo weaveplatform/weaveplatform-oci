@@ -10,6 +10,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -29,6 +30,8 @@ func (t Tools) LinuxAgentBoot(lock Lock, consoleUser string, sequence uint64) im
 }
 
 type linuxAgentProbe func(context.Context, agentcheck.Lifecycle, ed25519.PrivateKey, ed25519.PrivateKey, agentcheck.Expected, uint64) (agentcheck.LifecycleResult, error)
+
+var consoleAccount = regexp.MustCompile(`^[a-z_][a-z0-9_-]{0,30}$`)
 
 func (t Tools) bootLinuxAgent(
 	ctx context.Context,
@@ -90,7 +93,13 @@ func (t Tools) bootLinuxAgent(
 	}
 	// The ordinary seed helper's shutdown condition deliberately remains false:
 	// only an authenticated power operation may shut down an acceptance VM.
-	if err := t.seed(ctx, work, linuxAgentSeed(c), "agent-controlled-power", ""); err != nil {
+	if err := t.seed(
+		ctx,
+		work,
+		linuxAgentSeed(c, consoleUser),
+		"agent-controlled-power",
+		"",
+	); err != nil {
 		return result, err
 	}
 	result = imagecheck.Boot{
@@ -210,6 +219,9 @@ func linuxAgentExpectations(
 			ErrInput,
 		)
 	}
+	if e.Desktop && !consoleAccount.MatchString(consoleUser) {
+		return e, fmt.Errorf("%w: desktop acceptance needs a disposable console username", ErrInput)
+	}
 	entry, err := lock.RequirePackages("linux/" + g.Arch)
 	if err != nil {
 		return e, err
@@ -223,13 +235,25 @@ func linuxAgentExpectations(
 	return e, nil
 }
 
-func linuxAgentSeed(c imagecheck.Clone) string {
+func linuxAgentSeed(c imagecheck.Clone, consoleUser string) string {
 	pub := base64.StdEncoding.EncodeToString(c.OwnKey.Public().(ed25519.PublicKey))
 	console := "/dev/ttyS0"
 	if c.Config.Guest.Arch == "arm64" {
 		console = "/dev/ttyAMA0"
 	}
-	return "set -eu\nsystemctl stop weave-agent.service\ntest ! -e /etc/weave/channel.pub\ninstall -d -m 0755 /etc/weave\nprintf '%s\\n' " + shellQuote(
+	setup := ""
+	if c.Config.Guest.Variant == "desktop" {
+		setup = "if getent passwd " + shellQuote(
+			consoleUser,
+		) + " >/dev/null; then exit 1; fi\nuseradd --create-home --shell /bin/bash " + shellQuote(
+			consoleUser,
+		) + "\npasswd -l " + shellQuote(
+			consoleUser,
+		) + "\ninstall -d -m 0755 /etc/lightdm/lightdm.conf.d\nprintf '%s\\n' " + shellQuote(
+			"[Seat:*]\nautologin-user="+consoleUser+"\nautologin-user-timeout=0\nuser-session=xfce",
+		) + " > /etc/lightdm/lightdm.conf.d/99-weave-acceptance.conf\nsystemctl restart lightdm.service\n"
+	}
+	return "set -eu\n" + setup + "systemctl stop weave-agent.service\ntest ! -e /etc/weave/channel.pub\ninstall -d -m 0755 /etc/weave\nprintf '%s\\n' " + shellQuote(
 		pub,
 	) + " > /etc/weave/channel.pub\nchmod 0644 /etc/weave/channel.pub\ninstall -d -m 0700 /var/lib/weave\nprintf '%s\\n' " + shellQuote(
 		c.Marker,
