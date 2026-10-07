@@ -1,0 +1,921 @@
+{
+  "schemaVersion": 1,
+  "resolvedAt": "2026-10-06T14:37:48.891470+00:00",
+  "coreVersion": "0.9.11",
+  "platforms": {
+    "darwin/arm64": {
+      "core": {
+        "name": "weave-agent_0.9.11_darwin_arm64.pkg",
+        "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weave-agent_0.9.11_darwin_arm64.pkg",
+        "digest": "sha256:e66276ef94cec75125ddcf75a8312d6f1dedf790c6b84cda185e6aa1d37fb691",
+        "size": 14892408
+      },
+      "coreEvidence": [
+        {
+          "name": "weave-agent_0.9.11_darwin_arm64.pkg.sigstore.json",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weave-agent_0.9.11_darwin_arm64.pkg.sigstore.json",
+          "digest": "sha256:23722d55a8f2d07997ccc7007e351caf7ab264c9b3d1e4b179c211ff60624f6f",
+          "size": 10791
+        }
+      ],
+      "modules": [
+        {
+          "id": "weave-macos-presence",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-presence-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-presence/v0.2.1/weave-macos-presence-darwin-arm64",
+            "digest": "sha256:dbb456b88eddeb1ac8954d7911b7903c63ed135f24ba8e4dbdd8ab9471e9f312",
+            "size": 17288736
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-presence/v0.2.1/module.manifest.json",
+            "digest": "sha256:d0eaafd47c8f1227ec53f2a0bdf61fe2cfcd3f7951cd9aa5ae6c65c81be1d0ab",
+            "size": 559
+          },
+          "package": {
+            "name": "weave-macos-presence_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-presence/v0.2.1/weave-macos-presence_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:caea80fd20c8a0ce21575a6459458b91eeaa0bb0b9a7de86d2f6d19dfbe20d24",
+            "size": 8856217
+          }
+        },
+        {
+          "id": "weave-macos-exec",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-exec-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-exec/v0.2.1/weave-macos-exec-darwin-arm64",
+            "digest": "sha256:70de31642084bb349f7dbbe8c758db04d47dc4fde1328caa30c85979ec29c0ae",
+            "size": 16827152
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-exec/v0.2.1/module.manifest.json",
+            "digest": "sha256:79d78665762bd6ec93a5bd1daf36bec4ae55dffeeb32a3892312a1b235f55460",
+            "size": 550
+          },
+          "package": {
+            "name": "weave-macos-exec_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-exec/v0.2.1/weave-macos-exec_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:f3549deaaad583477d39f7394e87423de6140239ef774d47f0620985757f1ce4",
+            "size": 8713408
+          }
+        },
+        {
+          "id": "weave-macos-power",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-power-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-power/v0.2.1/weave-macos-power-darwin-arm64",
+            "digest": "sha256:8b5b76575c95557f882e787ef3bbcda78bd78f21425b16ebfa33241ea08eeda9",
+            "size": 16736480
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-power/v0.2.1/module.manifest.json",
+            "digest": "sha256:f7fbcd434e1a42baac5c1cc2d7f4e49ba9b477130d3c3d4390d3c64853219df6",
+            "size": 552
+          },
+          "package": {
+            "name": "weave-macos-power_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-power/v0.2.1/weave-macos-power_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:e5daa126f70a9c79018b111c103d06f88e662e804afc3a583fe24e965ee3a17d",
+            "size": 8659934
+          }
+        },
+        {
+          "id": "weave-macos-time",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-time-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-time/v0.2.1/weave-macos-time-darwin-arm64",
+            "digest": "sha256:36b9b88bc1cd178fa803e7dd0a1a1963c14940cab77381fe41f0765c48742467",
+            "size": 16611968
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-time/v0.2.1/module.manifest.json",
+            "digest": "sha256:10f6738d82167c2bdc377fba718459e755b73754482b5d29b629291b1598ee4f",
+            "size": 550
+          },
+          "package": {
+            "name": "weave-macos-time_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-time/v0.2.1/weave-macos-time_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:24d79b9465c881f4cb10b9bff4a1576fb189b9f394a3a1ce9363f2982f192a94",
+            "size": 8595851
+          }
+        },
+        {
+          "id": "weave-macos-metrics",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-metrics-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-metrics/v0.2.1/weave-macos-metrics-darwin-arm64",
+            "digest": "sha256:1ed4ecc995ce8c15b5f4338c3b75d52376d31b76e50809190305f2b0313474a4",
+            "size": 17391280
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-metrics/v0.2.1/module.manifest.json",
+            "digest": "sha256:bdc729cdd99bde56f72c00e1ae30ef122c2aa1a9489326ad3b07c0e0c7903e6f",
+            "size": 557
+          },
+          "package": {
+            "name": "weave-macos-metrics_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-metrics/v0.2.1/weave-macos-metrics_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:297f98ffa8dc1833c444793437c33ba82366461c1c6cd8aba1909ad7cf485aa4",
+            "size": 8883250
+          }
+        },
+        {
+          "id": "weave-macos-clipboard",
+          "version": "0.2.5",
+          "binary": {
+            "name": "weave-macos-clipboard-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-clipboard/v0.2.5/weave-macos-clipboard-darwin-arm64",
+            "digest": "sha256:e54519a1eeb835b09faa913f2e968927fe5ec9def41d5c081fe59423fbea71ac",
+            "size": 18251744
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-clipboard/v0.2.5/module.manifest.json",
+            "digest": "sha256:b327ecab4e0c47b9ad8005265cb16d2bbb26150de5d2c5019048524cb83d5947",
+            "size": 568
+          },
+          "package": {
+            "name": "weave-macos-clipboard_0.2.5_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-clipboard/v0.2.5/weave-macos-clipboard_0.2.5_darwin_arm64.pkg",
+            "digest": "sha256:393f87df097bcb3d61cf2cf964c9d1af719debeca6f73759a63bd1c6c1d8f1a9",
+            "size": 9213646
+          }
+        },
+        {
+          "id": "weave-macos-session",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-macos-session-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-session/v0.2.2/weave-macos-session-darwin-arm64",
+            "digest": "sha256:189ccd6d97e6c8d2bf0f833d9a72257c0707f45c8a2bbef6213b46b395fb7a7d",
+            "size": 17352384
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-session/v0.2.2/module.manifest.json",
+            "digest": "sha256:95c6465588a7ae7971546c4a6018407946ec1b3e915f3183d19176e5ea70c18f",
+            "size": 557
+          },
+          "package": {
+            "name": "weave-macos-session_0.2.2_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-session/v0.2.2/weave-macos-session_0.2.2_darwin_arm64.pkg",
+            "digest": "sha256:b8a301c1eeb1a344c47f8df29254dde1cba2d649c39ea32d44b6bf669d9347e4",
+            "size": 8879722
+          }
+        },
+        {
+          "id": "weave-macos-display",
+          "version": "0.2.1",
+          "binary": {
+            "name": "weave-macos-display-darwin-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-display/v0.2.1/weave-macos-display-darwin-arm64",
+            "digest": "sha256:1a072fbc62d1f75e9adf7f41333a17d2924dcf8852826d003987144863c2d770",
+            "size": 17075216
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-display/v0.2.1/module.manifest.json",
+            "digest": "sha256:f547aff31ebdf02b03ffdad9e24b7382648fe9cc09bc77cd3993fea4d4a9f2d0",
+            "size": 564
+          },
+          "package": {
+            "name": "weave-macos-display_0.2.1_darwin_arm64.pkg",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-macos-display/v0.2.1/weave-macos-display_0.2.1_darwin_arm64.pkg",
+            "digest": "sha256:2f3d5da1ffe5399a49619fc06b83372747abd05e8e4d71eeb757e93986367167",
+            "size": 8790572
+          }
+        }
+      ]
+    },
+    "linux/amd64": {
+      "core": {
+        "name": "weave-agent_0.9.11_amd64.deb",
+        "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weave-agent_0.9.11_amd64.deb",
+        "digest": "sha256:71f337520935c5d1f2c49a7008bfe07529bd2cf3d54fd740805cfc6422d42df3",
+        "size": 15959646
+      },
+      "coreEvidence": [
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "digest": "sha256:5fcb6c5d981de0596c6a214d3dbc035f627a80fc14dd03741cf3ded058a4a37c",
+          "size": 10701
+        },
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt",
+          "digest": "sha256:02d17c9573d2a5f3326c8952f77f854b58d46a732b8fea4af158ceba600cf784",
+          "size": 862
+        }
+      ],
+      "modules": [
+        {
+          "id": "weave-linux-presence",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-presence-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-presence/v0.2.0/weave-linux-presence-linux-amd64",
+            "digest": "sha256:a9e190cf0fe7151e1658b7f555ff9eff512c4e77dd79929df467e5130ffbdafe",
+            "size": 17103374
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-presence/v0.2.0/module.manifest.json",
+            "digest": "sha256:dfe9435049ff12d1684df9acdf6924f8ee182f9942845fa901e49babedad11e2",
+            "size": 730
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-exec",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-exec-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-exec/v0.2.0/weave-linux-exec-linux-amd64",
+            "digest": "sha256:05f3b43d00d382527ea43d9083a39af78d69082f62b7e82a008b74e0900e7900",
+            "size": 17336382
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-exec/v0.2.0/module.manifest.json",
+            "digest": "sha256:c158415b4f4b24c738941cfc9fcf52c079034f245801cc08be60537d61e3a8db",
+            "size": 721
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-power",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-power-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-power/v0.2.0/weave-linux-power-linux-amd64",
+            "digest": "sha256:3b4a29b55143228802b930c9cd2da3291c6daa3558ab85ae3aabb1eb5b209dbd",
+            "size": 17243507
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-power/v0.2.0/module.manifest.json",
+            "digest": "sha256:eb1ace249cbee9ff9bbefca012d9672a79ead06d1c966aa4744e65e9fb435eb1",
+            "size": 723
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-time",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-time-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-time/v0.2.0/weave-linux-time-linux-amd64",
+            "digest": "sha256:7ff06d2e80a4c48fb9eaa942e3f997bebb2adc87a1baee4cca5ce85e45850b8d",
+            "size": 17089229
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-time/v0.2.0/module.manifest.json",
+            "digest": "sha256:ab9748a06df006ce8b9ed4ae9f7063d7339100448b810cfaea9ef35b6bf398d0",
+            "size": 721
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-metrics",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-metrics-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-metrics/v0.2.0/weave-linux-metrics-linux-amd64",
+            "digest": "sha256:40d8bd6b1f6698cdf1553009ef99ab1f32dcaa23ab94f4827663fdae4f4545de",
+            "size": 17099424
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-metrics/v0.2.0/module.manifest.json",
+            "digest": "sha256:616722116f4d98955afb3893abf6e8b4c047777f177320d7650ccfeefd3a9b47",
+            "size": 728
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-clipboard",
+          "version": "0.2.4",
+          "binary": {
+            "name": "weave-linux-clipboard-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-clipboard/v0.2.4/weave-linux-clipboard-linux-amd64",
+            "digest": "sha256:b9db4e26a8d1c9f6e2ead8a29deca93a92e74472c6c2b7e60b0e93fc1053eda3",
+            "size": 18326659
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-clipboard/v0.2.4/module.manifest.json",
+            "digest": "sha256:df94ffc27072459c569cb5f96db4a51611bb25de4cb3cd6f2d68c839e38b9e7e",
+            "size": 739
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-session",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-session-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-session/v0.2.0/weave-linux-session-linux-amd64",
+            "digest": "sha256:998003d7b7f6d50068fc712f2dfcf4e7ae2d37311d9096e932eb1204e0e0e968",
+            "size": 17305939
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-session/v0.2.0/module.manifest.json",
+            "digest": "sha256:be7cbae2407a758a110365c98d6f8ec5888bd3d1729f2facdca765af83ffd6a8",
+            "size": 727
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-display",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-display-linux-amd64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-display/v0.2.0/weave-linux-display-linux-amd64",
+            "digest": "sha256:53d100c41fdcea864c3aa3dc6c10749eabfc827da6dd73bb32810a68c1a6a9ae",
+            "size": 17282222
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-display/v0.2.0/module.manifest.json",
+            "digest": "sha256:c176c3d1de3b2c864eb27a234b2c5fadb4bfa82aaacd48b66dd6ab3aabcf792e",
+            "size": 735
+          },
+          "package": null
+        }
+      ]
+    },
+    "linux/arm64": {
+      "core": {
+        "name": "weave-agent_0.9.11_arm64.deb",
+        "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weave-agent_0.9.11_arm64.deb",
+        "digest": "sha256:909003dd256117ca7216ce17d2cb014bc540236aacc124715a89ca755a69ebfd",
+        "size": 14470568
+      },
+      "coreEvidence": [
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "digest": "sha256:5fcb6c5d981de0596c6a214d3dbc035f627a80fc14dd03741cf3ded058a4a37c",
+          "size": 10701
+        },
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt",
+          "digest": "sha256:02d17c9573d2a5f3326c8952f77f854b58d46a732b8fea4af158ceba600cf784",
+          "size": 862
+        }
+      ],
+      "modules": [
+        {
+          "id": "weave-linux-presence",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-presence-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-presence/v0.2.0/weave-linux-presence-linux-arm64",
+            "digest": "sha256:0c4c30cbd0bddbed41c13bcb5aadf45be67c73ffff7cb783e7460d0b880c26e2",
+            "size": 16154371
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-presence/v0.2.0/module.manifest.json",
+            "digest": "sha256:dfe9435049ff12d1684df9acdf6924f8ee182f9942845fa901e49babedad11e2",
+            "size": 730
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-exec",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-exec-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-exec/v0.2.0/weave-linux-exec-linux-arm64",
+            "digest": "sha256:60fa97a55be7b8e95f33a8995b1341db1e053af191e51a5346a2a592416f2394",
+            "size": 16351795
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-exec/v0.2.0/module.manifest.json",
+            "digest": "sha256:c158415b4f4b24c738941cfc9fcf52c079034f245801cc08be60537d61e3a8db",
+            "size": 721
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-power",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-power-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-power/v0.2.0/weave-linux-power-linux-arm64",
+            "digest": "sha256:2aee3c0eb4dfa4dd53aed1d59465031d41e02d2d55084d5357dda8a23576bbb5",
+            "size": 16191128
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-power/v0.2.0/module.manifest.json",
+            "digest": "sha256:eb1ace249cbee9ff9bbefca012d9672a79ead06d1c966aa4744e65e9fb435eb1",
+            "size": 723
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-time",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-time-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-time/v0.2.0/weave-linux-time-linux-arm64",
+            "digest": "sha256:31b81adc69e341aac21af6bd1daeb872f9bcb74bb544f7bda9a7800b82773e0f",
+            "size": 16148426
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-time/v0.2.0/module.manifest.json",
+            "digest": "sha256:ab9748a06df006ce8b9ed4ae9f7063d7339100448b810cfaea9ef35b6bf398d0",
+            "size": 721
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-metrics",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-metrics-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-metrics/v0.2.0/weave-linux-metrics-linux-arm64",
+            "digest": "sha256:f1c48a9a20c73ae826570999bcbb5d3b40359f982013f6176b4ba09eed1bb8f9",
+            "size": 16154421
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-metrics/v0.2.0/module.manifest.json",
+            "digest": "sha256:616722116f4d98955afb3893abf6e8b4c047777f177320d7650ccfeefd3a9b47",
+            "size": 728
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-clipboard",
+          "version": "0.2.4",
+          "binary": {
+            "name": "weave-linux-clipboard-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-clipboard/v0.2.4/weave-linux-clipboard-linux-arm64",
+            "digest": "sha256:b434bc3f9a1cedadebd98ea305b190e21f7b8e379c44ae07753259f94d389bbf",
+            "size": 17236752
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-clipboard/v0.2.4/module.manifest.json",
+            "digest": "sha256:df94ffc27072459c569cb5f96db4a51611bb25de4cb3cd6f2d68c839e38b9e7e",
+            "size": 739
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-session",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-session-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-session/v0.2.0/weave-linux-session-linux-arm64",
+            "digest": "sha256:569d53038b7688dc6c263465de32cb33bae12da9dd38abd114cf1bf6a74c2741",
+            "size": 16338256
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-session/v0.2.0/module.manifest.json",
+            "digest": "sha256:be7cbae2407a758a110365c98d6f8ec5888bd3d1729f2facdca765af83ffd6a8",
+            "size": 727
+          },
+          "package": null
+        },
+        {
+          "id": "weave-linux-display",
+          "version": "0.2.0",
+          "binary": {
+            "name": "weave-linux-display-linux-arm64",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-display/v0.2.0/weave-linux-display-linux-arm64",
+            "digest": "sha256:1c625145311d350c41384d0688522125b63deaa07d2977789d24b0fffe5a1446",
+            "size": 16337797
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-linux-display/v0.2.0/module.manifest.json",
+            "digest": "sha256:c176c3d1de3b2c864eb27a234b2c5fadb4bfa82aaacd48b66dd6ab3aabcf792e",
+            "size": 735
+          },
+          "package": null
+        }
+      ]
+    },
+    "windows/amd64": {
+      "core": {
+        "name": "weaveplatform-agent_0.9.11_windows_amd64.zip",
+        "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_windows_amd64.zip",
+        "digest": "sha256:63cf59230d4fc50296a138c9c9050ac1311eafb635987019132929a03d2d125c",
+        "size": 16940901
+      },
+      "coreEvidence": [
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "digest": "sha256:5fcb6c5d981de0596c6a214d3dbc035f627a80fc14dd03741cf3ded058a4a37c",
+          "size": 10701
+        },
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt",
+          "digest": "sha256:02d17c9573d2a5f3326c8952f77f854b58d46a732b8fea4af158ceba600cf784",
+          "size": 862
+        }
+      ],
+      "modules": [
+        {
+          "id": "weave-windows-presence",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-presence-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/weave-windows-presence-windows-amd64.exe",
+            "digest": "sha256:3f4030c42cb84f595d4c83f411a6035c3072dde391bfc7c68102bb47b68e997f",
+            "size": 17885464
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/module.manifest.json",
+            "digest": "sha256:5505292786c98da3c8ff77afad2842dc49c905f658cd2ba95a0838553230120f",
+            "size": 892
+          },
+          "package": {
+            "name": "weave-windows-presence_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/weave-windows-presence_0.2.2_windows_amd64.zip",
+            "digest": "sha256:c5268705bf3a77e0bca5b0d2d24c955a55e552effafb3fca9fcf4bf7a3f8e4de",
+            "size": 9677006
+          }
+        },
+        {
+          "id": "weave-windows-exec",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-exec-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/weave-windows-exec-windows-amd64.exe",
+            "digest": "sha256:faea9f527bfc4dd9c0cbbc22ebac76375fa1d8babeca6480742e3b51e45096f8",
+            "size": 19069208
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/module.manifest.json",
+            "digest": "sha256:26dee6473b72a926ba954bec0beaba0d8cbbf755c8132c60e95fc7c322112f21",
+            "size": 883
+          },
+          "package": {
+            "name": "weave-windows-exec_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/weave-windows-exec_0.2.2_windows_amd64.zip",
+            "digest": "sha256:40696515c5d4a537df2decb25239bfb3a39ea938b9f314c508338bcedc684fc2",
+            "size": 10113047
+          }
+        },
+        {
+          "id": "weave-windows-power",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-power-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/weave-windows-power-windows-amd64.exe",
+            "digest": "sha256:49b37c3bb772ee6a9253ee9834dfebdc4365973f284582c7c7eee47e5f8e23ae",
+            "size": 18082072
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/module.manifest.json",
+            "digest": "sha256:25ddef31eb1f550ae679c1a3b66b5701ea0138dc7d2b76c5af8af197bb3d6f95",
+            "size": 885
+          },
+          "package": {
+            "name": "weave-windows-power_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/weave-windows-power_0.2.2_windows_amd64.zip",
+            "digest": "sha256:071ebe5b1ef3c2b6bdc0dc955b2c642640291f4d14c99b18e6411584b899cd97",
+            "size": 9741039
+          }
+        },
+        {
+          "id": "weave-windows-time",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-time-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/weave-windows-time-windows-amd64.exe",
+            "digest": "sha256:5ad4e64cd1e891f55025a376a48f14c9e45e45105dde747cd63b33d9390118b2",
+            "size": 18071320
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/module.manifest.json",
+            "digest": "sha256:e8a21df1c3e67ac70cc7ae800285bde28d83cc065a714113de92267b95da8160",
+            "size": 883
+          },
+          "package": {
+            "name": "weave-windows-time_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/weave-windows-time_0.2.2_windows_amd64.zip",
+            "digest": "sha256:5210fb6fee75f0d17f0907084e32327cefa203c44026bdc94716969ada5dcc06",
+            "size": 9749227
+          }
+        },
+        {
+          "id": "weave-windows-metrics",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-metrics-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/weave-windows-metrics-windows-amd64.exe",
+            "digest": "sha256:04c67d8a0f59c1eb0c407085f3450289e9be8346f9d43619fa44caa29b4328f0",
+            "size": 18419992
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/module.manifest.json",
+            "digest": "sha256:bdc7f4b4962184f5dce0f18286e991253aad4d8f6e7d2524b691fd5eec0c8e27",
+            "size": 890
+          },
+          "package": {
+            "name": "weave-windows-metrics_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/weave-windows-metrics_0.2.2_windows_amd64.zip",
+            "digest": "sha256:5e4d65fdaf76f9f9a51df452a1938c401e79821d11bd6428ce2cc5601e8f40d0",
+            "size": 9831285
+          }
+        },
+        {
+          "id": "weave-windows-clipboard",
+          "version": "0.2.6",
+          "binary": {
+            "name": "weave-windows-clipboard-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/weave-windows-clipboard-windows-amd64.exe",
+            "digest": "sha256:b3fd45fcc8b3a07e8506e1810f3969149103f8b8e3507890ec21e1818e7bd5f1",
+            "size": 20703000
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/module.manifest.json",
+            "digest": "sha256:60d095fb380724f030489e7dfbd9bb07a64dcd5fbb75f0bb850729861c4b1d62",
+            "size": 901
+          },
+          "package": {
+            "name": "weave-windows-clipboard_0.2.6_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/weave-windows-clipboard_0.2.6_windows_amd64.zip",
+            "digest": "sha256:343ca79ee948abf891eac120cc74c14b5a6ee890c9e23aa86d36650b85bd16a8",
+            "size": 10863345
+          }
+        },
+        {
+          "id": "weave-windows-session",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-session-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/weave-windows-session-windows-amd64.exe",
+            "digest": "sha256:0cb08dd7b0f2d13be7535867add6b08e5b0ed9e20f2b6b678545d7fd16c97b02",
+            "size": 18686232
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/module.manifest.json",
+            "digest": "sha256:677062a23bee4ec7b942a2f05472f92caa36d8002a9cc5817ae67cc72bfe3fda",
+            "size": 890
+          },
+          "package": {
+            "name": "weave-windows-session_0.2.2_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/weave-windows-session_0.2.2_windows_amd64.zip",
+            "digest": "sha256:9c564ca3426c6622d3ca5ee3e9bdc52424cdebcb7c34d107a6d78d913c7edc28",
+            "size": 9927152
+          }
+        },
+        {
+          "id": "weave-windows-display",
+          "version": "0.2.3",
+          "binary": {
+            "name": "weave-windows-display-windows-amd64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/weave-windows-display-windows-amd64.exe",
+            "digest": "sha256:cc29dca5538be4e5f7702c3e851fc12c7d666ddc983791f87568f723b7bb9e62",
+            "size": 18387224
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/module.manifest.json",
+            "digest": "sha256:50ed92d4b0c837a9c631c6065d9bfd9aab0633f754d333895f7b236041dfe4c4",
+            "size": 897
+          },
+          "package": {
+            "name": "weave-windows-display_0.2.3_windows_amd64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/weave-windows-display_0.2.3_windows_amd64.zip",
+            "digest": "sha256:75ba00aac6304f96f50fa425094527550cfd6460fda1c99e2c14ee3749d595c6",
+            "size": 9866379
+          }
+        }
+      ]
+    },
+    "windows/arm64": {
+      "core": {
+        "name": "weaveplatform-agent_0.9.11_windows_arm64.zip",
+        "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_windows_arm64.zip",
+        "digest": "sha256:dbca662ed87387ffce99af337f1a3003f83d77ea2652b0c8c86d22ce4bf708d7",
+        "size": 15155668
+      },
+      "coreEvidence": [
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt.sigstore.json",
+          "digest": "sha256:5fcb6c5d981de0596c6a214d3dbc035f627a80fc14dd03741cf3ded058a4a37c",
+          "size": 10701
+        },
+        {
+          "name": "weaveplatform-agent_0.9.11_checksums.txt",
+          "uri": "https://github.com/weaveplatform/weaveplatform-agent-core/releases/download/v0.9.11/weaveplatform-agent_0.9.11_checksums.txt",
+          "digest": "sha256:02d17c9573d2a5f3326c8952f77f854b58d46a732b8fea4af158ceba600cf784",
+          "size": 862
+        }
+      ],
+      "modules": [
+        {
+          "id": "weave-windows-presence",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-presence-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/weave-windows-presence-windows-arm64.exe",
+            "digest": "sha256:220bd0f6caf73ae60ce80c43aec39d9c23cb740d801841d98c14e7864db10cf9",
+            "size": 16613144
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/module.manifest.json",
+            "digest": "sha256:5505292786c98da3c8ff77afad2842dc49c905f658cd2ba95a0838553230120f",
+            "size": 892
+          },
+          "package": {
+            "name": "weave-windows-presence_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-presence/v0.2.2/weave-windows-presence_0.2.2_windows_arm64.zip",
+            "digest": "sha256:dc173eecbe1db624abe91877303e9954bc1cc88d458e53f9e39270f60149004c",
+            "size": 8863727
+          }
+        },
+        {
+          "id": "weave-windows-exec",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-exec-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/weave-windows-exec-windows-arm64.exe",
+            "digest": "sha256:d65af1618d2d9db7b57246503032c40c2c5c31f651421abb3b36d9fdf74c8ce4",
+            "size": 17791256
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/module.manifest.json",
+            "digest": "sha256:26dee6473b72a926ba954bec0beaba0d8cbbf755c8132c60e95fc7c322112f21",
+            "size": 883
+          },
+          "package": {
+            "name": "weave-windows-exec_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-exec/v0.2.2/weave-windows-exec_0.2.2_windows_arm64.zip",
+            "digest": "sha256:1446e0d40a208dcdef8cc5663298e86d8bb8c25d446e58f195c82452bee720fe",
+            "size": 9252382
+          }
+        },
+        {
+          "id": "weave-windows-power",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-power-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/weave-windows-power-windows-arm64.exe",
+            "digest": "sha256:2f715768df59546526037ab312fec682135fcf686348e2d393a95a2d978a07be",
+            "size": 16815896
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/module.manifest.json",
+            "digest": "sha256:25ddef31eb1f550ae679c1a3b66b5701ea0138dc7d2b76c5af8af197bb3d6f95",
+            "size": 885
+          },
+          "package": {
+            "name": "weave-windows-power_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-power/v0.2.2/weave-windows-power_0.2.2_windows_arm64.zip",
+            "digest": "sha256:37082731e40df3bee79d7d49ee41f64e8a5d2dd3f199dae1212f8f1e477b3973",
+            "size": 8920921
+          }
+        },
+        {
+          "id": "weave-windows-time",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-time-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/weave-windows-time-windows-arm64.exe",
+            "digest": "sha256:eec319507eaa6fd9b1c4322c9bf66e0a691a11cce4fad96e85ec3a457caaf331",
+            "size": 16804632
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/module.manifest.json",
+            "digest": "sha256:e8a21df1c3e67ac70cc7ae800285bde28d83cc065a714113de92267b95da8160",
+            "size": 883
+          },
+          "package": {
+            "name": "weave-windows-time_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-time/v0.2.2/weave-windows-time_0.2.2_windows_arm64.zip",
+            "digest": "sha256:c162dbec63ed3b66b3576efe161e18be3abdc1b5cb200b1f61ed4ddaa1391661",
+            "size": 8922492
+          }
+        },
+        {
+          "id": "weave-windows-metrics",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-metrics-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/weave-windows-metrics-windows-arm64.exe",
+            "digest": "sha256:f7621387ae89a3faf3d48858a5c913e22dc24ac0819b280079c3b9a9f20bfa1b",
+            "size": 17160472
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/module.manifest.json",
+            "digest": "sha256:bdc7f4b4962184f5dce0f18286e991253aad4d8f6e7d2524b691fd5eec0c8e27",
+            "size": 890
+          },
+          "package": {
+            "name": "weave-windows-metrics_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-metrics/v0.2.2/weave-windows-metrics_0.2.2_windows_arm64.zip",
+            "digest": "sha256:589b0d1b823d32baffd9bbcc398521e1d74ef1cfff49709af4f9f7350f1e51c2",
+            "size": 9008069
+          }
+        },
+        {
+          "id": "weave-windows-clipboard",
+          "version": "0.2.6",
+          "binary": {
+            "name": "weave-windows-clipboard-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/weave-windows-clipboard-windows-arm64.exe",
+            "digest": "sha256:3fff800e02df0a08daf611954f502ef69092615c2f10ab76a3f2d63153d6302d",
+            "size": 19390744
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/module.manifest.json",
+            "digest": "sha256:60d095fb380724f030489e7dfbd9bb07a64dcd5fbb75f0bb850729861c4b1d62",
+            "size": 901
+          },
+          "package": {
+            "name": "weave-windows-clipboard_0.2.6_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-clipboard/v0.2.6/weave-windows-clipboard_0.2.6_windows_arm64.zip",
+            "digest": "sha256:4263c585214ef924454bd47191a28001b711a3094ae6f913ca655ca3f3cead97",
+            "size": 9946876
+          }
+        },
+        {
+          "id": "weave-windows-session",
+          "version": "0.2.2",
+          "binary": {
+            "name": "weave-windows-session-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/weave-windows-session-windows-arm64.exe",
+            "digest": "sha256:013b33afd4b7eaea0bd8e29537a7d23226bb6242fe2333d47d2f50dbcdeafb5f",
+            "size": 17418520
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/module.manifest.json",
+            "digest": "sha256:677062a23bee4ec7b942a2f05472f92caa36d8002a9cc5817ae67cc72bfe3fda",
+            "size": 890
+          },
+          "package": {
+            "name": "weave-windows-session_0.2.2_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-session/v0.2.2/weave-windows-session_0.2.2_windows_arm64.zip",
+            "digest": "sha256:66b8a9583dae86106b0c8df675076f180c9bab415e206bdc864fb3a22536e90b",
+            "size": 9101483
+          }
+        },
+        {
+          "id": "weave-windows-display",
+          "version": "0.2.3",
+          "binary": {
+            "name": "weave-windows-display-windows-arm64.exe",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/weave-windows-display-windows-arm64.exe",
+            "digest": "sha256:756336eafb789652053a68886bb995b8e1f33938351ddde84149f80f283350e2",
+            "size": 17123608
+          },
+          "manifest": {
+            "name": "module.manifest.json",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/module.manifest.json",
+            "digest": "sha256:50ed92d4b0c837a9c631c6065d9bfd9aab0633f754d333895f7b236041dfe4c4",
+            "size": 897
+          },
+          "package": {
+            "name": "weave-windows-display_0.2.3_windows_arm64.zip",
+            "uri": "https://github.com/weaveplatform/weaveplatform-agent-modules/releases/download/modules/weave-windows-display/v0.2.3/weave-windows-display_0.2.3_windows_arm64.zip",
+            "digest": "sha256:eaa6cf0304409fcd6c5a508aa52c7d89287f33f23b9a7f869dd5f7acc6a42409",
+            "size": 9045143
+          }
+        }
+      ]
+    }
+  }
+}

@@ -63,6 +63,7 @@ func newRoot(stdout, stderr io.Writer) *cobra.Command {
 		newVersion(stdout),
 		newSource(stdout),
 		newBundle(stdout),
+		newImage(stdout, stderr),
 	)
 	g := &globals{}
 	g.register(root)

@@ -31,6 +31,7 @@ var sourceKinds = map[string]bool{
 	"esd":         true,
 	"cloud-image": true,
 	"bootc":       true,
+	"package":     true,
 }
 
 func newSource(stdout io.Writer) *cobra.Command {
@@ -50,7 +51,7 @@ func newSource(stdout io.Writer) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !sourceKinds[kind] {
 				return fmt.Errorf(
-					"%w: --kind must be ipsw, iso, esd, cloud-image or bootc",
+					"%w: --kind must be ipsw, iso, esd, cloud-image, bootc or package",
 					errUsage,
 				)
 			}
@@ -124,7 +125,7 @@ func newSource(stdout io.Writer) *cobra.Command {
 		&kind,
 		"kind",
 		"cloud-image",
-		"source kind recorded in the build: ipsw, iso, esd, cloud-image or bootc",
+		"source kind recorded in the build: ipsw, iso, esd, cloud-image, bootc or package",
 	)
 	f.StringVar(
 		&record,
@@ -147,6 +148,8 @@ type bundleInit struct {
 	created                     string
 	version, revision, repoURL  string
 	base                        string
+	agentName, agentVersion     string
+	auxStorage, uefiVars        string
 }
 
 func newBundle(stdout io.Writer) *cobra.Command {
@@ -227,6 +230,37 @@ func newBundle(stdout io.Writer) *cobra.Command {
 		"for a derived tier, the weave image it was built on: <name>@sha256:<platform manifest>",
 	)
 	f.StringVar(&b.fw.Type, "firmware", "uefi", "firmware: uefi, bios or apple")
+	f.StringVar(
+		&b.fw.HardwareModel,
+		"hardware-model",
+		"",
+		"base64 Apple hardware model (never a machine identifier)",
+	)
+	f.StringVar(
+		&b.fw.MinHostOS,
+		"min-host-os",
+		"",
+		"minimum host OS version required by the firmware",
+	)
+	f.StringVar(
+		&b.auxStorage,
+		"auxstorage",
+		"",
+		"Apple auxiliary storage file to carry with the disk",
+	)
+	f.StringVar(&b.uefiVars, "uefi-vars", "", "optional identity-free UEFI variables file")
+	f.StringVar(
+		&b.agentName,
+		"weaveagent-name",
+		"",
+		"installed agent name, used with --weaveagent-version",
+	)
+	f.StringVar(
+		&b.agentVersion,
+		"weaveagent-version",
+		"",
+		"installed agent version, used with --weaveagent-name",
+	)
 	f.BoolVar(&b.fw.SecureBoot, "secure-boot", false, "the guest requires Secure Boot")
 	f.StringVar(&b.fw.TPM, "tpm", "none", "TPM: none or required")
 	f.Int64Var(&b.cpuMin, "cpu-min", 1, "minimum vCPUs")
@@ -276,6 +310,20 @@ func (b bundleInit) file(dir string) (pack.BundleFile, error) {
 	}
 	if len(b.disks) == 0 {
 		return pack.BundleFile{}, bad("at least one --disk is required")
+	}
+	if (b.agentName == "") != (b.agentVersion == "") {
+		return pack.BundleFile{}, bad(
+			"--weaveagent-name and --weaveagent-version must be supplied together",
+		)
+	}
+	if b.agentName != "" {
+		if b.guest.Variant == spec.TierBase {
+			return pack.BundleFile{}, bad("a base image cannot contain an agent")
+		}
+		b.prov.Agent = &spec.Agent{Name: b.agentName, Version: b.agentVersion}
+	}
+	if b.auxStorage != "" && b.guest.OS != spec.OSDarwin {
+		return pack.BundleFile{}, bad("--auxstorage is only valid for darwin guests")
 	}
 	if b.template == "" || b.templateRef == "" {
 		return pack.BundleFile{}, bad("--template and --template-ref are required")
@@ -350,8 +398,35 @@ func (b bundleInit) file(dir string) (pack.BundleFile, error) {
 			spec.SourceMedia{Kind: r.Kind, URI: r.URI, Digest: r.Digest},
 		)
 	}
+	if err := b.movePayload(dir, &f); err != nil {
+		return pack.BundleFile{}, err
+	}
+	return f, nil
+}
+
+// movePayload keeps the sparse disks and their carried firmware on the
+// output volume; the caller builds all metadata before moving any input.
+func (b bundleInit) movePayload(dir string, f *pack.BundleFile) error {
 	if err := os.MkdirAll(dir, 0o750); err != nil {
-		return pack.BundleFile{}, fmt.Errorf("bundle: %w", err)
+		return fmt.Errorf("bundle: %w", err)
+	}
+	for _, state := range []struct {
+		name, path string
+		required   bool
+	}{
+		{spec.StateAuxStorage, b.auxStorage, true},
+		{spec.StateUEFIVars, b.uefiVars, false},
+	} {
+		if state.path == "" {
+			continue
+		}
+		name := state.name + ".bin"
+		if err := os.Rename(state.path, filepath.Join(dir, name)); err != nil {
+			return fmt.Errorf("bundle: move state %s: %w", state.name, err)
+		}
+		f.State = append(f.State, pack.BundleState{
+			Name: state.name, Path: name, Semantics: spec.SemanticsCarry, Required: state.required,
+		})
 	}
 	for i, d := range b.disks {
 		name, role := "disk"+strconv.Itoa(i), "data"
@@ -362,11 +437,11 @@ func (b bundleInit) file(dir string) (pack.BundleFile, error) {
 		// Disks are moved, not copied: a raw cloud disk is several GiB and
 		// a copy would drop its sparseness on most filesystems.
 		if err := os.Rename(d, filepath.Join(dir, file)); err != nil {
-			return pack.BundleFile{}, fmt.Errorf("bundle: move %s into %s: %w", d, dir, err)
+			return fmt.Errorf("bundle: move %s into %s: %w", d, dir, err)
 		}
 		f.Disks = append(f.Disks, pack.BundleDisk{Name: name, Role: role, Path: file})
 	}
-	return f, nil
+	return nil
 }
 
 // parseSize reads bytes, or a whole number of MiB or GiB.

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "registry": "ghcr.io/weaveplatform/weave-images",
+  "capabilities": ["presence", "exec", "power", "time", "metrics", "clipboard", "session", "display"],
+  "images": [
+    {"name": "macos-26", "os": "darwin", "osVersion": "26", "architectures": ["arm64"], "builder": "macos", "tiers": ["base", "agent"], "visibility": "private", "provisioning": "set-at-first-boot"},
+    {"name": "macos-27", "os": "darwin", "osVersion": "27", "architectures": ["arm64"], "builder": "macos", "tiers": ["base", "agent"], "visibility": "private", "provisioning": "set-at-first-boot"},
+    {"name": "windows-11-26h2", "os": "windows", "osVersion": "26H2", "edition": "Professional", "language": "en-us", "architectures": ["amd64", "arm64"], "builder": "windows", "tiers": ["base", "agent"], "visibility": "private", "provisioning": "set-at-first-boot"},
+    {"name": "ubuntu-20.04", "os": "linux", "osVersion": "20.04", "distro": "ubuntu", "architectures": ["amd64", "arm64"], "builder": "cloud-image", "tiers": ["base", "agent"], "visibility": "private", "provisioning": "cloud-init"},
+    {"name": "ubuntu-26.04", "os": "linux", "osVersion": "26.04", "distro": "ubuntu", "architectures": ["amd64", "arm64"], "builder": "cloud-image", "tiers": ["base", "agent"], "visibility": "private", "provisioning": "cloud-init"}
+  ]
+}

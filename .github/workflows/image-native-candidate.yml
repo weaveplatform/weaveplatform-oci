@@ -1,0 +1,101 @@
+name: images | Native candidate
+
+# Dedicated hosts are required: Apple silicon with Virtualization.framework,
+# or elevated Windows HCS with the same architecture as the guest.
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Native build host
+        type: choice
+        options: [macos-arm64, windows-amd64, windows-arm64]
+        required: true
+      version:
+        description: macOS major/exact version, or Windows edition-release (pro-26h2)
+        type: string
+        required: true
+      language:
+        description: Windows media language
+        type: string
+        default: en-US
+      revision:
+        description: Positive candidate revision
+        type: string
+        default: '1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-image-${{ inputs.platform }}
+  cancel-in-progress: false
+
+env:
+  GOWORK: 'off'
+  IMAGE_VERSION: ${{ inputs.version }}
+  IMAGE_LANGUAGE: ${{ inputs.language }}
+  IMAGE_REVISION: ${{ inputs.revision }}
+
+jobs:
+  macos:
+    if: inputs.platform == 'macos-arm64'
+    runs-on: [self-hosted, macOS, ARM64, weave-images]
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Build signed native builder on KING
+        run: |
+          set -euo pipefail
+          exec 2>&1
+          printf '[%s] Building signed native macOS builder\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          scripts/images/workspace.sh check 80
+          scripts/images/workspace.sh run make image-builder BIN_DIR=/Volumes/KING/weave-images/work/cache/native-builder
+      - name: Restore candidate through Virtualization.framework
+        run: |
+          set -euo pipefail
+          exec 2>&1
+          scripts/images/workspace.sh run /Volumes/KING/weave-images/work/cache/native-builder/weaveoci image build-macos \
+            --version "$IMAGE_VERSION" --revision "$IMAGE_REVISION"
+
+  windows:
+    if: startsWith(inputs.platform, 'windows-')
+    runs-on: ${{ fromJSON(inputs.platform == 'windows-arm64' && '["self-hosted","Windows","ARM64","weave-images"]' || '["self-hosted","Windows","X64","weave-images"]') }}
+    timeout-minutes: 180
+    env:
+      IMAGE_ARCH: ${{ inputs.platform == 'windows-arm64' && 'arm64' || 'amd64' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Build and install candidate through HCS
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Output "[$([DateTime]::UtcNow.ToString('o'))] Preparing native Windows builder for $env:IMAGE_ARCH"
+          if (!$env:WEAVE_IMAGE_WORKSPACE -or !(Test-Path $env:WEAVE_IMAGE_WORKSPACE)) {
+            throw 'Set WEAVE_IMAGE_WORKSPACE on the runner to its NTFS/ReFS image storage directory.'
+          }
+          $work = $env:WEAVE_IMAGE_WORKSPACE
+          $env:GOCACHE = Join-Path $work 'cache/go-build'
+          $env:GOMODCACHE = Join-Path $work 'cache/go-mod'
+          $env:TEMP = Join-Path $work 'tmp'
+          $env:TMP = $env:TEMP
+          New-Item -ItemType Directory -Force $env:GOCACHE,$env:GOMODCACHE,$env:TEMP | Out-Null
+          $binary = Join-Path $work 'cache/weaveoci.exe'
+          go build -o $binary ./cmd/weaveoci 2>&1
+          if ($LASTEXITCODE -ne 0) { throw 'Builder compilation failed' }
+          $out = Join-Path $work "builds/native-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          & $binary image build-windows --from-windows $env:IMAGE_VERSION --arch $env:IMAGE_ARCH `
+            --language $env:IMAGE_LANGUAGE --revision $env:IMAGE_REVISION `
+            --cache (Join-Path $work 'media/windows') --out $out 2>&1
+          if ($LASTEXITCODE -ne 0) { throw 'Native Windows installation failed' }
