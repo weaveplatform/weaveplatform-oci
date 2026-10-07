@@ -31,6 +31,7 @@ type (
 	// WindowsInstallRequest contains only build-owned paths and an unpredictable completion marker.
 	WindowsInstallRequest struct {
 		Directory, ISO, Seed, Marker string
+		BaseDisk                     string // Optional raw parent; never modified.
 		Timeout                      time.Duration
 		Arch                         string
 		Log                          io.Writer
@@ -173,20 +174,8 @@ func (t Tools) windowsBundle(
 		return "", err
 	}
 	disk := filepath.Join(o.Out, "disk.vhd")
-	_, f, size, err := vhd.Raw(disk)
-	if err != nil {
-		return "", fmt.Errorf("validate native fixed VHD: %w", err)
-	}
-	if err := f.Close(); err != nil {
-		return "", fmt.Errorf("close VHD: %w", err)
-	}
-	// A fixed VHD contains raw disk bytes followed by a footer. The VM is stopped
-	// and its handles are closed before removing that footer in place.
-	if err := os.Truncate(disk, size); err != nil {
-		return "", fmt.Errorf("remove VHD footer: %w", err)
-	}
-	if err := os.Rename(disk, filepath.Join(bundle, "disk0.img")); err != nil {
-		return "", fmt.Errorf("move raw disk: %w", err)
+	if err := moveWindowsRaw(disk, filepath.Join(bundle, "disk0.img")); err != nil {
+		return "", err
 	}
 	policy := "firmware-policy.json"
 	if err := writeJSON(
@@ -248,6 +237,24 @@ func (t Tools) windowsBundle(
 	return bundle, nil
 }
 
+func moveWindowsRaw(disk, destination string) error {
+	_, f, size, err := vhd.Raw(disk)
+	if err != nil {
+		return fmt.Errorf("validate native fixed VHD: %w", err)
+	}
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("close VHD: %w", err)
+	}
+	// The VM is stopped and its handles are closed before stripping the footer.
+	if err := os.Truncate(disk, size); err != nil {
+		return fmt.Errorf("remove VHD footer: %w", err)
+	}
+	if err := os.Rename(disk, destination); err != nil {
+		return fmt.Errorf("move raw disk: %w", err)
+	}
+	return nil
+}
+
 func windowsSeed(out string, s WindowsSource, marker string) (string, error) {
 	dir := filepath.Join(out, "seed")
 	if err := newDirectory(dir); err != nil {
@@ -262,6 +269,10 @@ func windowsSeed(out string, s WindowsSource, marker string) (string, error) {
 			return "", fmt.Errorf("write Windows seed: %w", err)
 		}
 	}
+	return windowsSeedISO(out, dir)
+}
+
+func windowsSeedISO(out, dir string) (string, error) {
 	iso := filepath.Join(out, "seed.iso")
 	f, err := os.OpenFile(
 		iso,

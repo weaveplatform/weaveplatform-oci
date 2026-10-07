@@ -102,6 +102,10 @@ func newDirectory(path string) error {
 }
 
 func copyFile(src, dst string) error {
+	return copyFileContext(context.Background(), src, dst)
+}
+
+func copyFileContext(ctx context.Context, src, dst string) error {
 	in, err := os.Open(src) //nolint:gosec // validated build input
 	if err != nil {
 		return fmt.Errorf("open %s: %w", src, err)
@@ -116,8 +120,9 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("create %s: %w", dst, err)
 	}
-	_, copyErr := io.Copy(out, in)
+	_, copyErr := io.Copy(out, contextReader{ctx, in})
 	if err := errors.Join(copyErr, out.Close()); err != nil {
+		_ = os.Remove(dst)
 		return fmt.Errorf("copy %s: %w", src, err)
 	}
 	return nil

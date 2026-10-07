@@ -212,7 +212,7 @@ func (p Packages) Prepare(
 		return nil, err
 	}
 	for i, a := range sources {
-		if err := copyFile(paths[i], filepath.Join(out, a.Name)); err != nil {
+		if err := copyFileContext(ctx, paths[i], filepath.Join(out, a.Name)); err != nil {
 			return nil, err
 		}
 	}

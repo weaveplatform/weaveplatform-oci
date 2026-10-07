@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -97,6 +98,7 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 		newImageBoot(tools, emit),
 		newImageValidate(tools, emit),
 		newImageAgent(packages, load, emit),
+		newImageAgentBuilder("windows", packages.BuildWindowsAgent, load, emit),
 		newImageMac(packages, emit),
 		newImageIPSW(packages, emit),
 		newImageWindowsSource(packages, emit),
@@ -169,10 +171,19 @@ func newImageAgent(
 	load func() (imagebuild.Lock, error),
 	emit func(any) error,
 ) *cobra.Command {
+	return newImageAgentBuilder("linux", p.BuildLinuxAgent, load, emit)
+}
+
+func newImageAgentBuilder(
+	osName string,
+	build func(context.Context, imagebuild.AgentOptions) (string, error),
+	load func() (imagebuild.Lock, error),
+	emit func(any) error,
+) *cobra.Command {
 	var o imagebuild.AgentOptions
 	var timeout int
 	cmd := &cobra.Command{
-		Use:   "build-linux-agent",
+		Use:   "build-" + osName + "-agent",
 		Short: "Install verified native packages into a sealed base clone",
 		Args:  usageArgs(0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
@@ -190,7 +201,7 @@ func newImageAgent(
 			}
 			o.Lock = l
 			o.Timeout = time.Duration(timeout) * time.Second
-			path, err := p.BuildLinuxAgent(cmd.Context(), o)
+			path, err := build(cmd.Context(), o)
 			if err != nil {
 				return fmt.Errorf("image: %w", err)
 			}

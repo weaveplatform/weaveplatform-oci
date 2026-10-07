@@ -12,6 +12,28 @@ import (
 	"github.com/weaveplatform/weaveplatform-oci/pkg/spec"
 )
 
+func TestWindowsAgentCLIRequiresCompleteInputs(t *testing.T) {
+	for _, args := range [][]string{
+		{"image", "build-windows-agent"},
+		{"image", "build-windows-agent", "unexpected"},
+		{"image", "build-windows-agent", "--base", "layout", "--base-name", "windows-base", "--arch", "arm64", "--cache", "cache", "--out", "out", "--timeout", "0"},
+		{"image", "build-windows-agent", "--base", "layout", "--base-name", "windows-base", "--arch", "arm64", "--cache", "cache", "--out", "out", "--catalogue", "absent"},
+	} {
+		if code, _, stderr := run(t, args...); code == 0 {
+			t.Fatal("invalid Windows builder invocation accepted", args, stderr)
+		}
+	}
+	if code, stdout, stderr := run(
+		t,
+		"image",
+		"build-windows-agent",
+		"--help",
+	); code != 0 ||
+		!strings.Contains(stdout, "--base-name") {
+		t.Fatal(stdout, stderr)
+	}
+}
+
 func TestImageExportCLI(t *testing.T) {
 	b := writeBundle(t, testbundle.Options{OS: spec.OSWindows, Arch: spec.ArchAMD64})
 	layout := filepath.Join(t.TempDir(), "layout")

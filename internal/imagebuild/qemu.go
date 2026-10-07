@@ -177,7 +177,7 @@ func (t Tools) seed(ctx context.Context, work, check, marker, payload string) er
 		return err
 	}
 	if payload != "" {
-		if err := copyTree(payload, filepath.Join(dir, "packages")); err != nil {
+		if err := copyTreeContext(ctx, payload, filepath.Join(dir, "packages")); err != nil {
 			return err
 		}
 	}
@@ -212,6 +212,10 @@ func (t Tools) seed(ctx context.Context, work, check, marker, payload string) er
 }
 
 func copyTree(src, dst string) error {
+	return copyTreeContext(context.Background(), src, dst)
+}
+
+func copyTreeContext(ctx context.Context, src, dst string) error {
 	err := filepath.WalkDir(src, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -226,7 +230,7 @@ func copyTree(src, dst string) error {
 		if !entry.Type().IsRegular() {
 			return fmt.Errorf("%w: payload contains non-regular file", ErrInput)
 		}
-		return copyFile(path, filepath.Join(dst, rel))
+		return copyFileContext(ctx, path, filepath.Join(dst, rel))
 	})
 	if err != nil {
 		return fmt.Errorf("copy payload: %w", err)
@@ -307,7 +311,7 @@ func (t Tools) BootLinux(ctx context.Context, o BootOptions) (BootResult, error)
 			return result, err
 		}
 	}
-	if err := copyFile(variables, filepath.Join(work, "vars.fd")); err != nil {
+	if err := copyFileContext(ctx, variables, filepath.Join(work, "vars.fd")); err != nil {
 		return result, err
 	}
 	marker := fmt.Sprintf("WEAVE-BOOT-OK-%x", randomMarker())

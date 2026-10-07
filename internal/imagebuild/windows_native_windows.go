@@ -24,14 +24,20 @@ func installWindowsNative(
 	ctx context.Context,
 	r WindowsInstallRequest,
 ) (WindowsInstallResult, error) {
-	result, err := installWindowsWith(ctx, r, windowsNativeAPI(hcsSystemCalls{
+	api := windowsNativeAPI(hcsSystemCalls{
 		operation: hcsOperation,
 		create:    hcs.HcsCreateComputeSystem,
 		observe:   hcs.HcsSetComputeSystemCallback,
 		start:     hcs.HcsStartComputeSystem,
 		terminate: hcs.HcsTerminateComputeSystem,
 		close:     hcs.HcsCloseComputeSystem,
-	}))
+	})
+	if r.BaseDisk != "" {
+		api.createDisk = func(path string) error {
+			return cloneWindowsDisk(ctx, r.BaseDisk, path, virtualdisk.Convert)
+		}
+	}
+	result, err := installWindowsWith(ctx, r, api)
 	if err != nil {
 		return result, err
 	}

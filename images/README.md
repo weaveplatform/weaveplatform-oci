@@ -252,7 +252,7 @@ Windows; normal licensing applies.
 
 These native builders produce candidates. Windows installation has not yet
 been exercised on shocone, and neither native builder yet supplies the two-clone
-consumer acceptance gate or a macOS/Windows agent tier. Native fleet acceptance
+consumer acceptance gate or a macOS agent builder. Native fleet acceptance
 and signed channel lineage checks remain required before promotion. Catalogue
 entries are not evidence of successful builds.
 
@@ -297,3 +297,31 @@ binary hashes, stops the agent and removes its machine-bound store and channel
 trust while preserving `manifest.sequence`. The builder still has to remove its
 temporary login account and generalize the OS; payload preparation alone does
 not produce or validate an agent image.
+
+On a matching Windows HCS host, build a Windows agent candidate from a packed
+base with:
+
+```powershell
+weaveoci image build-windows-agent --base "$env:WEAVE_IMAGE_WORKSPACE\base-layout" `
+  --base-name windows-enterprise-base --arch amd64 `
+  --cache "$env:WEAVE_IMAGE_WORKSPACE\cache\packages" `
+  --out "$env:WEAVE_IMAGE_WORKSPACE\windows-agent-r1"
+```
+
+The builder independently unpacks the parent, imports its raw sectors into a
+new VHDX, installs the authenticated payload through an offline audit-mode seed,
+and requires a Sysprep generalization receipt plus shutdown before export. It
+does not attach installation media or repartition the parent. The bundle records
+the exact parent platform digest and all package inputs. Its inventory remains
+`pending` until acceptance passes. Native Windows execution is deferred under
+[incident #38](https://github.com/weaveplatform/weaveplatform-oci/issues/38).
+
+`pkg/imagecheck.Validate` supplies shared two-clone orchestration for native and
+provider boot adapters: strict deep verification, independent unpacking, fresh
+challenges/keys, bounded runs and schema-2 admission. `pkg/agentcheck.ProbeLifecycle`
+uses the shared SDK to test module operations, foreign-key refusal, actual
+observed restart/shutdown, persistent identities/store keys and trust after
+reboot. These libraries require concrete guest inspection and power observers;
+they do not infer VM acceptance from unit tests or installer success. The
+[implementation tracker](../docs/research/15-image-delivery-implementation.md)
+distinguishes completed components from remaining adapters and live runs.

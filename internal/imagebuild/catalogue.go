@@ -23,6 +23,7 @@ var (
 	versionPattern   = regexp.MustCompile(`^v?([0-9]+)\.([0-9]+)\.([0-9]+)$`)
 	namePattern      = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 	imageNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9.-]*$`)
+	parentName       = regexp.MustCompile(`^[a-z0-9][a-z0-9./_-]*$`)
 )
 
 // Catalogue describes the requested image matrix.
