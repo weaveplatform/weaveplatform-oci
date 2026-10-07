@@ -32,7 +32,7 @@ func TestImageInputsAndUsage(t *testing.T) {
 		!strings.Contains(stderr, "installer missing") {
 		t.Fatalf("%d %s", code, stderr)
 	}
-	for _, args := range [][]string{{"image", "lock"}, {"image", "boot-linux", "missing"}, {"image", "validate-linux"}, {"image", "validate-linux", "missing"}, {"image", "build-linux-agent"}, {"image", "build-macos"}, {"image", "build-macos", "--version", "invalid"}, {"image", "build-macos", "--version", "26", "--revision", "0"}} {
+	for _, args := range [][]string{{"image", "lock"}, {"image", "boot-linux", "missing"}, {"image", "validate-linux"}, {"image", "validate-linux", "missing"}, {"image", "build-linux-agent"}} {
 		if code, _, stderr := run(t, args...); code != 2 {
 			t.Errorf("%v: %d %s", args, code, stderr)
 		}
@@ -59,7 +59,7 @@ func TestNativeImageVersionUsage(t *testing.T) {
 			t.Errorf("%v: %d %s", args, code, stderr)
 		}
 	}
-	for _, command := range []string{"ipsw", "windows", "build-macos", "build-windows"} {
+	for _, command := range []string{"ipsw", "windows", "build-windows"} {
 		if code, out, stderr := run(
 			t,
 			"image",

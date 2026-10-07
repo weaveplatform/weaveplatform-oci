@@ -6,7 +6,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/ProtonMail/go-crypto v1.5.2
 	github.com/cucumber/godog v0.16.0
-	github.com/deploymenttheory/go-bindings-macosplatform v0.20.1
 	github.com/deploymenttheory/go-bindings-win32 v0.5.0
 	github.com/deploymenttheory/go-sdk-winmediafoundry v0.8.0
 	github.com/go-chi/chi/v5 v5.3.2

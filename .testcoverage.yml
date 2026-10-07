@@ -13,6 +13,8 @@ exclude:
     - ^cmd/
 # Image-building code has the stricter coverage requirement requested for this work.
 override:
+  - path: ^pkg/handoff$
+    threshold: 95
   - path: ^internal/imagebuild$
     threshold: 95
   - path: ^pkg/imagecheck$

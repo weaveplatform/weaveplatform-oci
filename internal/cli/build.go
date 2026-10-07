@@ -157,6 +157,7 @@ func newBundle(stdout io.Writer) *cobra.Command {
 		Use:   "bundle",
 		Short: "Create bundle directories for pack and publish",
 	}
+	cmd.AddCommand(newImportImageweave(stdout))
 	var b bundleInit
 	initCmd := &cobra.Command{
 		Use:   "init <dir> --disk <raw> --os <os> --arch <arch> --os-version <v> --os-build <b> [flags]",

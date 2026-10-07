@@ -1,12 +1,18 @@
 # weaveplatform-oci
 
 This repository is home to the image layer of the weave platform. Its purpose
-is to give every weave project one way to build, publish, move, trust and run
+is to give every weave project one way to package, publish, move and verify
 virtual machine images for macOS, Windows and Linux guests, using standard OCI
 registries as the transport. It defines the **weave guest artifact contract**,
 implements it as a pure Go module, and ships the tools and pipelines built on
-it: the `weaveoci` CLI, the `weave-zot` reference registry and the image build
-workflows.
+it: the `weaveoci` CLI, the `weave-zot` reference registry and publication workflows.
+
+[Imageweave](https://github.com/weaveplatform/imageweave) owns image construction
+through Packer. OCI imports its completed artifacts through the
+[Imageweave handoff](docs/imageweave-handoff.md). Hostweave owns pinned image
+selection and placement; compatible runtimes execute the resulting images.
+Some legacy builders and acceptance runners remain here during migration; their
+removal conditions are recorded in the handoff guide.
 
 The motivation for this project stems from the following factors:
 

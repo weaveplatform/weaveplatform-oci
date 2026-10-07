@@ -31,7 +31,6 @@ type AppleSource struct {
 	Signed      bool   `json:"signed"`
 	ReleaseDate string `json:"releasedate,omitempty"`
 }
-type appleSource = AppleSource
 
 // ValidateMacVersion accepts the same major/exact version forms as guestweave.
 func ValidateMacVersion(version string) error {

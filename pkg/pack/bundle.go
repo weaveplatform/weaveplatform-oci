@@ -38,6 +38,8 @@ type BundleDisk struct {
 	Name string `json:"name"`
 	Role string `json:"role"`
 	Path string `json:"path"`
+	// ChunkDigests optionally pins raw chunks to a producer handoff snapshot.
+	ChunkDigests []string `json:"chunkDigests,omitempty"`
 }
 
 // BundleState names one state file, relative to the bundle directory.
@@ -46,6 +48,7 @@ type BundleState struct {
 	Path      string `json:"path"`
 	Semantics string `json:"semantics"`
 	Required  bool   `json:"required"`
+	Digest    string `json:"digest,omitempty"`
 }
 
 // Bundle is a loaded bundle with absolute file paths.

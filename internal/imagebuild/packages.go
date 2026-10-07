@@ -11,7 +11,6 @@ import (
 
 // Packages verifies publisher evidence before creating an offline installation payload.
 type Packages struct {
-	MacRestore     MacRestoreFunc
 	WindowsInstall WindowsInstallFunc
 	Tools          Tools
 	Downloader     Downloader

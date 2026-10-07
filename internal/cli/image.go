@@ -16,6 +16,13 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 	root := &cobra.Command{
 		Use:   "image",
 		Short: "Build and validate base and agent image candidates",
+		Args:  usageArgs(0),
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			if err := cmd.Help(); err != nil {
+				return fmt.Errorf("image help: %w", err)
+			}
+			return nil
+		},
 	}
 	var catalogue, lock string
 	root.PersistentFlags().
@@ -103,7 +110,6 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 		newImageValidate(tools, emit),
 		newImageAgent(packages, load, emit),
 		newImageAgentBuilder("windows", packages.BuildWindowsAgent, load, emit),
-		newImageMac(packages, emit),
 		newImageIPSW(packages, emit),
 		newImageWindowsSource(packages, emit),
 		newImageWindows(packages, emit),
@@ -219,38 +225,6 @@ func newImageAgentBuilder(
 	cmd.Flags().StringVar(&o.Out, "out", "", "New candidate directory")
 	cmd.Flags().IntVar(&o.Revision, "revision", 1, "Positive build revision")
 	cmd.Flags().IntVar(&timeout, "timeout", 1200, "Provisioning timeout in seconds")
-	return cmd
-}
-
-func newImageMac(p imagebuild.Packages, emit func(any) error) *cobra.Command {
-	var o imagebuild.MacOptions
-	cmd := &cobra.Command{
-		Use:   "build-macos",
-		Short: "Restore a pinned Apple IPSW to an agent-free base bundle",
-		Args:  usageArgs(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			if imagebuild.ValidateMacVersion(o.Version) != nil || o.Revision < 1 {
-				return fmt.Errorf(
-					"%w: --version must be a macOS major or exact version and --revision positive",
-					errUsage,
-				)
-			}
-			path, err := p.BuildMacOS(cmd.Context(), o)
-			if err != nil {
-				return fmt.Errorf("image: %w", err)
-			}
-			return emit(map[string]string{"bundle": path})
-		},
-	}
-	cmd.Flags().
-		Int64Var(&o.DiskSize, "disk-size", 80<<30, "Raw system disk size in bytes (minimum 64 GiB)")
-	cmd.Flags().
-		StringVar(&o.Version, "version", "", "macOS major or exact version (e.g. 26, 27, 26.6.2)")
-	cmd.Flags().
-		StringVar(&o.SourceLock, "source-lock", "", "Previously resolved Apple restore metadata")
-	cmd.Flags().IntVar(&o.Revision, "revision", 1, "Positive build revision")
-	cmd.Flags().
-		BoolVar(&o.Resume, "resume", false, "Resume an interrupted media download with identical source metadata")
 	return cmd
 }
 
