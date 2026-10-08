@@ -150,6 +150,21 @@ A missing policy or unavailable runner must fail or remain unqualified; neither
 can be replaced with a generated passing report. There is no automatic channel
 promotion or new signing-key hierarchy in this migration.
 
+## Delivery migration checkpoint — 2026-10-08
+
+Companion implementation: [Imageweave PR #5](https://github.com/weaveplatform/imageweave/pull/5).
+Its construction/runtime code is separated into Linux, Windows and macOS
+packages, with common inputs/helpers and narrow CLI backend interfaces.
+
+OCI's post-removal quality gate passed at **96.6% (4735/4904)**. Imageweave's
+full gate passed at **96.9% (3383/3492)**, with every package above 95% and both
+binaries built for all six platforms. The enhanced Linux validator passed four
+real boots of the existing Ubuntu 26.04 arm64 artifact on KING: each clone kept
+its identity across reboot and the two clones had different identities.
+The report is schema 3; it is local evidence, not a signed registry publication.
+See the companion's [validation checkpoint](https://github.com/weaveplatform/imageweave/blob/feat/oci-delivery-migration/docs/delivery-validation-checkpoint.md)
+for exact artifact digests, evidence paths and remaining qualification gaps.
+
 ## Local validation checkpoint — 2026-10-07
 
 `make vet lint test accept cover build vuln` passed on macOS arm64, including
