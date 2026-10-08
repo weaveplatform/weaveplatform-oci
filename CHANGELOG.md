@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3](https://github.com/weaveplatform/weaveplatform-oci/compare/v0.1.2...v0.1.3) (2026-10-08)
+
+
+### Features
+
+* **images:** import Imageweave candidates and authenticate image delivery ([#42](https://github.com/weaveplatform/weaveplatform-oci/issues/42)) ([2c44f6e](https://github.com/weaveplatform/weaveplatform-oci/commit/2c44f6e62f679a7fff9a21066e11f3e2b895ec1f))
+* **images:** validated publication and target delivery ([#40](https://github.com/weaveplatform/weaveplatform-oci/issues/40)) ([217c4ba](https://github.com/weaveplatform/weaveplatform-oci/commit/217c4ba38611f9f881e8d86b45fbbde1fcb06488))
+* **images:** verify published image admission evidence ([#44](https://github.com/weaveplatform/weaveplatform-oci/issues/44)) ([5f8bebb](https://github.com/weaveplatform/weaveplatform-oci/commit/5f8bebbcdf6f3e6534b8ccf79e592512791bc01c))
+
 ## [0.1.2](https://github.com/weaveplatform/weaveplatform-oci/compare/v0.1.1...v0.1.2) (2026-10-07)
 
 
