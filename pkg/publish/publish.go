@@ -165,7 +165,7 @@ func Run(ctx context.Context, r Request) (Result, error) {
 	if err := selfCheck(ctx, r, ref, res); err != nil {
 		return res, err
 	}
-	res.Promotion = promotion(ref, res, r.Signer, prov, now())
+	res.Promotion = promotion(ref, res, r.Signer, prov, r.Client.Profile().Verify.Identity, now())
 	return res, nil
 }
 
@@ -261,6 +261,7 @@ func promotion(
 	res Result,
 	s *sign.Signer,
 	prov profile.SigningProvider,
+	identity *profile.Identity,
 	now time.Time,
 ) channel.Image {
 	img := channel.Image{
@@ -271,9 +272,9 @@ func promotion(
 	}
 	for _, d := range res.Children {
 		img.Platforms = append(img.Platforms, channel.Platform{
-			OS:        d.Platform.OS,
-			Arch:      d.Platform.Architecture,
-			OSVersion: d.Platform.OSVersion,
+			OS:        d.Config.Guest.OS,
+			Arch:      d.Config.Guest.Arch,
+			OSVersion: d.Config.Guest.OSVersion,
 			Digest:    d.Digest.String(),
 		})
 	}
@@ -282,6 +283,12 @@ func promotion(
 		img.Signature = &channel.Signer{Provider: string(prov), KeyID: s.KeyID()}
 	case profile.SigningGitHubAttestation:
 		img.Signature = &channel.Signer{Provider: string(prov)}
+		if identity != nil {
+			// These are expected signer claims from reviewed configuration.
+			// Candidate/admission verification must authenticate the statements.
+			img.Signature.Issuer = identity.Issuer
+			img.Signature.SubjectRegexp = identity.SubjectRegexp
+		}
 	}
 	return img
 }

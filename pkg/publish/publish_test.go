@@ -1,6 +1,7 @@
 package publish_test
 
 import (
+	"bytes"
 	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -79,7 +80,10 @@ func TestPublishPrivateProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := res.Promotion
-	if res.Signature == nil || p.Repository != "weave-images/ubuntu-24.04" || p.Tag != "24.04-20260915-r1" || p.Digest != res.Index.Digest.String() ||
+	assertPromotionPlatforms(t, res)
+	if res.Signature == nil || p.Repository != "weave-images/ubuntu-24.04" ||
+		p.Tag != "24.04-20260915-r1" ||
+		p.Digest != res.Index.Digest.String() ||
 		len(p.Platforms) != 2 ||
 		p.Signature.Provider != "cosign-key" ||
 		p.Signature.KeyID != s.KeyID() ||
@@ -118,6 +122,65 @@ func TestPublishPrivateProfile(t *testing.T) {
 		client.ErrTagExists,
 	) {
 		t.Fatalf("republish: %v", err)
+	}
+}
+
+func assertPromotionPlatforms(t *testing.T, result publish.Result) {
+	t.Helper()
+	for n, child := range result.Children {
+		guest := child.Config.Guest
+		want := channel.Platform{
+			OS: guest.OS, Arch: guest.Arch, OSVersion: guest.OSVersion,
+			Digest: child.Digest.String(),
+		}
+		if guest.OSVersion == "" || result.Promotion.Platforms[n] != want {
+			t.Fatalf(
+				"platform metadata differs from the published guest: got %+v, want %+v",
+				result.Promotion.Platforms[n],
+				want,
+			)
+		}
+	}
+}
+
+func TestPublishGitHubProfilePreservesReviewedIdentityInWireFormat(t *testing.T) {
+	c, dirs, _ := setup(t, profile.SigningGitHubAttestation, testregistry.Options{})
+	p := c.Profile()
+	p.Verify.Identity = &profile.Identity{
+		Issuer:        "https://token.actions.githubusercontent.com",
+		SubjectRegexp: `^https://github\.com/weaveplatform/imageweave/\.github/workflows/linux-candidate\.yml@refs/heads/main$`,
+	}
+	c = client.New(p, client.Options{
+		Credentials: func(context.Context, string) (auth.Credential, error) { return auth.EmptyCredential, nil },
+	})
+	result, err := publish.Run(t.Context(), publish.Request{
+		Client: c, Bundles: dirs, Repository: "ubuntu-base", Tag: "r1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertPromotionPlatforms(t, result)
+	file := filepath.Join(t.TempDir(), "entry.json")
+	if err := publish.WritePromotion(file, result.Promotion); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var entry channel.Image
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&entry); err != nil {
+		t.Fatal(err)
+	}
+	if entry.Signature == nil || entry.Signature.Issuer != p.Verify.Identity.Issuer ||
+		entry.Signature.SubjectRegexp != p.Verify.Identity.SubjectRegexp ||
+		!bytes.Contains(
+			raw,
+			[]byte(`"subject_regexp"`),
+		) || !bytes.Contains(raw, []byte(`"os_version"`)) {
+		t.Fatalf("publication entry lost reviewed identity or platform version: %s", raw)
 	}
 }
 

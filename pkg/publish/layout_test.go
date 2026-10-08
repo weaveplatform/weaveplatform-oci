@@ -105,6 +105,7 @@ func TestPublishExactValidatedLayout(t *testing.T) {
 	if string(before) != string(after) {
 		t.Fatal("mutated validator's layout")
 	}
+	assertPromotionPlatforms(t, res)
 }
 
 func TestPublishRefusesInvalidLayoutEvidence(t *testing.T) {
