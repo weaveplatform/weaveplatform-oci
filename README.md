@@ -11,8 +11,9 @@ it: the `weaveoci` CLI, the `weave-zot` reference registry and publication workf
 through Packer. OCI imports its completed artifacts through the
 [Imageweave handoff](docs/imageweave-handoff.md). Hostweave owns pinned image
 selection and placement; compatible runtimes execute the resulting images.
-Some legacy builders and acceptance runners remain here during migration; their
-removal conditions are recorded in the handoff guide.
+Construction, media selection and runtime qualification live in Imageweave; OCI
+retains artifact verification and authenticated admission. See the handoff guide
+for migration commands and qualification limits.
 
 The motivation for this project stems from the following factors:
 
@@ -116,7 +117,7 @@ Run `weaveoci --help` for every verb.
 Every pull request must pass vet, blocking golangci-lint, unit tests on Linux,
 macOS and Windows, the godog acceptance suite against `weave-zot` and
 `registry:3` in Docker, govulncheck, a cross-compile, and merged coverage of at
-least **95% total, 95% for `internal/imagebuild`, and 90% for other packages**. `make gate` runs the same locally (with
+least **95% total, 95% for handoff and evidence verification, and 90% for other packages**. `make gate` runs the same locally (with
 `GOWORK=off`). Dependencies track their latest releases through Dependabot and
 `deps-refresh.yml`, and merge automatically once the gate passes.
 
