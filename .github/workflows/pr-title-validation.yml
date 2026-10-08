@@ -1,4 +1,4 @@
-name: PR Title Validation
+name: Pull request validation
 
 on:
   pull_request:
@@ -6,16 +6,16 @@ on:
 
 jobs:
   validate-pr-title:
-    name: '✅ Validate PR Title'
+    name: Pull request title validation
     runs-on: ubuntu-latest
     steps:
 
-      - name: Harden Runner
+      - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
-      - name: Check PR Title
+      - name: Validate pull request title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
