@@ -26,6 +26,7 @@ var (
 // RecipeCommit is a producer claim, not an authenticated build attestation.
 type Options struct {
 	Manifest, Out, RecipeCommit, SourceURI, Version string
+	ParentLayout, ParentRef, ParentName             string
 	Log                                             io.Writer
 }
 
@@ -88,10 +89,12 @@ func selectBuild(raw []byte, o Options) (build, error) {
 		return build{}, err
 	}
 	u, err := url.Parse(o.SourceURI)
+	parentSource := o.SourceURI == "" && o.ParentLayout != "" && o.ParentRef != "" &&
+		o.ParentName != ""
 	if !commit.MatchString(o.RecipeCommit) || o.Version == "" || o.Out == "" ||
-		err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		(!parentSource && (err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "")) {
 		return build{}, fmt.Errorf(
-			"%w: recipe commit, version, output and credential-free HTTPS source URI required",
+			"%w: recipe commit, version, output and either credential-free HTTPS source URI or complete parent reference required",
 			ErrInput,
 		)
 	}

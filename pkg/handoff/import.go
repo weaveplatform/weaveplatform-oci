@@ -66,6 +66,9 @@ func Import(ctx context.Context, o Options) (Receipt, error) {
 	if err != nil {
 		return receipt, err
 	}
+	if err := checkPreparedParent(ctx, o, f); err != nil {
+		return receipt, err
+	}
 	if err := validateBundle(f, files[selected[0]].Size); err != nil {
 		return receipt, err
 	}

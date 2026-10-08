@@ -105,6 +105,40 @@ and cloud acceptance in [#39](https://github.com/weaveplatform/weaveplatform-oci
 A restored macOS disk awaiting Setup Assistant still needs a guest observation
 and onboarding adapter before runtime qualification can pass.
 
+## Prepared macOS handoff
+
+Native result schema 1 remains the base-image contract. Schema 2 is reserved for
+prepared macOS images, with `firstBoot: desktop` and a `prepared` object containing
+`parent` (`name`, platform `digest`), `user: weave`, `automaticLogin: true` and
+`remoteLogin: true`. Passwords are not receipt fields. The prepared account's
+documented password is `weave`; these images are intended for isolated VM use.
+Prepared images contain no agent or modules.
+
+Import a prepared candidate with `--parent-layout`, `--parent-ref` and
+`--parent-name` instead of `--source-uri`. The manifest's `source_sha256` pins
+the parent platform manifest (without the `sha256:` prefix). The supplied parent
+index is deeply verified. Its selected platform must be a pristine macOS base
+with matching OS version/build, architecture, hardware model and resource policy.
+An index digest cannot substitute for its platform manifest. This checks local
+integrity and lineage; authenticating the parent remains a separate trust step.
+
+The imported tier is `prepared`, with `weave` as default user and `baked` as
+credential hint. No IPSW is falsely recorded as a second build input. The usual
+OCI parent annotations are generated from `build.base`. The import receipt
+remains schema 1 and unverified, because its envelope has not changed.
+
+Prepared qualification requires schema-3 evidence with profile `macos-prepared`.
+Both independent clones must pass account login, administrator membership, SSH,
+automatic login, desktop session, Setup Assistant completion and agent absence
+on first boot and reboot. SSH host key SHA-256 digests must differ between clones;
+`ssh-host-key-after-reboot` confirms persistence within each clone. The existing
+identity, shutdown, firmware and temporary-build-credential checks also apply.
+The intended `weave` account is preserved; temporary keys, build trust and instance
+identity are not. Base or agent reports cannot qualify a prepared image.
+
+The construction approach and upstream evidence are recorded in
+[the macOS preparation decision](research/19-macos-prepared-images.md).
+
 Keep candidates unqualified until the applicable acceptance profile passes on
 the exact artifact digest. Publication and channel admission use the existing
 signed-evidence flow. Cloud provider image registration is a separate destination

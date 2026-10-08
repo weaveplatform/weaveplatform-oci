@@ -87,6 +87,9 @@ func Check(data []byte, image conformance.Report, tag string) error {
 }
 
 func checkClones(clones []Boot, cfg spec.Config, schema int) error {
+	if cfg.Guest.Variant == spec.TierPrepared && schema != 3 {
+		return fmt.Errorf("%w: prepared images require schema 3 evidence", ErrEvidence)
+	}
 	platform := cfg.Guest.OS + "/" + cfg.Guest.Arch
 	if len(clones) != 2 {
 		return fmt.Errorf("%w: %s requires two fresh clones", ErrEvidence, platform)
@@ -133,16 +136,20 @@ func checkClones(clones []Boot, cfg spec.Config, schema int) error {
 	}
 	if schema >= 2 {
 		identities := requiredIdentities(cfg.Guest.OS)
+		if cfg.Guest.Variant == spec.TierPrepared {
+			identities = append(identities, "sshHostKeyDigest")
+		}
 		if cfg.Provisioning.Agent != nil {
 			identities = append(identities, "agentStoreKeyDigest")
 		}
 		for _, name := range identities {
 			a, b := clones[0].Identities[name], clones[1].Identities[name]
-			if name == "agentStoreKeyDigest" &&
+			if (name == "agentStoreKeyDigest" || name == "sshHostKeyDigest") &&
 				(!keyDigestPattern.MatchString(a) || !keyDigestPattern.MatchString(b)) {
 				return fmt.Errorf(
-					"%w: agent clones require store-key SHA-256 evidence",
+					"%w: clones require SHA-256 evidence for %s",
 					ErrEvidence,
+					name,
 				)
 			}
 			if strings.TrimSpace(a) == "" || strings.TrimSpace(b) == "" || strings.EqualFold(a, b) {
@@ -174,6 +181,9 @@ func requiredChecks(cfg spec.Config) []string {
 		"no-build-credentials",
 	}
 	if cfg.Provisioning.Agent == nil {
+		if cfg.Guest.Variant == spec.TierPrepared {
+			names = append(names, "ssh-host-key-after-reboot")
+		}
 		return append(names, "agent-absent")
 	}
 	names = append(

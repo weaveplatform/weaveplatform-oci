@@ -61,8 +61,9 @@ const (
 // Image tiers (guest.variant, contract §4.4). Any other value names a further
 // layer, such as xcode-26 or runner.
 const (
-	TierBase  = "base"
-	TierAgent = "agent"
+	TierBase     = "base"
+	TierAgent    = "agent"
+	TierPrepared = "prepared"
 )
 
 // Fixed sizes and limits.

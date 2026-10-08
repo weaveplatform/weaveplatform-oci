@@ -17,9 +17,10 @@ func newImportImageweave(stdout io.Writer) *cobra.Command {
 		Short: "Snapshot a completed Imageweave/Packer candidate into an unqualified OCI bundle",
 		Args:  usageArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if o.Out == "" || o.RecipeCommit == "" || o.SourceURI == "" || o.Version == "" {
+			if o.Out == "" || o.RecipeCommit == "" || o.Version == "" ||
+				(o.SourceURI == "" && (o.ParentLayout == "" || o.ParentRef == "" || o.ParentName == "")) {
 				return fmt.Errorf(
-					"%w: --out, --recipe-commit, --source-uri and --version required",
+					"%w: --out, --recipe-commit, --version and either --source-uri or all parent flags required",
 					errUsage,
 				)
 			}
@@ -42,5 +43,11 @@ func newImportImageweave(stdout io.Writer) *cobra.Command {
 		StringVar(&o.SourceURI, "source-uri", "", "Canonical HTTPS source-media URI, without credentials or query strings")
 	cmd.Flags().
 		StringVar(&o.Version, "version", "", "Candidate version annotation; does not promote the image")
+	cmd.Flags().
+		StringVar(&o.ParentLayout, "parent-layout", "", "Verified local OCI layout for a prepared image's base")
+	cmd.Flags().
+		StringVar(&o.ParentRef, "parent-ref", "", "Base index reference in the parent layout")
+	cmd.Flags().
+		StringVar(&o.ParentName, "parent-name", "", "Base repository matching the prepared receipt")
 	return cmd
 }
