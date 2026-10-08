@@ -1,4 +1,4 @@
-name: release-please
+name: Release management
 
 on:
   push:
@@ -10,10 +10,10 @@ permissions:
 
 jobs:
   release-please:
-    name: '🔖 Release Please'
+    name: Release management
     runs-on: ubuntu-latest
     steps:
-      - name: Harden Runner
+      - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
@@ -32,7 +32,8 @@ jobs:
       # installed: the next step falls back to RELEASE_PLEASE_PAT and says so,
       # because a silent fallback is how a repository ends up believing it
       # uses the App when it never has.
-      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      - name: Create GitHub App token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
         if: ${{ vars.RP_APP_ID != '' }}
         continue-on-error: true
@@ -40,7 +41,7 @@ jobs:
           app-id: ${{ vars.RP_APP_ID }}
           private-key: ${{ secrets.RP_APP_PRIVATE_KEY }}
 
-      - name: Which credential
+      - name: Report credential source
         env:
           HAVE_APP_TOKEN: ${{ steps.app-token.outputs.token != '' }}
         run: |
@@ -53,6 +54,7 @@ jobs:
       # Manifest mode: release types and pre-1.0 behaviour live in
       # release-please-config.json and .release-please-manifest.json. Setting
       # release-type here would select single-package mode and bypass them.
-      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+      - name: Manage releases
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token || secrets.RELEASE_PLEASE_PAT }}

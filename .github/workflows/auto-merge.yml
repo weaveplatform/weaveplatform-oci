@@ -1,4 +1,4 @@
-name: deps | Auto-merge
+name: Dependency auto-merge
 
 # Merges dependency PRs, Dependabot's and deps-refresh.yml's, once the quality
 # gate has passed on exactly the commit being merged. This is a workflow_run
@@ -11,7 +11,7 @@ name: deps | Auto-merge
 # executes PR code. It reads the PR's metadata and merges by API.
 on:
   workflow_run:
-    workflows: ['go | Quality gate']
+    workflows: ['Quality checks']
     types: [completed]
 
 permissions:
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   merge:
-    name: '🤖 Merge passing dependency PRs'
+    name: Dependency auto-merge
     if: >-
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success' &&
@@ -30,7 +30,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Harden Runner
+      - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
@@ -38,14 +38,15 @@ jobs:
       # Merging with the App token means the merge commit on main triggers
       # the push workflows (the gate on main, release-please); a merge made
       # with GITHUB_TOKEN would not.
-      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      - name: Create GitHub App token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
         continue-on-error: true
         with:
           app-id: ${{ vars.RP_APP_ID }}
           private-key: ${{ secrets.RP_APP_PRIVATE_KEY }}
 
-      - name: Merge
+      - name: Merge dependency pull request
         env:
           REPO: ${{ github.repository }}
           HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
