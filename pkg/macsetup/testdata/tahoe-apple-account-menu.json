@@ -1,0 +1,104 @@
+{
+  "Height" : 1536,
+  "Text" : [
+    {
+      "Height" : 24,
+      "Value" : "U.S. ffl Tue Sep 29 6:52AM",
+      "Width" : 372,
+      "X" : 1634,
+      "Y" : 18
+    },
+    {
+      "Height" : 33,
+      "Value" : "Sign In to Your Apple Account",
+      "Width" : 478,
+      "X" : 576,
+      "Y" : 541
+    },
+    {
+      "Height" : 31,
+      "Value" : "Sign in to use iCloud, the App Store, and other Apple",
+      "Width" : 796,
+      "X" : 576,
+      "Y" : 583
+    },
+    {
+      "Height" : 25,
+      "Value" : "services.",
+      "Width" : 132,
+      "X" : 576,
+      "Y" : 625
+    },
+    {
+      "Height" : 19,
+      "Value" : "mail or Phone Number",
+      "Width" : 267,
+      "X" : 603,
+      "Y" : 723
+    },
+    {
+      "Height" : 24,
+      "Value" : "Create new Apple Account..",
+      "Width" : 333,
+      "X" : 575,
+      "Y" : 785
+    },
+    {
+      "Height" : 24,
+      "Value" : "Forgot password?",
+      "Width" : 213,
+      "X" : 576,
+      "Y" : 837
+    },
+    {
+      "Height" : 21,
+      "Value" : "This Mac will be associated with your Apple Account and data such as photos,",
+      "Width" : 816,
+      "X" : 575,
+      "Y" : 1147
+    },
+    {
+      "Height" : 21,
+      "Value" : "contacts, and documents will be stored in iCloud so you can access them on other",
+      "Width" : 861,
+      "X" : 575,
+      "Y" : 1175
+    },
+    {
+      "Height" : 21,
+      "Value" : "devices. See how your data is managed...",
+      "Width" : 429,
+      "X" : 575,
+      "Y" : 1203
+    },
+    {
+      "Height" : 25,
+      "Value" : "Other Sign-In Options v",
+      "Width" : 297,
+      "X" : 293,
+      "Y" : 1282
+    },
+    {
+      "Height" : 21,
+      "Value" : "Continue",
+      "Width" : 107,
+      "X" : 1603,
+      "Y" : 1282
+    },
+    {
+      "Height" : 26,
+      "Value" : ".• Use Multiple Accounts",
+      "Width" : 311,
+      "X" : 297,
+      "Y" : 1341
+    },
+    {
+      "Height" : 26,
+      "Value" : "Q Sign in Later in Settings",
+      "Width" : 324,
+      "X" : 300,
+      "Y" : 1389
+    }
+  ],
+  "Width" : 2048
+}

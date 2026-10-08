@@ -128,6 +128,26 @@ func packDisk(
 	if err != nil {
 		return spec.Disk{}, nil, fmt.Errorf("disk %s: %w", d.Name, err)
 	}
+	// Compare the bytes actually chunked, not a separate preflight file read.
+	if d.ChunkDigests != nil {
+		if len(d.ChunkDigests) != len(chunks) {
+			return spec.Disk{}, nil, fmt.Errorf(
+				"%w: disk %s handoff chunk count changed",
+				ErrBundle,
+				d.Name,
+			)
+		}
+		for i, c := range chunks {
+			if d.ChunkDigests[i] != c.UncompressedDigest.String() {
+				return spec.Disk{}, nil, fmt.Errorf(
+					"%w: disk %s handoff chunk %d changed",
+					ErrBundle,
+					d.Name,
+					i,
+				)
+			}
+		}
+	}
 	disk := spec.Disk{
 		Name:        d.Name,
 		Role:        d.Role,
@@ -178,6 +198,13 @@ func packState(
 	raw, err := os.ReadFile(p) //nolint:gosec // path checked to be inside the bundle
 	if err != nil {
 		return spec.StateEntry{}, ocispec.Descriptor{}, fmt.Errorf("state %s: %w", s.Name, err)
+	}
+	if s.Digest != "" && s.Digest != digest.FromBytes(raw).String() {
+		return spec.StateEntry{}, ocispec.Descriptor{}, fmt.Errorf(
+			"%w: state %s handoff digest changed",
+			ErrBundle,
+			s.Name,
+		)
 	}
 	desc := ocispec.Descriptor{
 		MediaType: mt,

@@ -38,8 +38,14 @@ children; promotion refuses a child whose parent digest is not itself promoted.
 The initial agent set is presence, exec, power, time, metrics, clipboard, session
 and display, pinned independently by platform in `images/packages.lock.json`.
 The macOS module prefix is `weave-macos-`; Linux and Windows use `weave-linux-`
-and `weave-windows-`. osquery is deferred to a later layer. Linux images remain
-headless; session-dependent capabilities can wait for a graphical session.
+and `weave-windows-`. osquery is deferred to a later layer. The Linux `agent`
+tier remains headless; session-dependent capabilities can wait for a graphical
+session. The separately selected `desktop` tier derives from the exact agent
+parent and adds Xfce/X11, LightDM and pinned desktop dependencies. It includes
+all eight modules and requires an active console, clipboard round-trip and
+display-change acceptance on both first boot and reboot. Neither tier carries
+default account credentials or automatic-login settings. This extends the
+original headless-only scope in the validated delivery phase.
 
 Sealing also removes the agent's `store.db` (including WAL/SHM files),
 `store.key` and host-specific `channel.pub`. The platform provisioning the VM

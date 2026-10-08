@@ -49,7 +49,7 @@ type Clone struct {
 type BootClone func(context.Context, Clone) (Boot, error)
 
 // Validate deeply verifies an existing OCI index, independently unpacks and
-// boots two clones of every platform, and writes digest-bound schema-2 evidence.
+// boots two clones of every platform, and writes digest-bound schema-3 evidence.
 // It does not publish, register cloud images, or run a consumer CLI. Native and
 // provider adapters supply BootClone; missing or skipped adapters are errors.
 func Validate(ctx context.Context, c Candidate, boot BootClone) (result Report, err error) {
@@ -84,7 +84,7 @@ func Validate(ctx context.Context, c Candidate, boot BootClone) (result Report, 
 		return result, fmt.Errorf("validation output must be new: %w", err)
 	}
 	result = Report{
-		SchemaVersion: 2, IndexDigest: c.Root.Digest.String(), Tag: c.Tag,
+		SchemaVersion: 3, IndexDigest: c.Root.Digest.String(), Tag: c.Tag,
 		PlatformDigests: map[string]string{}, Platforms: map[string][]Boot{},
 	}
 	defer func() {
@@ -169,7 +169,7 @@ func validatePlatform(
 			return results, fmt.Errorf("validate %s clone %d: %w", platform, n+1, err)
 		}
 	}
-	return results, checkClones(results, cfg, 2)
+	return results, checkClones(results, cfg, 3)
 }
 
 func validateClone(

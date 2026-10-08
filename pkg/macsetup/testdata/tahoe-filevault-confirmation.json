@@ -1,0 +1,125 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "U.S. ffl Tue Sep 29 7:33AM",
+      "X": 1634,
+      "Y": 18,
+      "Width": 372,
+      "Height": 24
+    },
+    {
+      "Value": "Your Mac is Read for FileVault",
+      "X": 575,
+      "Y": 544,
+      "Width": 495,
+      "Height": 29
+    },
+    {
+      "Value": "FileVault kee",
+      "X": 577,
+      "Y": 586,
+      "Width": 186,
+      "Height": 27
+    },
+    {
+      "Value": "ur data and",
+      "X": 1287,
+      "Y": 586,
+      "Width": 169,
+      "Height": 27
+    },
+    {
+      "Value": "Mac Data Will Not Be",
+      "X": 810,
+      "Y": 627,
+      "Width": 265,
+      "Height": 21
+    },
+    {
+      "Value": "protecting",
+      "X": 576,
+      "Y": 628,
+      "Width": 152,
+      "Height": 33
+    },
+    {
+      "Value": "If you",
+      "X": 1321,
+      "Y": 628,
+      "Width": 80,
+      "Height": 33
+    },
+    {
+      "Value": "Securely Encrypted",
+      "X": 809,
+      "Y": 660,
+      "Width": 251,
+      "Height": 25
+    },
+    {
+      "Value": "forget your",
+      "X": 575,
+      "Y": 670,
+      "Width": 167,
+      "Height": 33
+    },
+    {
+      "Value": "Key to",
+      "X": 1334,
+      "Y": 673,
+      "Width": 92,
+      "Height": 30
+    },
+    {
+      "Value": "reset it.",
+      "X": 576,
+      "Y": 712,
+      "Width": 110,
+      "Height": 27
+    },
+    {
+      "Value": "Are you sure you want to continue",
+      "X": 809,
+      "Y": 712,
+      "Width": 409,
+      "Height": 24
+    },
+    {
+      "Value": "without FileVault? You can manage",
+      "X": 809,
+      "Y": 744,
+      "Width": 417,
+      "Height": 25
+    },
+    {
+      "Value": "this at any time in Privacy \u0026",
+      "X": 808,
+      "Y": 776,
+      "Width": 334,
+      "Height": 25
+    },
+    {
+      "Value": "Security settings.",
+      "X": 809,
+      "Y": 808,
+      "Width": 209,
+      "Height": 25
+    },
+    {
+      "Value": "Cancel",
+      "X": 865,
+      "Y": 884,
+      "Width": 81,
+      "Height": 21
+    },
+    {
+      "Value": "Continue",
+      "X": 1089,
+      "Y": 884,
+      "Width": 107,
+      "Height": 20
+    }
+  ]
+}

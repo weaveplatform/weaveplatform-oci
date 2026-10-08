@@ -1,0 +1,11 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {"Value": "Location Access Needed", "X": 72, "Y": 118, "Width": 262, "Height": 22},
+    {"Value": "MONDAY", "X": 72, "Y": 446, "Width": 98, "Height": 20},
+    {"Value": "5", "X": 72, "Y": 474, "Width": 28, "Height": 46},
+    {"Value": "No events today", "X": 72, "Y": 590, "Width": 176, "Height": 20},
+    {"Value": "Photos", "X": 420, "Y": 446, "Width": 74, "Height": 20}
+  ]
+}

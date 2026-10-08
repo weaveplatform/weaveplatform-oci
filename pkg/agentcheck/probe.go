@@ -15,6 +15,7 @@ import (
 	"github.com/weaveplatform/weaveplatform-agent-modules/sdk/protocol/hvchannel"
 	"github.com/weaveplatform/weaveplatform-agent-modules/sdk/weaveclient"
 	"github.com/weaveplatform/weaveplatform-agent-modules/sdk/weavewire"
+	"github.com/weaveplatform/weaveplatform-oci/pkg/imagecheck"
 )
 
 var ErrProbe = errors.New("agent acceptance failed")
@@ -25,6 +26,9 @@ type Expected struct {
 	OS, Arch, CoreVersion string
 	Modules               map[string]Module
 	Headless              bool
+	// Desktop requires active console, clipboard and display round trips.
+	Desktop     bool
+	ConsoleUser string
 }
 
 type Module struct{ ID, Version string }
@@ -32,7 +36,8 @@ type Module struct{ ID, Version string }
 // Result contains only checks actually performed here. The caller must add
 // boot, sealing, per-clone identity and observed power-cycle evidence.
 type Result struct {
-	Checks map[string]bool `json:"checks"`
+	Checks     map[string]bool               `json:"checks"`
+	Operations map[string]imagecheck.Outcome `json:"operations"`
 }
 
 var capabilities = []string{
@@ -112,12 +117,15 @@ func probe(
 	call caller,
 	run func(context.Context, []string) (string, error),
 ) (Result, error) {
-	r := Result{Checks: map[string]bool{}}
+	r := Result{Checks: map[string]bool{}, Operations: map[string]imagecheck.Outcome{}}
 	if (e.OS != "linux" && e.OS != "darwin" && e.OS != "windows") ||
 		(e.Arch != "amd64" && e.Arch != "arm64") ||
 		e.CoreVersion == "" ||
 		len(e.Modules) != 8 {
 		return r, fmt.Errorf("%w: complete platform/core/module expectations required", ErrProbe)
+	}
+	if e.Desktop && (e.Headless || e.ConsoleUser == "") {
+		return r, fmt.Errorf("%w: desktop requires a console user and cannot be headless", ErrProbe)
 	}
 	snapshot, err := modules(ctx)
 	if err != nil {
@@ -159,6 +167,7 @@ func probe(
 		return r, fmt.Errorf("%w: presence platform mismatch", ErrProbe)
 	}
 	r.Checks["agent-startup"], r.Checks["module-presence-operation"] = true, true
+	r.Operations["presence"] = imagecheck.Outcome{Status: imagecheck.Passed}
 	binary := map[string]string{"linux": "/usr/bin/weave-agent", "darwin": "/usr/local/libexec/weave/weave-agent", "windows": `C:\Program Files\Weave\weave-agent.exe`}[e.OS]
 	version, err := run(ctx, []string{binary, "--version"})
 	if err != nil {
@@ -168,6 +177,7 @@ func probe(
 		return r, fmt.Errorf("%w: running core version differs from lock", ErrProbe)
 	}
 	r.Checks["agent-version"], r.Checks["module-exec-operation"] = true, true
+	r.Operations["exec"] = imagecheck.Outcome{Status: imagecheck.Passed}
 	for _, op := range []struct {
 		capability, kind string
 		result           any
@@ -190,6 +200,19 @@ func probe(
 			return r, fmt.Errorf("%w: metrics returned no valid memory sample", ErrProbe)
 		}
 		r.Checks["module-"+op.capability+"-operation"] = true
+		outcome := imagecheck.Outcome{Status: imagecheck.Passed}
+		if err != nil {
+			outcome = imagecheck.Outcome{
+				Status: imagecheck.ExpectedUnavailable,
+				Reason: err.Error(),
+			}
+		}
+		r.Operations[op.capability] = outcome
+	}
+	if e.Desktop {
+		if err := probeDesktop(ctx, call, e.ConsoleUser, &r); err != nil {
+			return r, err
+		}
 	}
 	return r, nil
 }

@@ -83,6 +83,7 @@ func observed(c Clone) Boot {
 		Passed:         true,
 		Identities:     map[string]string{},
 		Checks:         map[string]bool{},
+		Profile:        ValidationProfile(c.Config),
 	}
 	for _, k := range requiredIdentities(c.Config.Guest.OS) {
 		b.Identities[k] = fmt.Sprintf("%s-%d", k, c.Number)
@@ -92,6 +93,14 @@ func observed(c Clone) Boot {
 	}
 	for _, k := range requiredChecks(c.Config) {
 		b.Checks[k] = true
+	}
+	if c.Config.Provisioning.Agent != nil {
+		b.Operations, b.RebootOperations = map[string]Outcome{}, map[string]Outcome{}
+		for _, ops := range []map[string]Outcome{b.Operations, b.RebootOperations} {
+			for _, name := range []string{"presence", "exec", "time", "metrics", "clipboard", "session", "display", "clipboard-roundtrip", "display-roundtrip", "desktop-session"} {
+				ops[name] = Outcome{Status: Passed}
+			}
+		}
 	}
 	return b
 }
@@ -130,7 +139,7 @@ func TestValidateUnpacksIndependentClonesAndBindsReports(t *testing.T) {
 					},
 				)
 				require(t, err)
-				if !report.Passed || report.SchemaVersion != 2 ||
+				if !report.Passed || report.SchemaVersion != 3 ||
 					!strings.Contains(log.String(), "clone 2/2") {
 					t.Fatal(report, log.String())
 				}

@@ -1,0 +1,160 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "System Settings",
+      "X": 109,
+      "Y": 17,
+      "Width": 211,
+      "Height": 25
+    },
+    {
+      "Value": "Edit View",
+      "X": 364,
+      "Y": 18,
+      "Width": 144,
+      "Height": 20
+    },
+    {
+      "Value": "Window",
+      "X": 551,
+      "Y": 18,
+      "Width": 95,
+      "Height": 20
+    },
+    {
+      "Value": "Help",
+      "X": 690,
+      "Y": 18,
+      "Width": 53,
+      "Height": 24
+    },
+    {
+      "Value": "Tue Sep 29 7:19AM",
+      "X": 1761,
+      "Y": 18,
+      "Width": 249,
+      "Height": 24
+    },
+    {
+      "Value": "weave--zsh- 120x30",
+      "X": 285,
+      "Y": 123,
+      "Width": 309,
+      "Height": 20
+    },
+    {
+      "Value": "Last login: Tue Sep 29 07:17:22 on console",
+      "X": 103,
+      "Y": 182,
+      "Width": 584,
+      "Height": 25
+    },
+    {
+      "Value": "Iweave@weaves-Virtual-Machine",
+      "X": 94,
+      "Y": 212,
+      "Width": 397,
+      "Height": 22
+    },
+    {
+      "Value": "Iweave@weaves-Virtual-Machine",
+      "X": 94,
+      "Y": 242,
+      "Width": 397,
+      "Height": 22
+    },
+    {
+      "Value": "% def aults write NSGlobalDomain AppleKeyboardUIMode -int 3; open ' x-apple. systempref erencl",
+      "X": 534,
+      "Y": 242,
+      "Width": 1252,
+      "Height": 25
+    },
+    {
+      "Value": "es: com. apple.Sharing-Settings. extension?Services_RemoteLogin'",
+      "X": 102,
+      "Y": 272,
+      "Width": 847,
+      "Height": 25
+    },
+    {
+      "Value": "weave@weaves-Virtual-Machine",
+      "X": 100,
+      "Y": 302,
+      "Width": 391,
+      "Height": 22
+    },
+    {
+      "Value": "Your computer was restarted",
+      "X": 809,
+      "Y": 510,
+      "Width": 373,
+      "Height": 25
+    },
+    {
+      "Value": "because of a problem.",
+      "X": 810,
+      "Y": 541,
+      "Width": 282,
+      "Height": 26
+    },
+    {
+      "Value": "Click Report to see more detailed",
+      "X": 809,
+      "Y": 594,
+      "Width": 400,
+      "Height": 25
+    },
+    {
+      "Value": "information and send a report to",
+      "X": 810,
+      "Y": 625,
+      "Width": 387,
+      "Height": 26
+    },
+    {
+      "Value": "Apple.",
+      "X": 809,
+      "Y": 658,
+      "Width": 74,
+      "Height": 24
+    },
+    {
+      "Value": "Ignore",
+      "X": 870,
+      "Y": 735,
+      "Width": 74,
+      "Height": 24
+    },
+    {
+      "Value": "Report...",
+      "X": 1093,
+      "Y": 735,
+      "Width": 99,
+      "Height": 24
+    },
+    {
+      "Value": "Tue",
+      "X": 851,
+      "Y": 1450,
+      "Width": 21,
+      "Height": 9
+    },
+    {
+      "Value": "tv",
+      "X": 1191,
+      "Y": 1460,
+      "Width": 28,
+      "Height": 22
+    },
+    {
+      "Value": "29",
+      "X": 841,
+      "Y": 1464,
+      "Width": 43,
+      "Height": 30
+    }
+  ]
+}

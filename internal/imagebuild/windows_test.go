@@ -265,6 +265,9 @@ func TestWindowsBundleDropsBuildIdentity(t *testing.T) {
 	loaded, err := pack.LoadBundle(bundle)
 	must(t, err)
 	f := loaded.File
+	if f.Annotations["io.weave.image.windows.release"] != "26H2" || f.Guest.Variant != "base" {
+		t.Fatal("Windows release must remain separate from image tier", f)
+	}
 	if f.Guest.OS != "windows" || f.Guest.OSBuild != "27000.1" || len(f.State) != 1 ||
 		string(f.State[0].Semantics) != "regenerate" {
 		t.Fatal(f)

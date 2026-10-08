@@ -13,6 +13,8 @@ exclude:
     - ^cmd/
 # Image-building code has the stricter coverage requirement requested for this work.
 override:
+  - path: ^pkg/handoff$
+    threshold: 95
   - path: ^internal/imagebuild$
     threshold: 95
   - path: ^pkg/imagecheck$
@@ -20,4 +22,6 @@ override:
   - path: ^pkg/disk/virtualdisk$
     threshold: 95
   - path: ^pkg/agentcheck$
+    threshold: 95
+  - path: ^pkg/macsetup$
     threshold: 95

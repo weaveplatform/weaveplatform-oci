@@ -66,7 +66,7 @@ func services(e Expected, armed *atomic.Bool) []weavemodule.Service {
 }
 
 func TestLifecycleRealSDKFramingAndFailureEvidence(t *testing.T) {
-	for _, mode := range []string{"valid", "nil-dial", "nil-inspect", "nil-power", "dial", "probe", "inspect", "credentials", "arm", "nil-wait", "nil-close", "restart", "reconnect", "reboot-probe", "reboot-inspect", "sequence", "same-boot", "changed-identity", "changed-key", "shutdown"} {
+	for _, mode := range []string{"valid", "ready", "reboot-ready", "nil-dial", "nil-inspect", "nil-power", "dial", "probe", "inspect", "credentials", "arm", "nil-wait", "nil-close", "restart", "reconnect", "reboot-probe", "reboot-inspect", "sequence", "same-boot", "changed-identity", "changed-key", "shutdown"} {
 		t.Run(mode, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer cancel()
@@ -75,6 +75,12 @@ func TestLifecycleRealSDKFramingAndFailureEvidence(t *testing.T) {
 			var armed atomic.Bool
 			boot, inspections, subscriptions, closes := 1, 0, 0, 0
 			vm := Lifecycle{
+				Ready: func(context.Context, *weaveclient.Client) error {
+					if mode == "ready" || (mode == "reboot-ready" && boot == 2) {
+						return os.ErrPermission
+					}
+					return nil
+				},
 				Dial: func(context.Context) (io.ReadWriteCloser, error) {
 					if mode == "dial" || (mode == "reconnect" && boot == 2) {
 						return nil, os.ErrPermission

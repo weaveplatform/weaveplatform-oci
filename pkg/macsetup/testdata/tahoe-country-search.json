@@ -1,0 +1,125 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "ABC ffl 6:35AM",
+      "X": 1781,
+      "Y": 18,
+      "Width": 225,
+      "Height": 21
+    },
+    {
+      "Value": "Select Your Country or Region",
+      "X": 575,
+      "Y": 520,
+      "Width": 485,
+      "Height": 35
+    },
+    {
+      "Value": "United Kingdom",
+      "X": 594,
+      "Y": 604,
+      "Width": 191,
+      "Height": 26
+    },
+    {
+      "Value": "Afghanistan",
+      "X": 593,
+      "Y": 645,
+      "Width": 141,
+      "Height": 25
+    },
+    {
+      "Value": "Aland Islands",
+      "X": 593,
+      "Y": 685,
+      "Width": 159,
+      "Height": 20
+    },
+    {
+      "Value": "Albania",
+      "X": 593,
+      "Y": 724,
+      "Width": 87,
+      "Height": 21
+    },
+    {
+      "Value": "Aiand Islands",
+      "X": 1036,
+      "Y": 747,
+      "Width": 139,
+      "Height": 21
+    },
+    {
+      "Value": "Algeria",
+      "X": 593,
+      "Y": 765,
+      "Width": 82,
+      "Height": 25
+    },
+    {
+      "Value": "American Samoa",
+      "X": 593,
+      "Y": 805,
+      "Width": 201,
+      "Height": 21
+    },
+    {
+      "Value": "Andorra",
+      "X": 593,
+      "Y": 845,
+      "Width": 95,
+      "Height": 20
+    },
+    {
+      "Value": "Angola",
+      "X": 593,
+      "Y": 885,
+      "Width": 81,
+      "Height": 25
+    },
+    {
+      "Value": "Anguilla",
+      "X": 593,
+      "Y": 925,
+      "Width": 94,
+      "Height": 25
+    },
+    {
+      "Value": "Antarctica",
+      "X": 593,
+      "Y": 965,
+      "Width": 121,
+      "Height": 20
+    },
+    {
+      "Value": "Antigua \u0026 Barbuda",
+      "X": 593,
+      "Y": 1005,
+      "Width": 225,
+      "Height": 25
+    },
+    {
+      "Value": "Continue",
+      "X": 1603,
+      "Y": 1282,
+      "Width": 107,
+      "Height": 21
+    },
+    {
+      "Value": "Press the escape key to hear how to set up your Mac with VoiceOver.",
+      "X": 584,
+      "Y": 1434,
+      "Width": 879,
+      "Height": 25
+    },
+    {
+      "Value": "Press Command-Option-F5 to view accessibility options.",
+      "X": 659,
+      "Y": 1466,
+      "Width": 730,
+      "Height": 25
+    }
+  ]
+}

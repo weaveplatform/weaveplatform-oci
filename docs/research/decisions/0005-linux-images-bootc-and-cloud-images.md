@@ -2,6 +2,12 @@
 
 Status: Proposed
 
+Implementation clarification (2026-10-07): the supported Ubuntu image matrix
+uses the cloud-image path described below. Bootc remains a future source
+adapter, not a prerequisite for agent or Xfce desktop delivery. See the
+[validated delivery tracker](../16-validated-image-delivery.md). Historical
+verification proposals below are not evidence that those runs have passed.
+
 ## Context
 
 Linux is the one guest with no weave artifact today. guestweave-cli-macos creates an

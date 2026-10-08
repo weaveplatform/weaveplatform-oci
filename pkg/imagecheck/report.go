@@ -1,6 +1,6 @@
 // Package imagecheck checks image acceptance evidence against the exact OCI
-// subject. It does not authenticate reports: publication workflows must attest
-// them, and promotion must verify that attestation before calling Check.
+// subject. Check validates report contents; Admit authenticates both build and
+// acceptance statements before evaluating current promotion policy.
 package imagecheck
 
 import (
@@ -17,8 +17,8 @@ import (
 
 var ErrEvidence = errors.New("image acceptance evidence rejected")
 
-// Report preserves the Linux schema-1 report; schema 2 adds native and agent
-// checks and requires a manifest binding for every platform.
+// Report preserves historical schemas 1 and 2. Schema 3 adds required validation
+// profiles and explicit first-boot and post-reboot operation outcomes.
 type Report struct {
 	SchemaVersion   int               `json:"schemaVersion"`
 	IndexDigest     string            `json:"indexDigest"`
@@ -31,18 +31,21 @@ type Report struct {
 // Boot is one fresh clone. Checks are named assertions emitted by the native
 // validator. Missing checks, including skipped checks, never count as passed.
 type Boot struct {
-	Platform       string            `json:"platform"`
-	OSVersion      string            `json:"osVersion"`
-	OSBuild        string            `json:"osBuild,omitempty"`
-	Edition        string            `json:"edition,omitempty"`
-	Accelerator    string            `json:"accelerator"`
-	Passed         bool              `json:"passed"`
-	Marker         string            `json:"marker"`
-	MachineID      string            `json:"machineID,omitempty"` //nolint:tagliatelle // Existing report wire format.
-	Error          string            `json:"error,omitempty"`
-	ElapsedSeconds float64           `json:"elapsedSeconds"`
-	Identities     map[string]string `json:"identities,omitempty"`
-	Checks         map[string]bool   `json:"checks,omitempty"`
+	Platform         string             `json:"platform"`
+	OSVersion        string             `json:"osVersion"`
+	OSBuild          string             `json:"osBuild,omitempty"`
+	Edition          string             `json:"edition,omitempty"`
+	Accelerator      string             `json:"accelerator"`
+	Passed           bool               `json:"passed"`
+	Marker           string             `json:"marker"`
+	MachineID        string             `json:"machineID,omitempty"` //nolint:tagliatelle // Existing report wire format.
+	Error            string             `json:"error,omitempty"`
+	ElapsedSeconds   float64            `json:"elapsedSeconds"`
+	Identities       map[string]string  `json:"identities,omitempty"`
+	Checks           map[string]bool    `json:"checks,omitempty"`
+	Profile          string             `json:"profile,omitempty"`
+	Operations       map[string]Outcome `json:"operations,omitempty"`
+	RebootOperations map[string]Outcome `json:"rebootOperations,omitempty"`
 }
 
 var (
@@ -59,11 +62,11 @@ func Check(data []byte, image conformance.Report, tag string) error {
 		return fmt.Errorf("%w: decode report: %w", ErrEvidence, err)
 	}
 	if !image.OK() || len(image.Children) == 0 || image.Root.MediaType != spec.MediaTypeIndex ||
-		(r.SchemaVersion != 1 && r.SchemaVersion != 2) || !r.Passed || r.IndexDigest != image.Root.Digest.String() ||
+		(r.SchemaVersion < 1 || r.SchemaVersion > 3) || !r.Passed || r.IndexDigest != image.Root.Digest.String() ||
 		r.Tag != tag || tag == "" || len(r.Platforms) != len(image.Children) {
 		return fmt.Errorf("%w: report must pass and match the complete index and tag", ErrEvidence)
 	}
-	if r.SchemaVersion == 2 && len(r.PlatformDigests) != len(image.Children) {
+	if r.SchemaVersion >= 2 && len(r.PlatformDigests) != len(image.Children) {
 		return fmt.Errorf("%w: platform manifest bindings required", ErrEvidence)
 	}
 	for _, child := range image.Children {
@@ -73,7 +76,7 @@ func Check(data []byte, image conformance.Report, tag string) error {
 			(cfg.Guest.OS != "linux" || cfg.Guest.Variant != "base" || cfg.Provisioning.Agent != nil) {
 			return fmt.Errorf("%w: schema 1 only validates Linux base images", ErrEvidence)
 		}
-		if r.SchemaVersion == 2 && r.PlatformDigests[platform] != child.Descriptor.Digest.String() {
+		if r.SchemaVersion >= 2 && r.PlatformDigests[platform] != child.Descriptor.Digest.String() {
 			return fmt.Errorf("%w: wrong manifest for %s", ErrEvidence, platform)
 		}
 		if err := checkClones(r.Platforms[platform], cfg, r.SchemaVersion); err != nil {
@@ -104,7 +107,7 @@ func checkClones(clones []Boot, cfg spec.Config, schema int) error {
 			(!linuxIdentity.MatchString(c.MachineID) || c.MachineID == strings.Repeat("0", 32)) {
 			return fmt.Errorf("%w: invalid Linux machine identity", ErrEvidence)
 		}
-		if schema == 2 {
+		if schema >= 2 {
 			if c.OSBuild != cfg.Guest.OSBuild || c.Edition != cfg.Guest.Edition {
 				return fmt.Errorf("%w: guest build/edition mismatch", ErrEvidence)
 			}
@@ -119,11 +122,16 @@ func checkClones(clones []Boot, cfg spec.Config, schema int) error {
 				}
 			}
 		}
+		if schema == 3 {
+			if err := checkOutcomes(c, cfg); err != nil {
+				return err
+			}
+		}
 	}
 	if clones[0].MachineID == clones[1].MachineID || clones[0].Marker == clones[1].Marker {
 		return fmt.Errorf("%w: clones reused an identity or boot challenge", ErrEvidence)
 	}
-	if schema == 2 {
+	if schema >= 2 {
 		identities := requiredIdentities(cfg.Guest.OS)
 		if cfg.Provisioning.Agent != nil {
 			identities = append(identities, "agentStoreKeyDigest")

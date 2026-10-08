@@ -165,10 +165,10 @@ still required. The base validator deliberately refuses agent-tier bundles.
 ## Native media selection and builds
 
 Guestweave keeps its native image acquisition. `weaveoci` independently uses the
-same sources and libraries: Apple's IPSW catalogue and
-`go-bindings-macosplatform` for Virtualization.framework; Microsoft's retail
-media through `go-sdk-winmediafoundry`, and `go-bindings-win32` for HCS. Image
-building does not invoke or import Guestweave.
+same media sources: Apple's IPSW catalogue and Microsoft's retail media through
+`go-sdk-winmediafoundry`. Windows HCS building remains transitional; native Apple
+construction has moved to Imageweave. Image building does not invoke or import
+Guestweave. See the [ownership and removal checklist](../docs/imageweave-handoff.md).
 
 The selectors match the consumer forms where supported:
 
@@ -199,28 +199,15 @@ resolving and reviewing a new lock; the builder does not silently replace it.
 
 ### macOS
 
-Build with `make image-builder` to sign the local executable with Apple's
-virtualization entitlement. Run the signed executable through the KING wrapper:
+Base construction now lives in [Imageweave](https://github.com/weaveplatform/imageweave)
+behind its native Packer plugin. OCI's duplicated `image build-macos` command,
+Apple restore code and virtualization entitlement have been removed.
+Use `weaveoci bundle import-imageweave` for completed native output; see the
+[handoff guide](../docs/imageweave-handoff.md) for commands and validation limits.
 
-```sh
-scripts/images/workspace.sh run /Volumes/KING/weave-images/work/cache/weaveoci image ipsw \
-  --version 26 --list
-scripts/images/workspace.sh run /Volumes/KING/weave-images/work/cache/weaveoci image build-macos \
-  --version 26 --disk-size 85899345920
-```
-
-`build-macos` restores directly through Virtualization.framework on an Apple
-silicon host. It verifies the IPSW digest and embedded version/build before
-restoring; Apple determines host compatibility and restore eligibility. The
-bundle contains a raw disk, hardware model and auxiliary storage, with no
-source VM machine identifier or MAC address. The restored base remains at
-Setup Assistant. Use `--version 27` for the other catalogue target.
-
-IPSW downloads retain partial data with their pinned URL, size and checksum.
-To resume an interrupted download, use `--resume --source-lock
-<candidate>/source-lock.json` with the same version selector and revision.
-Completed or partially restored candidates are not overwritten. `--disk-size`
-is in bytes, defaults to 80 GiB and requires at least 64 GiB.
+`weaveoci image ipsw --version 26 --list` remains available for source discovery
+while media acquisition is migrated. Imported pristine bases remain at Setup
+Assistant and require native clone/first-boot acceptance before promotion.
 
 ### Windows
 
@@ -256,9 +243,9 @@ consumer acceptance gate or a macOS agent builder. Native fleet acceptance
 and signed channel lineage checks remain required before promotion. Catalogue
 entries are not evidence of successful builds.
 
-`image-native-candidate.yml` provides manual native build jobs. Register dedicated
+`image-native-candidate.yml` retains manual Windows build jobs. Register dedicated
 self-hosted runners with `weave-images` and the matching OS/architecture labels.
-The macOS job uses the mounted KING workspace. A Windows runner must run elevated
+A Windows runner must run elevated
 and set `WEAVE_IMAGE_WORKSPACE` to its image storage before starting the runner.
 These jobs retain local candidates and do not publish or promote them. No native
 runner registration is implied by adding the workflow.

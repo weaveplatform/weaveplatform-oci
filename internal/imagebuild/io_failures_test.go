@@ -330,46 +330,6 @@ func TestSourceValidationFailures(t *testing.T) {
 	}
 }
 
-func TestAppleCandidateFilesystemFailures(t *testing.T) {
-	s := appleFixture()
-	root := t.TempDir()
-	out := filepath.Join(root, "candidate")
-	must(t, os.Mkdir(out, 0o700))
-	must(t, os.WriteFile(filepath.Join(out, "source-lock.json"), []byte("{"), 0o600))
-	if err := macCandidate(out, s, nil, true); err == nil {
-		t.Fatal("corrupt resume lock")
-	}
-	file := filepath.Join(root, "file")
-	must(t, os.WriteFile(file, nil, 0o600))
-	if err := macCandidate(file, s, nil, true); err == nil {
-		t.Fatal("file candidate")
-	}
-	if err := macCandidate(filepath.Join(file, "child"), s, nil, false); err == nil {
-		t.Fatal("file parent")
-	}
-	tools := Tools{
-		Run: func(context.Context, io.Writer, io.Writer, string, ...string) error { return nil },
-	}
-	if err := tools.verifyIPSW(
-		t.Context(),
-		makeIPSW(t),
-		filepath.Join(root, "missing"),
-		s,
-	); err == nil {
-		t.Fatal("missing manifest workspace")
-	}
-	if _, err := tools.macBundle(
-		t.Context(),
-		filepath.Join(root, "missing"),
-		MacRestoreResult{},
-		s,
-		"26",
-		"tag",
-	); err == nil {
-		t.Fatal("missing bundle directory")
-	}
-}
-
 func TestSystemDiskRequiresExistingBundleRoot(t *testing.T) {
 	root := t.TempDir()
 	must(t, os.WriteFile(filepath.Join(root, "disk.img"), []byte("original"), 0o600))

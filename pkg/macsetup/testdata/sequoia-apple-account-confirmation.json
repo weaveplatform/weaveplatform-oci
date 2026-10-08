@@ -1,0 +1,111 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Sig",
+      "X": 667,
+      "Y": 535,
+      "Width": 74,
+      "Height": 48
+    },
+    {
+      "Value": "unt",
+      "X": 1303,
+      "Y": 538,
+      "Width": 77,
+      "Height": 36
+    },
+    {
+      "Value": "Sign in t",
+      "X": 648,
+      "Y": 624,
+      "Width": 97,
+      "Height": 25
+    },
+    {
+      "Value": "ervices.",
+      "X": 1306,
+      "Y": 624,
+      "Width": 93,
+      "Height": 19
+    },
+    {
+      "Value": "Are you sure you want to skip",
+      "X": 835,
+      "Y": 717,
+      "Width": 377,
+      "Height": 25
+    },
+    {
+      "Value": "signing in with an Apple",
+      "X": 871,
+      "Y": 748,
+      "Width": 306,
+      "Height": 27
+    },
+    {
+      "Value": "Account?",
+      "X": 964,
+      "Y": 783,
+      "Width": 119,
+      "Height": 20
+    },
+    {
+      "Value": "An Apple Account is used to",
+      "X": 877,
+      "Y": 833,
+      "Width": 294,
+      "Height": 21
+    },
+    {
+      "Value": "automatically set up the App Store,",
+      "X": 840,
+      "Y": 861,
+      "Width": 366,
+      "Height": 21
+    },
+    {
+      "Value": "re",
+      "X": 713,
+      "Y": 868,
+      "Width": 21,
+      "Height": 15
+    },
+    {
+      "Value": "pur",
+      "X": 1300,
+      "Y": 868,
+      "Width": 39,
+      "Height": 20
+    },
+    {
+      "Value": "iCloud, and other Apple services.",
+      "X": 851,
+      "Y": 889,
+      "Width": 345,
+      "Height": 21
+    },
+    {
+      "Value": "Don't Skip",
+      "X": 845,
+      "Y": 960,
+      "Width": 122,
+      "Height": 25
+    },
+    {
+      "Value": "Skip",
+      "X": 1117,
+      "Y": 960,
+      "Width": 50,
+      "Height": 25
+    },
+    {
+      "Value": "Continue",
+      "X": 1664,
+      "Y": 1299,
+      "Width": 106,
+      "Height": 21
+    }
+  ]
+}

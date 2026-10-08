@@ -1,0 +1,118 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Select Your Country or Region",
+      "X": 660,
+      "Y": 535,
+      "Width": 727,
+      "Height": 51
+    },
+    {
+      "Value": "Tristan da Cunha",
+      "X": 738,
+      "Y": 681,
+      "Width": 211,
+      "Height": 27
+    },
+    {
+      "Value": "Tunisia",
+      "X": 738,
+      "Y": 723,
+      "Width": 89,
+      "Height": 24
+    },
+    {
+      "Value": "Türkiye",
+      "X": 738,
+      "Y": 762,
+      "Width": 92,
+      "Height": 29
+    },
+    {
+      "Value": "Turkmenistan",
+      "X": 741,
+      "Y": 803,
+      "Width": 166,
+      "Height": 21
+    },
+    {
+      "Value": "Turks \u0026 Caicos Islands",
+      "X": 741,
+      "Y": 842,
+      "Width": 277,
+      "Height": 27
+    },
+    {
+      "Value": "Tuvalu",
+      "X": 737,
+      "Y": 883,
+      "Width": 84,
+      "Height": 25
+    },
+    {
+      "Value": "Uganda",
+      "X": 741,
+      "Y": 922,
+      "Width": 95,
+      "Height": 30
+    },
+    {
+      "Value": "Ukraine",
+      "X": 741,
+      "Y": 961,
+      "Width": 95,
+      "Height": 27
+    },
+    {
+      "Value": "United Arab Emirates",
+      "X": 741,
+      "Y": 1002,
+      "Width": 262,
+      "Height": 27
+    },
+    {
+      "Value": "United Kingdom",
+      "X": 740,
+      "Y": 1038,
+      "Width": 201,
+      "Height": 35
+    },
+    {
+      "Value": "United States",
+      "X": 738,
+      "Y": 1083,
+      "Width": 172,
+      "Height": 24
+    },
+    {
+      "Value": "Back",
+      "X": 1521,
+      "Y": 1300,
+      "Width": 65,
+      "Height": 24
+    },
+    {
+      "Value": "Continue",
+      "X": 1660,
+      "Y": 1300,
+      "Width": 114,
+      "Height": 24
+    },
+    {
+      "Value": "Press the escape key to hear how to set up your Mac with VoiceOver.",
+      "X": 583,
+      "Y": 1434,
+      "Width": 884,
+      "Height": 27
+    },
+    {
+      "Value": "Press Command-Option-F5 to view accessibility options.",
+      "X": 651,
+      "Y": 1492,
+      "Width": 745,
+      "Height": 38
+    }
+  ]
+}

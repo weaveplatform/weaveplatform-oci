@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	attest "github.com/in-toto/attestation/go/v1"
 	"github.com/opencontainers/go-digest"
 	"github.com/sigstore/sigstore-go/pkg/bundle"
 	"github.com/sigstore/sigstore-go/pkg/root"
@@ -41,20 +42,38 @@ func LoadTrustedRoot(path string) (root.TrustedMaterial, error) {
 // Verify checks one attestation bundle against subject: certificate chain,
 // transparency-log inclusion and integrated time, identity, and predicate.
 func (id *Identity) Verify(bundleJSON []byte, subject digest.Digest) (*SignatureResult, error) {
+	signature, _, err := id.VerifyStatement(bundleJSON, subject)
+	return signature, err
+}
+
+// VerifyStatement returns the authenticated statement, never an unverified
+// decoded payload. Callers must still apply their predicate admission rules.
+func (id *Identity) VerifyStatement(
+	bundleJSON []byte,
+	subject digest.Digest,
+) (*SignatureResult, *attest.Statement, error) {
 	var b bundle.Bundle
 	if err := b.UnmarshalJSON(bundleJSON); err != nil {
-		return nil, fmt.Errorf("%w: bundle: %w", ErrUnverified, err)
+		return nil, nil, fmt.Errorf("%w: bundle: %w", ErrUnverified, err)
 	}
-	return id.verifyEntity(&b, subject)
+	return id.verifyStatementEntity(&b, subject)
 }
 
 func (id *Identity) verifyEntity(
 	e sgverify.SignedEntity,
 	subject digest.Digest,
 ) (*SignatureResult, error) {
-	if id.Trusted == nil {
+	signature, _, err := id.verifyStatementEntity(e, subject)
+	return signature, err
+}
+
+func (id *Identity) verifyStatementEntity(
+	e sgverify.SignedEntity,
+	subject digest.Digest,
+) (*SignatureResult, *attest.Statement, error) {
+	if id == nil || id.Trusted == nil {
 		// sigstore-go accepts nil trusted material and then panics in Verify
-		return nil, fmt.Errorf("%w: attestation verification needs a trusted root", ErrConfig)
+		return nil, nil, fmt.Errorf("%w: attestation verification needs a trusted root", ErrConfig)
 	}
 	opts := []sgverify.VerifierOption{
 		sgverify.WithTransparencyLog(1),
@@ -65,15 +84,15 @@ func (id *Identity) verifyEntity(
 	}
 	v, err := sgverify.NewVerifier(id.Trusted, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrConfig, err)
+		return nil, nil, fmt.Errorf("%w: %w", ErrConfig, err)
 	}
 	ci, err := sgverify.NewShortCertificateIdentity(id.Issuer, "", "", id.SubjectRegexp)
 	if err != nil {
-		return nil, fmt.Errorf("%w: identity: %w", ErrConfig, err)
+		return nil, nil, fmt.Errorf("%w: identity: %w", ErrConfig, err)
 	}
 	raw, err := hex.DecodeString(subject.Encoded())
 	if err != nil || subject.Algorithm() != digest.SHA256 {
-		return nil, fmt.Errorf("%w: subject %q is not a sha256 digest", ErrConfig, subject)
+		return nil, nil, fmt.Errorf("%w: subject %q is not a sha256 digest", ErrConfig, subject)
 	}
 	res, err := v.Verify(
 		e,
@@ -83,18 +102,18 @@ func (id *Identity) verifyEntity(
 		),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrUnverified, err)
+		return nil, nil, fmt.Errorf("%w: %w", ErrUnverified, err)
 	}
 	want := id.PredicateType
 	if want == "" {
 		want = SLSAProvenanceV1
 	}
 	if res.Statement == nil || res.Statement.GetPredicateType() != want {
-		return nil, fmt.Errorf("%w: predicate type is not %s", ErrUnverified, want)
+		return nil, nil, fmt.Errorf("%w: predicate type is not %s", ErrUnverified, want)
 	}
 	r := &SignatureResult{Provider: string(profile.SigningGitHubAttestation), Issuer: id.Issuer}
 	if res.Signature != nil && res.Signature.Certificate != nil {
 		r.Identity = res.Signature.Certificate.SubjectAlternativeName
 	}
-	return r, nil
+	return r, res.Statement, nil
 }

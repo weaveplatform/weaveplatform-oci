@@ -90,10 +90,9 @@ gate: vet lint test accept cover vuln
 
 .PHONY: help fmt lint vet test accept cover vuln build image-zot fixtures channel-schema gate
 
-## image-builder: build the local image CLI, signing the Apple virtualization entitlement on macOS
+## image-builder: build the local OCI CLI for retained image validation and migration commands
 image-builder:
 	@mkdir -p $(BIN_DIR)
 	$(GO) build -o $(BIN_DIR)/weaveoci ./cmd/weaveoci
-	@if [ "$$(uname -s)" = Darwin ]; then codesign --force --sign - --entitlements scripts/images/entitlements.plist $(BIN_DIR)/weaveoci; fi
 
 .PHONY: image-builder

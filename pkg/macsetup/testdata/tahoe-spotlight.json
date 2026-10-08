@@ -1,0 +1,265 @@
+{
+  "Height" : 1536,
+  "Text" : [
+    {
+      "Height" : 21,
+      "Value" : "Finder",
+      "Width" : 80,
+      "X" : 110,
+      "Y" : 17
+    },
+    {
+      "Height" : 20,
+      "Value" : "File",
+      "Width" : 39,
+      "X" : 234,
+      "Y" : 18
+    },
+    {
+      "Height" : 20,
+      "Value" : "Edit View",
+      "Width" : 144,
+      "X" : 318,
+      "Y" : 18
+    },
+    {
+      "Height" : 21,
+      "Value" : "Window",
+      "Width" : 95,
+      "X" : 581,
+      "Y" : 18
+    },
+    {
+      "Height" : 24,
+      "Value" : "Help",
+      "Width" : 53,
+      "X" : 720,
+      "Y" : 18
+    },
+    {
+      "Height" : 24,
+      "Value" : "Tue Sep 29 7:14AM",
+      "Width" : 249,
+      "X" : 1761,
+      "Y" : 18
+    },
+    {
+      "Height" : 15,
+      "Value" : "SEPTEMBER",
+      "Width" : 121,
+      "X" : 69,
+      "Y" : 132
+    },
+    {
+      "Height" : 23,
+      "Value" : "London",
+      "Width" : 103,
+      "X" : 430,
+      "Y" : 126
+    },
+    {
+      "Height" : 15,
+      "Value" : "S M T W T F S",
+      "Width" : 247,
+      "X" : 72,
+      "Y" : 168
+    },
+    {
+      "Height" : 15,
+      "Value" : "2 3 4 5",
+      "Width" : 128,
+      "X" : 191,
+      "Y" : 209
+    },
+    {
+      "Height" : 15,
+      "Value" : "6 7 8 9 10 11 12",
+      "Width" : 253,
+      "X" : 72,
+      "Y" : 246
+    },
+    {
+      "Height" : 50,
+      "Value" : "Q Terminal.app",
+      "Width" : 363,
+      "X" : 425,
+      "Y" : 225
+    },
+    {
+      "Height" : 22,
+      "Value" : "Terminal",
+      "Width" : 114,
+      "X" : 862,
+      "Y" : 239
+    },
+    {
+      "Height" : 15,
+      "Value" : "13 14 15 16 17 18 19",
+      "Width" : 257,
+      "X" : 67,
+      "Y" : 284
+    },
+    {
+      "Height" : 15,
+      "Value" : "20 21 22 23 24 25 26",
+      "Width" : 261,
+      "X" : 65,
+      "Y" : 323
+    },
+    {
+      "Height" : 15,
+      "Value" : "27 28",
+      "Width" : 63,
+      "X" : 66,
+      "Y" : 362
+    },
+    {
+      "Height" : 15,
+      "Value" : "29",
+      "Width" : 24,
+      "X" : 144,
+      "Y" : 362
+    },
+    {
+      "Height" : 15,
+      "Value" : "30",
+      "Width" : 24,
+      "X" : 184,
+      "Y" : 362
+    },
+    {
+      "Height" : 26,
+      "Value" : "Terminal",
+      "Width" : 126,
+      "X" : 527,
+      "Y" : 368
+    },
+    {
+      "Height" : 18,
+      "Value" : "Search Terminal tab",
+      "Width" : 210,
+      "X" : 1367,
+      "Y" : 372
+    },
+    {
+      "Height" : 27,
+      "Value" : "Terminal User Guide for Mac",
+      "Width" : 431,
+      "X" : 529,
+      "Y" : 463
+    },
+    {
+      "Height" : 29,
+      "Value" : "support.apple.com > guide > terminal",
+      "Width" : 500,
+      "X" : 529,
+      "Y" : 505
+    },
+    {
+      "Height" : 32,
+      "Value" : "Terminal (macOS)",
+      "Width" : 268,
+      "X" : 529,
+      "Y" : 574
+    },
+    {
+      "Height" : 29,
+      "Value" : "en.wikipedia.org > wiki > Terminal macOS",
+      "Width" : 553,
+      "X" : 529,
+      "Y" : 616
+    },
+    {
+      "Height" : 21,
+      "Value" : "Photos will appear",
+      "Width" : 199,
+      "X" : 170,
+      "Y" : 663
+    },
+    {
+      "Height" : 21,
+      "Value" : "finished p",
+      "Width" : 106,
+      "X" : 269,
+      "Y" : 687
+    },
+    {
+      "Height" : 27,
+      "Value" : "Terminal Console",
+      "Width" : 260,
+      "X" : 521,
+      "Y" : 705
+    },
+    {
+      "Height" : 24,
+      "Value" : "Utilities",
+      "Width" : 99,
+      "X" : 522,
+      "Y" : 747
+    },
+    {
+      "Height" : 19,
+      "Value" : "Get",
+      "Width" : 41,
+      "X" : 1501,
+      "Y" : 727
+    },
+    {
+      "Height" : 32,
+      "Value" : "Windows Terminal - Free download and install on Windows | Micros...",
+      "Width" : 1042,
+      "X" : 529,
+      "Y" : 834
+    },
+    {
+      "Height" : 27,
+      "Value" : "apps.microsoft.com > detail > n dx hk",
+      "Width" : 503,
+      "X" : 529,
+      "Y" : 876
+    },
+    {
+      "Height" : 32,
+      "Value" : "11111 TNS Expands Android Terminal Platform with Bring Your Own App",
+      "Width" : 1068,
+      "X" : 450,
+      "Y" : 945
+    },
+    {
+      "Height" : 42,
+      "Value" : "f* businesswire.com . 1h ago",
+      "Width" : 425,
+      "X" : 456,
+      "Y" : 974
+    },
+    {
+      "Height" : 27,
+      "Value" : "Search in Finder",
+      "Width" : 243,
+      "X" : 528,
+      "Y" : 1080
+    },
+    {
+      "Height" : 9,
+      "Value" : "Tue",
+      "Width" : 22,
+      "X" : 905,
+      "Y" : 1446
+    },
+    {
+      "Height" : 31,
+      "Value" : "29",
+      "Width" : 45,
+      "X" : 894,
+      "Y" : 1462
+    },
+    {
+      "Height" : 26,
+      "Value" : "etv",
+      "Width" : 52,
+      "X" : 1244,
+      "Y" : 1455
+    }
+  ],
+  "Width" : 2048
+}

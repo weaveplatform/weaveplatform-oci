@@ -1,0 +1,202 @@
+{
+  "Width": 2048,
+  "Height": 1536,
+  "Text": [
+    {
+      "Value": "Finder",
+      "X": 108,
+      "Y": 17,
+      "Width": 81,
+      "Height": 21
+    },
+    {
+      "Value": "File",
+      "X": 231,
+      "Y": 18,
+      "Width": 39,
+      "Height": 20
+    },
+    {
+      "Value": "Edit View Go",
+      "X": 313,
+      "Y": 18,
+      "Width": 217,
+      "Height": 21
+    },
+    {
+      "Value": "Window",
+      "X": 571,
+      "Y": 18,
+      "Width": 96,
+      "Height": 20
+    },
+    {
+      "Value": "Help",
+      "X": 709,
+      "Y": 18,
+      "Width": 53,
+      "Height": 24
+    },
+    {
+      "Value": "Wed Sep 30 1:12AM",
+      "X": 1747,
+      "Y": 18,
+      "Width": 259,
+      "Height": 24
+    },
+    {
+      "Value": "London",
+      "X": 430,
+      "Y": 129,
+      "Width": 103,
+      "Height": 23
+    },
+    {
+      "Value": "SEPTEMBER",
+      "X": 69,
+      "Y": 132,
+      "Width": 121,
+      "Height": 15
+    },
+    {
+      "Value": "S M T W T F S",
+      "X": 72,
+      "Y": 168,
+      "Width": 247,
+      "Height": 17
+    },
+    {
+      "Value": "FYn\u003c\u0026Bt r2in in th",
+      "X": 430,
+      "Y": 174,
+      "Width": 197,
+      "Height": 18
+    },
+    {
+      "Value": "2 3 4 5",
+      "X": 191,
+      "Y": 209,
+      "Width": 128,
+      "Height": 16
+    },
+    {
+      "Value": "Q Terminal.app- Terminal",
+      "X": 429,
+      "Y": 225,
+      "Width": 616,
+      "Height": 50
+    },
+    {
+      "Value": "6 7 8 9 10 11 12",
+      "X": 72,
+      "Y": 246,
+      "Width": 253,
+      "Height": 15
+    },
+    {
+      "Value": "13 14 15 16 17 18 19",
+      "X": 67,
+      "Y": 284,
+      "Width": 257,
+      "Height": 16
+    },
+    {
+      "Value": "20 21 22 23 24 25 26",
+      "X": 65,
+      "Y": 323,
+      "Width": 261,
+      "Height": 15
+    },
+    {
+      "Value": "Safari",
+      "X": 682,
+      "Y": 339,
+      "Width": 76,
+      "Height": 24
+    },
+    {
+      "Value": "Applications",
+      "X": 1245,
+      "Y": 339,
+      "Width": 167,
+      "Height": 29
+    },
+    {
+      "Value": "27 28 29",
+      "X": 66,
+      "Y": 362,
+      "Width": 102,
+      "Height": 15
+    },
+    {
+      "Value": "30",
+      "X": 183,
+      "Y": 362,
+      "Width": 25,
+      "Height": 15
+    },
+    {
+      "Value": "Terminal",
+      "X": 527,
+      "Y": 442,
+      "Width": 126,
+      "Height": 26
+    },
+    {
+      "Value": "Search Terminal tab",
+      "X": 1367,
+      "Y": 447,
+      "Width": 211,
+      "Height": 16
+    },
+    {
+      "Value": "| Terminal.app",
+      "X": 485,
+      "Y": 558,
+      "Width": 236,
+      "Height": 31
+    },
+    {
+      "Value": "Photos will appear",
+      "X": 170,
+      "Y": 663,
+      "Width": 199,
+      "Height": 21
+    },
+    {
+      "Value": "Search in Finder",
+      "X": 528,
+      "Y": 673,
+      "Width": 244,
+      "Height": 27
+    },
+    {
+      "Value": "finished p",
+      "X": 269,
+      "Y": 687,
+      "Width": 107,
+      "Height": 21
+    },
+    {
+      "Value": "Search The Web",
+      "X": 528,
+      "Y": 786,
+      "Width": 248,
+      "Height": 27
+    },
+    {
+      "Value": "Wed",
+      "X": 902,
+      "Y": 1446,
+      "Width": 27,
+      "Height": 10
+    },
+    {
+      "Value": "30",
+      "X": 893,
+      "Y": 1462,
+      "Width": 46,
+      "Height": 31
+    }
+  ]
+}
