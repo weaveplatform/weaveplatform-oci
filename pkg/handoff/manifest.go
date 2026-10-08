@@ -119,7 +119,8 @@ func selectBuild(raw []byte, o Options) (build, error) {
 			ErrInput,
 		)
 	}
-	if b.Builder != "qemu" && b.Builder != "imageweave-native" {
+	if b.Builder != "qemu" && b.Builder != "imageweave-native" &&
+		b.Builder != "imageweave-macos-prepared" {
 		return build{}, fmt.Errorf("%w: unsupported builder %q", ErrInput, b.Builder)
 	}
 	return b, nil

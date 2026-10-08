@@ -30,6 +30,7 @@ func preparedInput(t *testing.T) (Options, manifest, nativeResult) {
 	must(t, err)
 	must(t, store.Tag(t.Context(), root, "base"))
 	o, m := fixture(t, "macos")
+	m.Builds[0].Builder = "imageweave-macos-prepared"
 	raw, err := os.ReadFile(filepath.Join(filepath.Dir(o.Manifest), "build-result.json"))
 	must(t, err)
 	var r nativeResult

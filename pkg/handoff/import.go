@@ -205,7 +205,7 @@ func inventory(root *os.Root, dir string, b build) (map[string]artifact, error) 
 	for _, f := range b.Files {
 		name := filepath.Base(f.Name)
 		allowed := name == "disk.raw" || name == "efivars.fd"
-		if b.Builder == "imageweave-native" {
+		if b.Builder == "imageweave-native" || b.Builder == "imageweave-macos-prepared" {
 			allowed = name == "disk0.img" || name == "auxstorage.bin" || name == "build-result.json"
 		}
 		if !allowed || files[name].Name != "" || f.Size <= 0 {

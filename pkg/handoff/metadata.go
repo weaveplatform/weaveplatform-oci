@@ -73,7 +73,11 @@ func nativeMetadata(raw []byte, b build, f *pack.BundleFile) error {
 		return err
 	}
 	i := r.Inputs
-	if (r.SchemaVersion != 1 && r.SchemaVersion != 2) || r.Qualification != "unverified" || r.OSVersion == "" ||
+	if (b.Builder == "imageweave-macos-prepared") != (r.SchemaVersion == 2) {
+		return fmt.Errorf("%w: native schema does not match the selected Packer builder", ErrInput)
+	}
+	if (r.SchemaVersion != 1 && r.SchemaVersion != 2) || r.Qualification != "unverified" ||
+		r.OSVersion == "" ||
 		i.SourceSHA256 != b.Data["source_sha256"] ||
 		i.SourceBuild != b.Data["source_build"] ||
 		!slices.Contains([]string{"amd64", "arm64"}, i.Arch) {
@@ -121,7 +125,8 @@ func nativeMetadata(raw []byte, b build, f *pack.BundleFile) error {
 		w := r.Windows
 		edition := map[string]string{"pro": "Professional", "home": "Core", "enterprise": "Enterprise", "education": "Education"}[i.Edition]
 		if w == nil || r.Mac != nil || edition == "" || !w.Generalized || w.Release != i.Release || w.Arch != i.Arch || w.Edition != edition ||
-			w.Build != i.SourceBuild || w.OSVersion != r.OSVersion ||
+			w.Build != i.SourceBuild ||
+			w.OSVersion != r.OSVersion ||
 			w.OSVersion != "10.0."+w.Build ||
 			r.FirstBoot != "windows-oobe" ||
 			r.Firmware.Type != "uefi" ||
