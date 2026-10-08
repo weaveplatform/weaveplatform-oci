@@ -82,6 +82,24 @@ func TestAttachedAcceptanceAuthenticatesBeforeSelectingPredicate(t *testing.T) {
 				ctx, cancel = context.WithCancel(ctx)
 				cancel()
 			}
+			candidatePolicy := CandidatePolicy{
+				Build:      policy.Build,
+				Acceptance: policy.Acceptance,
+				Registry:   policy.Registry,
+			}
+			evidence, candidateErr := VerifyCandidateAttached(
+				ctx,
+				candidatePolicy,
+				inspection,
+				"r1",
+				verify.StoreSource{Store: store},
+			)
+			if (candidateErr == nil) != (mode == "valid") {
+				t.Fatal(mode, evidence, candidateErr)
+			}
+			if candidateErr == nil && evidence.Report.SchemaVersion != 3 {
+				t.Fatal(evidence)
+			}
 			_, err := AdmitAttached(ctx, policy, inspection, "r1", verify.StoreSource{Store: store})
 			if (err == nil) != (mode == "valid") {
 				t.Fatal(mode, err)
@@ -181,6 +199,40 @@ func TestPublishedAdmissionCopiesAndAuthenticatesExactIndex(t *testing.T) {
 					bad := *policy.Acceptance
 					bad.SubjectRegexp = "^wrong$"
 					policy.Acceptance = &bad
+				}
+				candidatePolicy := CandidatePolicy{
+					Build:      policy.Build,
+					Acceptance: policy.Acceptance,
+					Registry:   policy.Registry,
+				}
+				evidence, candidateErr := VerifyCandidatePublished(
+					t.Context(),
+					candidatePolicy,
+					cc,
+					e,
+					out,
+				)
+				if (candidateErr == nil) != (mode == "valid") {
+					t.Fatal(mode, evidence, candidateErr)
+				}
+				if candidateErr == nil &&
+					(evidence.IndexDigest != entry.Digest || evidence.Report.SchemaVersion != 3) {
+					t.Fatal(evidence)
+				}
+				// Candidate verification requires no release-channel authority. The
+				// same artifact still cannot pass promotion admission without it.
+				if mode == "valid" {
+					untrustedChannel := policy
+					untrustedChannel.Anchors = nil
+					if _, err := AdmitPublished(
+						t.Context(),
+						untrustedChannel,
+						cc,
+						e,
+						out,
+					); err == nil {
+						t.Fatal("candidate evidence bypassed channel admission")
+					}
 				}
 				got, err := AdmitPublished(t.Context(), policy, cc, e, out)
 				if (err == nil) != (mode == "valid") {
