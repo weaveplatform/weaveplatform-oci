@@ -58,6 +58,7 @@ consumer.
 | [13-deployment-profiles.md](13-deployment-profiles.md) | github, private and hybrid profiles; the `weave-zot` reference registry; cosign key signing; the `weaveoci` and `weave-zot` container images |
 | [14-guestweave-adoption.md](14-guestweave-adoption.md) | Phases 4 and 5: guestweave standalone or with weaveplatform-oci, the image-source seam, cache and prune, push per guest OS, Windows VHD conversion, the hostweave contract |
 | [17-destination-first-image-research.md](17-destination-first-image-research.md) | Destination requirements, primary-source research, Packer adoption options, lifecycle mechanisms, repository gaps and qualification experiments; research baseline 2026-10-07 |
+| [18-verified-image-delivery.md](18-verified-image-delivery.md) | Candidate authentication versus channel admission, public/private Sigstore limits, audited Hostweave consumption gaps and the first complete Ubuntu QEMU qualification path |
 | [glossary.md](glossary.md) | Terms used across the set |
 | [decisions/](decisions/README.md) | Decision records 0001–0013 |
 
