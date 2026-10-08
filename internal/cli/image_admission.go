@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -68,40 +69,9 @@ func newImageAdmission(emit func(any) error) *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("candidate inspection: %w", err)
 			}
-			trusted, err := verify.LoadTrustedRoot(config.TrustedRoot)
+			p, err := config.admission(cmd.Context())
 			if err != nil {
-				return fmt.Errorf("promotion trust: %w", err)
-			}
-			p := imagecheck.AdmissionPolicy{
-				Registry:   config.Registry,
-				ParentTags: config.ParentTags,
-				Build: &verify.Identity{
-					Trusted:       trusted,
-					Issuer:        config.Build.Issuer,
-					SubjectRegexp: config.Build.SubjectRegexp,
-					RequireSCT:    true,
-				},
-				Acceptance: &verify.Identity{
-					Trusted:       trusted,
-					Issuer:        config.Acceptance.Issuer,
-					SubjectRegexp: config.Acceptance.SubjectRegexp,
-					RequireSCT:    true,
-				},
-			}
-			for _, item := range config.Anchors {
-				data, e := os.ReadFile(item.PublicKey)
-				if e != nil {
-					return fmt.Errorf("promotion anchor: %w", e)
-				}
-				anchor, e := channel.ParseAnchor(item.Name, data)
-				if e != nil {
-					return fmt.Errorf("promotion anchor: %w", e)
-				}
-				p.Anchors = append(p.Anchors, anchor)
-			}
-			p.Channel, err = channel.Load(cmd.Context(), config.Channel, nil)
-			if err != nil {
-				return fmt.Errorf("promotion channel: %w", err)
+				return err
 			}
 			build, err := os.ReadFile(provenance)
 			if err != nil {
@@ -168,6 +138,47 @@ func loadAdmissionPolicy(file string) (imageAdmissionPolicy, error) {
 			return p, fmt.Errorf("%w: named anchor key required", errUsage)
 		}
 		p.Anchors[n].PublicKey = resolve(p.Anchors[n].PublicKey)
+	}
+	return p, nil
+}
+
+func (config imageAdmissionPolicy) admission(
+	ctx context.Context,
+) (imagecheck.AdmissionPolicy, error) {
+	trusted, err := verify.LoadTrustedRoot(config.TrustedRoot)
+	if err != nil {
+		return imagecheck.AdmissionPolicy{}, fmt.Errorf("promotion trust: %w", err)
+	}
+	p := imagecheck.AdmissionPolicy{
+		Registry:   config.Registry,
+		ParentTags: config.ParentTags,
+		Build: &verify.Identity{
+			Trusted:       trusted,
+			Issuer:        config.Build.Issuer,
+			SubjectRegexp: config.Build.SubjectRegexp,
+			RequireSCT:    true,
+		},
+		Acceptance: &verify.Identity{
+			Trusted:       trusted,
+			Issuer:        config.Acceptance.Issuer,
+			SubjectRegexp: config.Acceptance.SubjectRegexp,
+			RequireSCT:    true,
+		},
+	}
+	for _, item := range config.Anchors {
+		data, e := os.ReadFile(item.PublicKey)
+		if e != nil {
+			return imagecheck.AdmissionPolicy{}, fmt.Errorf("promotion anchor: %w", e)
+		}
+		anchor, e := channel.ParseAnchor(item.Name, data)
+		if e != nil {
+			return imagecheck.AdmissionPolicy{}, fmt.Errorf("promotion anchor: %w", e)
+		}
+		p.Anchors = append(p.Anchors, anchor)
+	}
+	p.Channel, err = channel.Load(ctx, config.Channel, nil)
+	if err != nil {
+		return imagecheck.AdmissionPolicy{}, fmt.Errorf("promotion channel: %w", err)
 	}
 	return p, nil
 }
