@@ -644,8 +644,8 @@ cost/time measurements, logs, output IDs, acceptance and cleanup results.
 | 7 | HCP versus a small portable record with native catalogs. | Represent OCI and provider outputs, resolve exact identities, track parents, demonstrate rollback/withdrawal, and document offline/export/API limitations and commercial requirements. |
 | 8 | Failure and lifecycle exercise. | Failed regional copy or validation never promotes; interrupted build resources found/cleaned; lost rebuild events reconciled; rollback resource survives retention; rejected image cannot be newly selected through the supported consumer path. |
 
-Local image files and build caches should use `/Volumes/KING/weave-images/`
-as requested. Cloud experiments need explicitly provisioned test accounts,
+Local image files and build caches should use a configurable workspace on
+storage with sufficient free space. Cloud experiments need explicitly provisioned test accounts,
 matching runners, quotas and cleanup controls; this report does not allocate
 them. A unit-tested or skipped experiment remains unqualified until its recorded
 destination checks pass.
@@ -831,8 +831,8 @@ does not qualify a destination or satisfy a missing consumer integration.
 
 The next discussion established a preferred direction: start with the target
 runtime and work upwards, with Imageweave focused on Packer templates for the
-required scenarios. The local repository
-`/Users/dafyddwatkins/GitHub/weave/imageweave` was inspected at
+required scenarios. The [Imageweave repository](https://github.com/weaveplatform/imageweave)
+was inspected at
 `edf6fc7391d33e6458e44add36aa4b8ed8d4c6b9`. It is a clean repository-template
 checkout: the README and Go module still use `weaveplatform-template`, and no
 Packer templates or image-production implementation were found. It has an

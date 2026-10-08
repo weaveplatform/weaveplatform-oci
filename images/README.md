@@ -13,7 +13,7 @@ Use `imageweave image ...` for migrated construction and qualification commands.
 Use `weaveoci image verify-acceptance` or `weaveoci image verify-published` for
 admission verification. Native construction alone is never acceptance evidence.
 
-Store local image files under `/Volumes/KING/weave-images/`. Package source and
+Choose an output directory on a filesystem with sufficient free space. Package source and
 firmware pins are reviewed Imageweave inputs; they are not release-channel trust
 configuration. Windows and cloud execution remain tracked by OCI incidents
 [#38](https://github.com/weaveplatform/weaveplatform-oci/issues/38) and

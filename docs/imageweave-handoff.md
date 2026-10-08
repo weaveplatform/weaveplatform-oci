@@ -33,8 +33,9 @@ For native templates, use `candidate/packer-manifest.json`; its sibling
 firmware and first-boot policy. Older development receipts lacking that policy
 are rejected rather than silently assigned defaults.
 
-Use `/Volumes/KING/weave-images/` for local macOS build, import and validation
-output. The output directory must be new and its parent must exist. Import
+Set `WORK` to an absolute workspace path on storage with sufficient free space
+for build, import and validation output. The output directory must be new and
+its parent must exist. Import
 copies files and preserves zero ranges as sparse holes, reporting byte progress
 to stderr every 30 seconds and on file completion. It needs space for a
 separate bundle as well as the producer output. Source files remain untouched.
@@ -159,11 +160,11 @@ packages, with common inputs/helpers and narrow CLI backend interfaces.
 OCI's post-removal quality gate passed at **96.6% (4735/4904)**. Imageweave's
 full gate passed at **96.9% (3383/3492)**, with every package above 95% and both
 binaries built for all six platforms. The enhanced Linux validator passed four
-real boots of the existing Ubuntu 26.04 arm64 artifact on KING: each clone kept
+real boots of the existing Ubuntu 26.04 arm64 artifact: each clone kept
 its identity across reboot and the two clones had different identities.
 The report is schema 3; it is local evidence, not a signed registry publication.
 See the companion's [validation checkpoint](https://github.com/weaveplatform/imageweave/blob/feat/oci-delivery-migration/docs/delivery-validation-checkpoint.md)
-for exact artifact digests, evidence paths and remaining qualification gaps.
+for exact artifact digests and remaining qualification gaps.
 
 ## Local validation checkpoint — 2026-10-07
 
@@ -191,8 +192,8 @@ metadata was needed. The live run completed at 2026-10-07T15:59:59Z.
 - Clone machine IDs: `aacee86253a4499aa2363ff4eed68815` and `d548fcda962844bca3483e1e492e6808`.
 - Both clones reported Ubuntu 26.04 and shut down; boot durations were 23.5s and 15.9s.
 
-Artifacts, receipts and logs remain under
-`/Volumes/KING/weave-images/work/imageweave/oci-handoff-20261007/`.
+Artifacts, receipts and logs were retained in the operator's local workspace;
+they are not published evidence available from this repository.
 The tested local OCI binary SHA256 was
 `143325ed91a44ad74e30b4f303f547ab96904e0c9bbd1208dd2c2d2994ac1229`;
 it was built from the working branch before committing this handoff change.

@@ -22,7 +22,7 @@ import (
 )
 
 // Candidate selects the exact packed index to validate. Out must not exist;
-// all disposable disks live below it, so callers can place them on KING.
+// all disposable disks live below it, so callers can select suitable storage.
 type Candidate struct {
 	Store   *oci.Store
 	Root    ocispec.Descriptor

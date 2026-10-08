@@ -64,7 +64,7 @@ The design set lives in [`docs/research`](docs/research/README.md):
 - [OCI primer](docs/research/01-oci-primer.md) and [prior art](docs/research/02-prior-art.md) — the standards and how others ship VM images
 - [Registries and GitHub](docs/research/04-registries-and-github.md), [supply chain](docs/research/05-supply-chain.md), [large artifacts](docs/research/06-large-artifacts.md) — the constraints the design answers
 - [Build pipelines](docs/research/07-build-pipelines.md) and [target architecture](docs/research/08-target-architecture.md) — how images are made and where they flow
-- [Image catalogue and local builds](images/README.md) — KING workspace, package locks, base and agent candidates, and acceptance reports
+- [Image production](images/README.md) — Imageweave ownership, candidate handoff and acceptance reports
 - [Artifact contract v1](docs/research/09-artifact-contract-v1.md) — the format
 - [Shared Go module](docs/research/10-shared-go-module.md) — the packages, the CLI and the bundle format
 - [Deployment profiles](docs/research/13-deployment-profiles.md) — github, private and hybrid deployments, `weave-zot`, cosign keys

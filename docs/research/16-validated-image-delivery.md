@@ -4,8 +4,8 @@ Branch: `feat/validated-image-delivery`, based on main after PR #40.
 
 This phase completes the Linux agent and desktop images, macOS native builders,
 authenticated promotion and Guestweave consumption. Construction stays in OCI
-through native libraries. All local image artifacts and build caches stay under
-`/Volumes/KING/weave-images/` using the existing APFS workspace.
+through native libraries. Local image artifacts and build caches use an
+operator-selected workspace on storage with sufficient free space.
 
 ## Accepted decisions
 
