@@ -8,6 +8,16 @@ will adopt. The numbered research reports retain that baseline; decision records
 and the [image delivery implementation tracker](15-image-delivery-implementation.md)
 record subsequent implementation and outstanding validation.
 
+**Image design reassessment, 2026-10-07:** start with
+[Destination-first VM image research](17-destination-first-image-research.md)
+for the current image-handling review. It works backwards from Guestweave, AWS,
+Azure, GCP and private-cloud requirements, compares Packer and existing lifecycle
+services, and identifies code gaps and unverified assumptions. The OCI-first
+purpose and fixed decisions below remain the historical baseline; report 17
+evaluates alternatives without silently superseding the accepted ADRs.
+Its Hostweave comparison also evaluates separating image production into
+`imageweave`, with explicit ownership of building, OCI delivery and execution.
+
 ## Purpose
 
 hostweave brokers ephemeral compute and runs jobs as containers or full VMs. The two
@@ -47,6 +57,7 @@ consumer.
 | [12-open-questions.md](12-open-questions.md) | Unresolved questions, who resolves them and what they block |
 | [13-deployment-profiles.md](13-deployment-profiles.md) | github, private and hybrid profiles; the `weave-zot` reference registry; cosign key signing; the `weaveoci` and `weave-zot` container images |
 | [14-guestweave-adoption.md](14-guestweave-adoption.md) | Phases 4 and 5: guestweave standalone or with weaveplatform-oci, the image-source seam, cache and prune, push per guest OS, Windows VHD conversion, the hostweave contract |
+| [17-destination-first-image-research.md](17-destination-first-image-research.md) | Destination requirements, primary-source research, Packer adoption options, lifecycle mechanisms, repository gaps and qualification experiments; research baseline 2026-10-07 |
 | [glossary.md](glossary.md) | Terms used across the set |
 | [decisions/](decisions/README.md) | Decision records 0001–0013 |
 

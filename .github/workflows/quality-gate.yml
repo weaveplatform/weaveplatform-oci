@@ -3,7 +3,7 @@ name: go | Quality gate
 # Decision 0013: every pull request must pass build and vet, lint, unit tests
 # on Linux, macOS and Windows, the godog acceptance suite against real
 # registries (weave-zot and registry:3 in Docker), govulncheck, and the merged
-# coverage gate (>=95% total/imagebuild, >=90% for other packages). The `gate` job is the single
+# coverage gate (>=95% total, >=90% for other packages). The `gate` job is the single
 # required status check.
 
 on:
@@ -23,30 +23,6 @@ env:
   GOWORK: 'off'
 
 jobs:
-  image-inputs:
-    name: 'Image input integrity'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-        with:
-          egress-policy: audit
-
-      - name: Check Out
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: go.mod
-
-      - name: Validate the package lock and native wrappers
-        run: |
-          go run ./cmd/weaveoci image check-lock
-          shellcheck scripts/images/workspace.sh scripts/linux/build-cloud-image.sh
-
   unit:
     name: 'Unit tests (${{ matrix.os }})'
     strategy:
@@ -234,7 +210,7 @@ jobs:
   gate:
     name: 'Quality gate'
     if: always()
-    needs: [unit, acceptance, lint, vuln, build, coverage, image-inputs]
+    needs: [unit, acceptance, lint, vuln, build, coverage]
     runs-on: ubuntu-latest
     steps:
       - name: Every gate job passed

@@ -44,7 +44,7 @@ accept:
 	@rm -rf $(COVER_DIR)/accept && mkdir -p $(COVER_DIR)/accept
 	cd test/acceptance && WEAVEOCI_GOCOVERDIR=$(abspath $(COVER_DIR))/accept $(GO) test -count=1 -timeout 30m .
 
-## cover: merge cover/* and enforce >=95% total/imagebuild, >=90% for other packages
+## cover: merge cover/* and enforce >=95% total, >=90% for other packages
 cover:
 	@dirs=$$(find $(COVER_DIR) -mindepth 1 -maxdepth 1 -type d ! -name '.merged' | paste -sd, -); \
 	if [ -z "$$dirs" ]; then echo "no coverage data; run make test and make accept first"; exit 1; fi; \
@@ -90,9 +90,3 @@ gate: vet lint test accept cover vuln
 
 .PHONY: help fmt lint vet test accept cover vuln build image-zot fixtures channel-schema gate
 
-## image-builder: build the local OCI CLI for retained image validation and migration commands
-image-builder:
-	@mkdir -p $(BIN_DIR)
-	$(GO) build -o $(BIN_DIR)/weaveoci ./cmd/weaveoci
-
-.PHONY: image-builder

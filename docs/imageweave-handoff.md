@@ -33,8 +33,9 @@ For native templates, use `candidate/packer-manifest.json`; its sibling
 firmware and first-boot policy. Older development receipts lacking that policy
 are rejected rather than silently assigned defaults.
 
-Use `/Volumes/KING/weave-images/` for local macOS build, import and validation
-output. The output directory must be new and its parent must exist. Import
+Set `WORK` to an absolute workspace path on storage with sufficient free space
+for build, import and validation output. The output directory must be new and
+its parent must exist. Import
 copies files and preserves zero ranges as sparse holes, reporting byte progress
 to stderr every 30 seconds and on file completion. It needs space for a
 separate bundle as well as the producer output. Source files remain untouched.
@@ -84,41 +85,86 @@ An import never emits `runtime_verified` or a passing acceptance report.
 
 ## Acceptance and publication
 
-For Linux, the retained validator can exercise the final artifact:
+For Linux, Imageweave owns the validator that exercises the final artifact:
 
 ```sh
-weaveoci image validate-linux "$WORK/oci-bundle" \
+imageweave image validate-linux "$WORK/oci-bundle" \
   --arches arm64 --out "$WORK/oci-validation"
 ```
 
-This packs, checks, unpacks and boots two independent overlays. It does not cover
-the full future reboot-persistence, build-access-removal and agent acceptance
-contract. Native construction tests and packaging round trips do not substitute
-for native runtime acceptance. Windows execution remains tracked in
+The migrated validator packages and deeply verifies the candidate before booting
+independent clones. Qualification must check first boot, persistent identity
+after reboot, guest OS identity and removal of build access against the exact
+index. Schema-1 smoke reports remain historical evidence; new admission requires
+schema 3 and authenticated attestations.
+
+Native construction and packaging round trips do not substitute for native
+runtime acceptance. Windows execution remains tracked in
 [incident #38](https://github.com/weaveplatform/weaveplatform-oci/issues/38),
 and cloud acceptance in [#39](https://github.com/weaveplatform/weaveplatform-oci/issues/39).
+A restored macOS disk awaiting Setup Assistant still needs a guest observation
+and onboarding adapter before runtime qualification can pass.
 
 Keep candidates unqualified until the applicable acceptance profile passes on
 the exact artifact digest. Publication and channel admission use the existing
 signed-evidence flow. Cloud provider image registration is a separate destination
 contract; this adapter imports portable raw VM artifacts only.
 
-## Cleanup completed and remaining
+## Ownership after the delivery migration
 
-| OCI component | Disposition |
+| Capability | Owner |
 |---|---|
-| macOS base orchestration and Apple restore implementation/tests | Removed; owned by Imageweave's tested native Packer plugin |
-| `image build-macos`, its workflow job, Apple SDK dependency and signing entitlement | Removed |
-| `pkg/handoff`, `bundle import-imageweave` | Added; no builder subprocesses or platform SDKs |
-| Package/chunk/state verification, signing, registry transport, cache and admission | Remain in OCI |
-| Apple/Windows media selectors and acquisition | Retained until equivalent Imageweave source acquisition is migrated; native Imageweave currently takes pinned local media |
-| Windows base builder and native workflow | Transitional fallback until matching-host Imageweave acceptance passes; not removed on the strength of unit tests |
-| Windows native lifecycle/export helpers | Also used by the retained Windows agent builder; migrate that caller before removal |
-| Linux base workflows, agent/desktop preparation and rebuild orchestration | Migrate scenario by scenario; retain until Imageweave replacements and workflow callers pass |
-| Runtime boot/agent acceptance in `internal/imagebuild` | Move to Imageweave once it consumes the exact OCI artifact; retain OCI's evidence-verification primitives |
+| Packer base construction and native builders | Imageweave |
+| Media selectors/acquisition, catalog and package locks | Imageweave |
+| Windows fallback, agent/desktop scenarios and rebuild planning | Imageweave; migrated commands preserve existing behavior while scenarios adopt Packer |
+| Runtime boot/agent acceptance and destination export orchestration | Imageweave |
+| Import receipt, artifact/chunk/state verification, registry transport, signing and admission | weaveplatform-oci |
+| Selection, placement and digest pins | Hostweave |
+| Execution | Compatible destination runtimes |
 
-No wholesale deletion of `internal/imagebuild` is safe yet. Historical research
-documents describe earlier designs; this guide records the implemented boundary.
+The migrated Imageweave implementation depends on a pinned released/committed
+OCI public module. OCI has no dependency on Imageweave's Go module or platform
+construction SDKs. The HCS media SDK and duplicate construction commands have
+been removed from OCI. Its remaining Windows disk conversion support is an
+artifact-consumption primitive, not an installer.
+
+The following commands move from `weaveoci image` to `imageweave image`:
+`matrix`, `lock`, `check-lock`, `ipsw`, `windows`, `build-windows`,
+`build-linux-agent`, `build-windows-agent`, `build-linux-desktop`, `prepare-agent`,
+`boot-linux`, `validate-linux`, `validate-agent-linux`, `export` and `rebuild-plan`.
+Use command help for retained options. OCI keeps `verify-acceptance` and
+`verify-published`. Removed construction subcommands fail explicitly.
+
+Image build workflows, source scripts and catalog files move with their owner.
+Merge the companion Imageweave migration before this OCI command removal.
+Moving tested implementations does not qualify additional OS/version/host
+combinations: the runner matrix and explicit acceptance results determine that.
+
+## Candidate delivery and trust
+
+The Imageweave candidate workflow builds using Packer, imports into an OCI
+bundle, packages and qualifies the exact artifact, and preserves its reports.
+Publication is a separate explicit operation. It requires reviewed admission
+policy and trust material, signs build and acceptance statements for the exact
+index, and runs `weaveoci image verify-published` against registry evidence.
+A missing policy or unavailable runner must fail or remain unqualified; neither
+can be replaced with a generated passing report. There is no automatic channel
+promotion or new signing-key hierarchy in this migration.
+
+## Delivery migration checkpoint — 2026-10-08
+
+Companion implementation: [Imageweave PR #5](https://github.com/weaveplatform/imageweave/pull/5).
+Its construction/runtime code is separated into Linux, Windows and macOS
+packages, with common inputs/helpers and narrow CLI backend interfaces.
+
+OCI's post-removal quality gate passed at **96.6% (4735/4904)**. Imageweave's
+full gate passed at **96.9% (3383/3492)**, with every package above 95% and both
+binaries built for all six platforms. The enhanced Linux validator passed four
+real boots of the existing Ubuntu 26.04 arm64 artifact: each clone kept
+its identity across reboot and the two clones had different identities.
+The report is schema 3; it is local evidence, not a signed registry publication.
+See the companion's [validation checkpoint](https://github.com/weaveplatform/imageweave/blob/feat/oci-delivery-migration/docs/delivery-validation-checkpoint.md)
+for exact artifact digests and remaining qualification gaps.
 
 ## Local validation checkpoint — 2026-10-07
 
@@ -146,8 +192,8 @@ metadata was needed. The live run completed at 2026-10-07T15:59:59Z.
 - Clone machine IDs: `aacee86253a4499aa2363ff4eed68815` and `d548fcda962844bca3483e1e492e6808`.
 - Both clones reported Ubuntu 26.04 and shut down; boot durations were 23.5s and 15.9s.
 
-Artifacts, receipts and logs remain under
-`/Volumes/KING/weave-images/work/imageweave/oci-handoff-20261007/`.
+Artifacts, receipts and logs were retained in the operator's local workspace;
+they are not published evidence available from this repository.
 The tested local OCI binary SHA256 was
 `143325ed91a44ad74e30b4f303f547ab96904e0c9bbd1208dd2c2d2994ac1229`;
 it was built from the working branch before committing this handoff change.

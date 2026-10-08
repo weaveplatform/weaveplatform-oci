@@ -11,8 +11,9 @@ it: the `weaveoci` CLI, the `weave-zot` reference registry and publication workf
 through Packer. OCI imports its completed artifacts through the
 [Imageweave handoff](docs/imageweave-handoff.md). Hostweave owns pinned image
 selection and placement; compatible runtimes execute the resulting images.
-Some legacy builders and acceptance runners remain here during migration; their
-removal conditions are recorded in the handoff guide.
+Construction, media selection and runtime qualification live in Imageweave; OCI
+retains artifact verification and authenticated admission. See the handoff guide
+for migration commands and qualification limits.
 
 The motivation for this project stems from the following factors:
 
@@ -63,7 +64,7 @@ The design set lives in [`docs/research`](docs/research/README.md):
 - [OCI primer](docs/research/01-oci-primer.md) and [prior art](docs/research/02-prior-art.md) — the standards and how others ship VM images
 - [Registries and GitHub](docs/research/04-registries-and-github.md), [supply chain](docs/research/05-supply-chain.md), [large artifacts](docs/research/06-large-artifacts.md) — the constraints the design answers
 - [Build pipelines](docs/research/07-build-pipelines.md) and [target architecture](docs/research/08-target-architecture.md) — how images are made and where they flow
-- [Image catalogue and local builds](images/README.md) — KING workspace, package locks, base and agent candidates, and acceptance reports
+- [Image production](images/README.md) — Imageweave ownership, candidate handoff and acceptance reports
 - [Artifact contract v1](docs/research/09-artifact-contract-v1.md) — the format
 - [Shared Go module](docs/research/10-shared-go-module.md) — the packages, the CLI and the bundle format
 - [Deployment profiles](docs/research/13-deployment-profiles.md) — github, private and hybrid deployments, `weave-zot`, cosign keys
@@ -116,7 +117,7 @@ Run `weaveoci --help` for every verb.
 Every pull request must pass vet, blocking golangci-lint, unit tests on Linux,
 macOS and Windows, the godog acceptance suite against `weave-zot` and
 `registry:3` in Docker, govulncheck, a cross-compile, and merged coverage of at
-least **95% total, 95% for `internal/imagebuild`, and 90% for other packages**. `make gate` runs the same locally (with
+least **95% total, 95% for handoff and evidence verification, and 90% for other packages**. `make gate` runs the same locally (with
 `GOWORK=off`). Dependencies track their latest releases through Dependabot and
 `deps-refresh.yml`, and merge automatically once the gate passes.
 
