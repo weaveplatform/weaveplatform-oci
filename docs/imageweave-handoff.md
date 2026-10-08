@@ -133,7 +133,8 @@ The following commands move from `weaveoci image` to `imageweave image`:
 `build-linux-agent`, `build-windows-agent`, `build-linux-desktop`, `prepare-agent`,
 `boot-linux`, `validate-linux`, `validate-agent-linux`, `export` and `rebuild-plan`.
 Use command help for retained options. OCI keeps `verify-acceptance` and
-`verify-published`. Removed construction subcommands fail explicitly.
+`verify-published`; `verify-candidate` authenticates a candidate independently of
+channel admission. Removed construction subcommands fail explicitly.
 
 Image build workflows, source scripts and catalog files move with their owner.
 Merge the companion Imageweave migration before this OCI command removal.
@@ -144,12 +145,26 @@ combinations: the runner matrix and explicit acceptance results determine that.
 
 The Imageweave candidate workflow builds using Packer, imports into an OCI
 bundle, packages and qualifies the exact artifact, and preserves its reports.
-Publication is a separate explicit operation. It requires reviewed admission
-policy and trust material, signs build and acceptance statements for the exact
-index, and runs `weaveoci image verify-published` against registry evidence.
+Publication is a separate explicit operation. It requires reviewed candidate
+policy and public trust material, signs build and acceptance statements for the
+exact index, and runs `weaveoci image verify-candidate` against registry evidence.
 A missing policy or unavailable runner must fail or remain unqualified; neither
 can be replaced with a generated passing report. There is no automatic channel
 promotion or new signing-key hierarchy in this migration.
+
+`verify-candidate ENTRY --policy candidate-policy.json --out audit-layout`
+authenticates the build and schema-3 acceptance statements and checks the exact
+published platform inventory. Its strict policy contains only `registry`,
+`trustedRoot`, `build` and `acceptance`; the latter two specify `issuer` and an
+anchored `subjectRegexp`. The trusted root is one local Sigstore JSON document,
+resolved relative to the policy. It must come from a reviewed trusted source,
+never from the candidate itself.
+
+Successful candidate verification does not authorize channel promotion, establish
+current parent lineage or grant runtime scheduling permission. The existing
+`verify-acceptance` and `verify-published` commands retain mandatory signed-channel
+and parent-lineage checks. See the [delivery gap analysis](research/18-verified-image-delivery.md)
+for the remaining Hostweave adapter and the concrete end-to-end proof.
 
 ## Delivery migration checkpoint — 2026-10-08
 

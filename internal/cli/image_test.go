@@ -10,7 +10,7 @@ func TestImageCommandsBelongToTheirOwner(t *testing.T) {
 	if code != 0 || !strings.Contains(out, "imageweave image") {
 		t.Fatalf("help: %d %s %s", code, out, stderr)
 	}
-	for _, command := range []string{"verify-acceptance", "verify-published"} {
+	for _, command := range []string{"verify-acceptance", "verify-published", "verify-candidate"} {
 		if !strings.Contains(out, command) {
 			t.Fatalf("missing verifier %s: %s", command, out)
 		}

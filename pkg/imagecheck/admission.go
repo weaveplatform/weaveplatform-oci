@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"google.golang.org/protobuf/encoding/protojson"
-
 	"github.com/weaveplatform/weaveplatform-oci/pkg/channel"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/conformance"
 	"github.com/weaveplatform/weaveplatform-oci/pkg/verify"
@@ -45,33 +43,21 @@ func Admit(
 	tag string,
 	buildBundle, acceptanceBundle []byte,
 ) (Admission, error) {
+	evidence, err := VerifyCandidate(CandidatePolicy{
+		Build: p.Build, Acceptance: p.Acceptance, Registry: p.Registry,
+	}, image, tag, buildBundle, acceptanceBundle)
+	if err != nil {
+		return Admission{}, err
+	}
+	return admitCandidate(p, image, evidence)
+}
+
+func admitCandidate(
+	p AdmissionPolicy,
+	image conformance.Report,
+	evidence CandidateEvidence,
+) (Admission, error) {
 	var result Admission
-	if p.Build == nil || p.Acceptance == nil || p.Registry == "" ||
-		!image.OK() || len(image.Children) == 0 {
-		return result, fmt.Errorf(
-			"%w: trusted identities, registry and valid image required",
-			ErrEvidence,
-		)
-	}
-	build := *p.Build
-	build.PredicateType = verify.SLSAProvenanceV1
-	signer, _, err := build.VerifyStatement(buildBundle, image.Root.Digest)
-	if err != nil {
-		return result, fmt.Errorf("build attestation: %w", err)
-	}
-	acceptance := *p.Acceptance
-	acceptance.PredicateType = AcceptancePredicate
-	accepted, statement, err := acceptance.VerifyStatement(acceptanceBundle, image.Root.Digest)
-	if err != nil {
-		return result, fmt.Errorf("acceptance attestation: %w", err)
-	}
-	data, err := protojson.Marshal(statement.GetPredicate())
-	if err != nil {
-		return result, fmt.Errorf("acceptance predicate: %w", err)
-	}
-	if err := CheckPromotion(data, image, tag); err != nil {
-		return result, err
-	}
 	promoted, _, err := channel.Verify(p.Anchors, p.Channel, p.ChannelOptions)
 	if err != nil {
 		return result, fmt.Errorf("promotion channel: %w", err)
@@ -79,10 +65,9 @@ func Admit(
 	if err := CheckCurrentParents(image, *promoted, p.Registry, p.ParentTags); err != nil {
 		return result, err
 	}
-	// CheckPromotion has already decoded this exact authenticated payload.
-	_ = json.Unmarshal(data, &result.Report)
-	result.IndexDigest = image.Root.Digest.String()
-	result.BuildSigner, result.AcceptanceSigner = signer.Identity, accepted.Identity
+	result.Report = evidence.Report
+	result.IndexDigest = evidence.IndexDigest
+	result.BuildSigner, result.AcceptanceSigner = evidence.BuildSigner, evidence.AcceptanceSigner
 	result.ChannelSequence = promoted.Sequence
 	return result, nil
 }
