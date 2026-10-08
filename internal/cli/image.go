@@ -102,6 +102,7 @@ func newImage(stdout, stderr io.Writer) *cobra.Command {
 	root.AddCommand(
 		check,
 		newImageAdmission(emit),
+		newImagePublished(emit),
 		newImageRebuild(emit),
 		newImageAgentValidate(tools, load, emit, stderr),
 		newImageDesktop(packages, load, emit),

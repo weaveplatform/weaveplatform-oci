@@ -37,10 +37,10 @@ type Source interface {
 	FetchAll(ctx context.Context, d ocispec.Descriptor) ([]byte, error)
 }
 
-// bundles returns the Sigstore bundle bytes attached to subject: each
+// Bundles returns untrusted Sigstore bundle bytes attached to subject: each
 // referrer with the bundle artifactType and exactly one bundle layer, as
-// cosign requires.
-func bundles(ctx context.Context, src Source, subject ocispec.Descriptor) ([][]byte, error) {
+// cosign requires. Callers must authenticate each bundle before reading claims.
+func Bundles(ctx context.Context, src Source, subject ocispec.Descriptor) ([][]byte, error) {
 	refs, err := src.Referrers(ctx, subject, sign.BundleMediaType)
 	if err != nil {
 		return nil, fmt.Errorf("referrers of %s: %w", subject.Digest, err)
@@ -167,7 +167,7 @@ func Signature(
 	src Source,
 	subject ocispec.Descriptor,
 ) (*SignatureResult, error) {
-	bs, err := bundles(ctx, src, subject)
+	bs, err := Bundles(ctx, src, subject)
 	if err != nil {
 		return nil, err
 	}
