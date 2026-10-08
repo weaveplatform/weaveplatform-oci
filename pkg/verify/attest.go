@@ -29,8 +29,9 @@ type Identity struct {
 	RequireSCT bool
 }
 
-// LoadTrustedRoot reads a trusted_root.json (for example from
-// `gh attestation trusted-root`), for offline verification.
+// LoadTrustedRoot reads one trusted_root.json for offline verification.
+// `gh attestation trusted-root` emits JSONL containing multiple instances;
+// select the intended TUF-verified root before using this single-root loader.
 func LoadTrustedRoot(path string) (root.TrustedMaterial, error) {
 	tr, err := root.NewTrustedRootFromPath(path)
 	if err != nil {

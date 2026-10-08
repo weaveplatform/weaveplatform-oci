@@ -27,6 +27,6 @@ func newImage(stdout, _ io.Writer) *cobra.Command {
 		}
 		return nil
 	}
-	root.AddCommand(newImageAdmission(emit), newImagePublished(emit))
+	root.AddCommand(newImageAdmission(emit), newImagePublished(emit), newImageCandidate(emit))
 	return root
 }
