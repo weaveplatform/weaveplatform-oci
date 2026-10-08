@@ -11,11 +11,12 @@ import (
 
 // Native result v1 is a JSON boundary, deliberately independent of builder SDKs.
 type nativeResult struct {
-	SchemaVersion int      `json:"schemaVersion"`
-	Qualification string   `json:"qualification"`
-	OSVersion     string   `json:"osVersion"`
-	FirstBoot     string   `json:"firstBoot"`
-	Files         []string `json:"files"`
+	SchemaVersion int             `json:"schemaVersion"`
+	Qualification string          `json:"qualification"`
+	OSVersion     string          `json:"osVersion"`
+	FirstBoot     string          `json:"firstBoot"`
+	Prepared      *preparedResult `json:"prepared,omitempty"`
+	Files         []string        `json:"files"`
 	Firmware      struct {
 		Type          string `json:"type"`
 		SecureBoot    bool   `json:"secureBoot"`
@@ -72,10 +73,15 @@ func nativeMetadata(raw []byte, b build, f *pack.BundleFile) error {
 		return err
 	}
 	i := r.Inputs
-	if r.SchemaVersion != 1 || r.Qualification != "unverified" || r.OSVersion == "" ||
-		i.SourceSHA256 != b.Data["source_sha256"] || i.SourceBuild != b.Data["source_build"] ||
+	if (r.SchemaVersion != 1 && r.SchemaVersion != 2) || r.Qualification != "unverified" || r.OSVersion == "" ||
+		i.SourceSHA256 != b.Data["source_sha256"] ||
+		i.SourceBuild != b.Data["source_build"] ||
 		!slices.Contains([]string{"amd64", "arm64"}, i.Arch) {
 		return fmt.Errorf("%w: native result does not match manifest", ErrInput)
+	}
+	if (r.SchemaVersion == 1 && r.Prepared != nil) ||
+		(r.SchemaVersion == 2 && (r.Prepared == nil || i.Family != "macos")) {
+		return fmt.Errorf("%w: native v2 is reserved for prepared macOS images", ErrInput)
 	}
 	f.Guest.Arch, f.Guest.OSVersion = i.Arch, r.OSVersion
 	f.Annotations["io.weave.image.first-boot"] = r.FirstBoot
@@ -83,7 +89,7 @@ func nativeMetadata(raw []byte, b build, f *pack.BundleFile) error {
 	case "macos":
 		if r.Mac == nil || r.Windows != nil || i.Arch != "arm64" ||
 			strings.Split(r.OSVersion, ".")[0] != i.Release ||
-			r.FirstBoot != "setup-assistant" ||
+			(r.Prepared == nil && r.FirstBoot != "setup-assistant") ||
 			r.Firmware.Type != "apple" ||
 			r.Firmware.TPM != "none" ||
 			r.Firmware.SecureBoot ||
@@ -106,11 +112,17 @@ func nativeMetadata(raw []byte, b build, f *pack.BundleFile) error {
 			},
 		}
 		f.Build.Template, f.Build.SourceMedia[0].Kind = "templates/macos/image.pkr.hcl", "ipsw"
+		if r.Prepared != nil {
+			if err := preparedMetadata(r, b, f); err != nil {
+				return err
+			}
+		}
 	case "windows-11":
 		w := r.Windows
 		edition := map[string]string{"pro": "Professional", "home": "Core", "enterprise": "Enterprise", "education": "Education"}[i.Edition]
 		if w == nil || r.Mac != nil || edition == "" || !w.Generalized || w.Release != i.Release || w.Arch != i.Arch || w.Edition != edition ||
-			w.Build != i.SourceBuild || w.OSVersion != r.OSVersion || w.OSVersion != "10.0."+w.Build ||
+			w.Build != i.SourceBuild || w.OSVersion != r.OSVersion ||
+			w.OSVersion != "10.0."+w.Build ||
 			r.FirstBoot != "windows-oobe" ||
 			r.Firmware.Type != "uefi" ||
 			r.Firmware.TPM != "required" ||

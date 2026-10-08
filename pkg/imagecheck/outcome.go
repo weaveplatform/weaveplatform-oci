@@ -24,6 +24,9 @@ const (
 // ValidationProfile derives the required profile from signed image metadata;
 // a report cannot opt a desktop image into weaker headless checks.
 func ValidationProfile(cfg spec.Config) string {
+	if cfg.Guest.Variant == spec.TierPrepared {
+		return "macos-prepared"
+	}
 	if cfg.Provisioning.Agent == nil {
 		return "base"
 	}
@@ -34,6 +37,9 @@ func ValidationProfile(cfg spec.Config) string {
 }
 
 func checkOutcomes(b Boot, cfg spec.Config) error {
+	if cfg.Guest.Variant == spec.TierPrepared {
+		return checkPreparedOutcomes(b, cfg)
+	}
 	if (cfg.Provisioning.Agent == nil && cfg.Guest.Variant != "base") ||
 		(cfg.Provisioning.Agent != nil && cfg.Guest.Variant != "agent" && cfg.Guest.Variant != "desktop") {
 		return fmt.Errorf("%w: image tier and agent declaration disagree", ErrEvidence)
@@ -88,5 +94,33 @@ func checkOutcomes(b Boot, cfg spec.Config) error {
 		}
 	}
 	// Reboot/shutdown are observed by the lifecycle adapter, not an RPC reply.
+	return nil
+}
+
+// Prepared accounts are intentional template content, not temporary build access.
+// Keep their profile separate so neither base nor agent evidence can substitute.
+func checkPreparedOutcomes(b Boot, cfg spec.Config) error {
+	if cfg.Guest.OS != spec.OSDarwin || cfg.Guest.Arch != "arm64" ||
+		cfg.Provisioning.Agent != nil || cfg.Provisioning.DefaultUser != "weave" ||
+		cfg.Provisioning.CredentialHint != "baked" || cfg.Build.Base == nil ||
+		b.Profile != "macos-prepared" {
+		return fmt.Errorf("%w: invalid macOS prepared profile", ErrEvidence)
+	}
+	for _, operations := range []map[string]Outcome{b.Operations, b.RebootOperations} {
+		for _, name := range []string{"account-login", "administrator", "ssh", "automatic-login", "desktop-session", "setup-complete", "agent-absent"} {
+			if operations[name].Status != Passed {
+				return fmt.Errorf(
+					"%w: prepared image requires %s on first boot and reboot",
+					ErrEvidence,
+					name,
+				)
+			}
+		}
+		for name, outcome := range operations {
+			if outcome.Status != Passed {
+				return fmt.Errorf("%w: prepared operation %s did not pass", ErrEvidence, name)
+			}
+		}
+	}
 	return nil
 }

@@ -20,6 +20,7 @@ Images are published in tiers, each in its own repository
 | Tier | Contents | Built from |
 |---|---|---|
 | `base` | the vendor operating system, unmodified; no weave software | vendor media, verified against the vendor's signatures |
+| `prepared` (macOS) | `weave` administrator, SSH and automatic desktop login; no agent or modules | an exact macOS base platform digest |
 | `agent` | base + weave-agent core + the full `weave-<os>-*` module set | a base image, by digest |
 | a named layer (`xcode-26`, `runner`) | agent + workload tooling | an agent image or another layer, by digest |
 
