@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4](https://github.com/weaveplatform/weaveplatform-oci/compare/v0.1.3...v0.1.4) (2026-10-09)
+
+
+### Features
+
+* authenticate image candidates separately from channel admission ([#46](https://github.com/weaveplatform/weaveplatform-oci/issues/46)) ([acbfaa6](https://github.com/weaveplatform/weaveplatform-oci/commit/acbfaa685f89813c9314ff010d1afbc84a8e62a1))
+* validate prepared macOS image handoff and acceptance ([#50](https://github.com/weaveplatform/weaveplatform-oci/issues/50)) ([9aee864](https://github.com/weaveplatform/weaveplatform-oci/commit/9aee8641bd6ea21af82c6f3f3f5a4f3aa8d360a8))
+
+
+### Bug Fixes
+
+* **publish:** preserve guest versions and reviewed signer metadata ([#48](https://github.com/weaveplatform/weaveplatform-oci/issues/48)) ([cbcbfb6](https://github.com/weaveplatform/weaveplatform-oci/commit/cbcbfb6ad311eb00b05ac48bdaabb03d7494026f))
+
 ## [0.1.3](https://github.com/weaveplatform/weaveplatform-oci/compare/v0.1.2...v0.1.3) (2026-10-08)
 
 
